@@ -96,9 +96,10 @@
                     No Model Set
                 </span>
             </div>
-            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                M
-            </div>
+            <!-- Garbage / Clear Chat Icon replacing the M avatar -->
+            <button onclick="clearCurrentChat()" class="text-gray-400 hover:text-red-400 hover:bg-gray-800 w-9 h-9 rounded-full transition flex items-center justify-center" title="Delete current chat">
+                <i class="fa-regular fa-trash-can text-base"></i>
+            </button>
         </header>
 
         <!-- Messages Container -->
@@ -261,6 +262,26 @@
             appState.currentChatId = chatId;
             renderChat(chatId);
             if (window.innerWidth <= 768 && els.sidebar.classList.contains('open')) toggleSidebar();
+        }
+
+        function clearCurrentChat() {
+            if (!appState.currentChatId) return;
+            const chat = appState.chats.find(c => c.id === appState.currentChatId);
+            
+            if (!chat || chat.messages.length === 0) return;
+
+            if (confirm("Are you sure you want to delete this chat?")) {
+                appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
+                
+                if (appState.chats.length === 0) {
+                    startNewChat(false);
+                } else {
+                    appState.currentChatId = appState.chats[0].id;
+                }
+                
+                saveChatsToStorage();
+                renderChat(appState.currentChatId);
+            }
         }
 
         function renderHistory() {
