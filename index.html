@@ -31,7 +31,7 @@
         }
     </script>
     <style>
-        /* Modern, minimal dark scrollbar */
+        /* Minimal Dark Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
@@ -44,19 +44,24 @@
         .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; color: #e2e8f0; }
         .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; color: #e2e8f0; }
         .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; color: #e2e8f0; }
+        .markdown-body img { max-width: 100%; border-radius: 0.75rem; margin-top: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border: 1px solid #374151; }
         
-        /* Image specific styling for markdown */
-        .markdown-body img { max-width: 100%; border-radius: 0.5rem; margin-top: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        
-        /* Mobile sidebar transition */
+        /* Mobile Sidebar Drawer */
         @media (max-width: 768px) {
             #sidebar { transform: translateX(-100%); transition: transform 0.3s ease; position: absolute; z-index: 40; height: 100%; }
             #sidebar.open { transform: translateX(0); }
             #overlay.open { display: block; }
         }
+
+        /* Message Animations */
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(8px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
     </style>
 </head>
-<body class="bg-gemini-bg text-gray-100 h-screen flex overflow-hidden font-sans">
+<body class="bg-gemini-bg text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0">
 
     <!-- Mobile Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
@@ -75,7 +80,7 @@
         <div class="flex-1 overflow-y-auto p-3">
             <div class="text-xs font-semibold text-gray-400 mb-2 px-2">Recent</div>
             <ul id="historyList" class="space-y-1">
-                <!-- Chat history dynamically populated -->
+                <!-- Dynamic Chat History -->
             </ul>
         </div>
 
@@ -87,20 +92,20 @@
     </aside>
 
     <!-- Main Chat Area -->
-    <main class="flex-1 flex flex-col h-full relative">
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
         <!-- Header -->
-        <header class="h-14 flex items-center justify-between px-4 lg:px-8 border-b border-gray-800/60 bg-gemini-bg/80 backdrop-blur-md z-10">
+        <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-800/60 bg-gemini-bg/80 backdrop-blur-md z-10">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="text-gray-400 hover:bg-gray-800 p-2 rounded-full transition lg:hidden">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <h1 class="text-lg font-medium text-gray-200">Mei AI</h1>
                 <span id="currentModelBadge" class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-950/80 text-blue-300 border border-blue-800/50">
-                    No Model Set
+                    google/gemini-2.5-pro
                 </span>
             </div>
             
-            <!-- Solid Red Garbage / Clear Chat Icon -->
+            <!-- Clear Chat Button -->
             <button onclick="clearCurrentChat()" class="text-red-500 hover:text-red-400 hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center" title="Clear current chat">
                 <i class="fa-solid fa-trash-can text-lg"></i>
             </button>
@@ -108,10 +113,9 @@
 
         <!-- Messages Container -->
         <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-32">
-            <!-- Messages dynamically populated here -->
             <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
                 <h2 class="text-3xl font-medium mb-3 text-gray-200">How can I help you today?</h2>
-                <p class="text-sm text-gray-400">Configure your APIs in settings to chat or generate images.</p>
+                <p class="text-sm text-gray-400">Ask a question or toggle the <i class="fa-solid fa-image text-purple-400 mx-1"></i> icon to generate free AI images.</p>
             </div>
         </div>
 
@@ -126,16 +130,17 @@
                     oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
                     onkeydown="handleEnter(event)"></textarea>
                 
-                <!-- Image Mode Toggle -->
-                <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-400 hover:text-purple-400 hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Toggle Image Generation Mode">
+                <!-- Toggle Image Mode Button -->
+                <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-400 hover:text-purple-400 hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Toggle Free Image Generation Mode">
                     <i class="fa-solid fa-image"></i>
                 </button>
 
+                <!-- Send Message Button -->
                 <button id="sendBtn" onclick="sendMessage()" class="p-3 m-1 text-blue-400 hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
-            <p class="text-xs text-center text-gray-500 mt-3">Mei AI may produce inaccurate information. Verify important outputs.</p>
+            <p class="text-xs text-center text-gray-500 mt-3">Mei AI may produce inaccurate information. Image generation is powered by Pollinations AI (Free).</p>
         </div>
     </main>
 
@@ -143,12 +148,12 @@
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-200">
             <div class="p-6 border-b border-gray-800 flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Settings</h3>
+                <h3 class="text-lg font-semibold">Chat Settings</h3>
                 <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">OpenRouter API Key (Text)</label>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">OpenRouter API Key (Text Chat)</label>
                     <input type="password" id="apiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-[#131314] border border-gray-700 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm text-gray-100 placeholder-gray-500">
                 </div>
                 <div>
@@ -156,11 +161,8 @@
                     <input type="text" id="modelInput" placeholder="e.g. google/gemini-2.5-pro" class="w-full bg-[#131314] border border-gray-700 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm text-gray-100 placeholder-gray-500">
                     <p class="text-xs text-gray-500 mt-1">Default: google/gemini-2.5-pro</p>
                 </div>
-                <hr class="border-gray-700 my-2">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Stability AI API Key (Images)</label>
-                    <input type="password" id="stabilityKeyInput" placeholder="sk-..." class="w-full bg-[#131314] border border-gray-700 rounded-lg p-2.5 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition text-sm text-gray-100 placeholder-gray-500">
-                    <p class="text-xs text-gray-500 mt-1">Required for generating images in Image Mode.</p>
+                <div class="p-3 bg-purple-950/30 border border-purple-800/40 rounded-lg">
+                    <p class="text-xs text-purple-300"><i class="fa-solid fa-circle-info mr-1"></i> <strong>Image Generation:</strong> Free & unlimited via Pollinations.ai. No API key required.</p>
                 </div>
             </div>
             <div class="p-4 bg-[#18181a] border-t border-gray-800/80 flex justify-end gap-2">
@@ -170,13 +172,12 @@
         </div>
     </div>
 
-    <!-- Application Logic -->
+    <!-- Application Script -->
     <script>
         // --- State Management ---
         let appState = {
             apiKey: localStorage.getItem('ai_api_key') || '',
             modelName: localStorage.getItem('ai_model_name') || 'google/gemini-2.5-pro',
-            stabilityApiKey: localStorage.getItem('ai_stability_key') || '',
             chats: JSON.parse(localStorage.getItem('ai_chats')) || [],
             currentChatId: null
         };
@@ -196,7 +197,6 @@
             settingsModal: document.getElementById('settingsModal'),
             apiKeyInput: document.getElementById('apiKeyInput'),
             modelInput: document.getElementById('modelInput'),
-            stabilityKeyInput: document.getElementById('stabilityKeyInput'),
             currentModelBadge: document.getElementById('currentModelBadge')
         };
 
@@ -212,7 +212,7 @@
             }
         }
 
-        // --- UI & Interaction ---
+        // --- UI & Interactions ---
         function toggleSidebar() {
             els.sidebar.classList.toggle('open');
             els.overlay.classList.toggle('open');
@@ -223,7 +223,7 @@
             if (isImageMode) {
                 els.imageModeBtn.classList.replace('text-gray-400', 'text-purple-400');
                 els.imageModeBtn.classList.add('bg-purple-900/30');
-                els.messageInput.placeholder = "Describe an image to generate...";
+                els.messageInput.placeholder = "Describe an image to generate (Free)...";
                 els.sendBtn.classList.replace('text-blue-400', 'text-purple-400');
             } else {
                 els.imageModeBtn.classList.replace('text-purple-400', 'text-gray-400');
@@ -236,7 +236,6 @@
         function openSettings() {
             els.apiKeyInput.value = appState.apiKey;
             els.modelInput.value = appState.modelName;
-            els.stabilityKeyInput.value = appState.stabilityApiKey;
             els.settingsModal.classList.remove('hidden');
         }
 
@@ -247,11 +246,9 @@
         function saveSettings() {
             appState.apiKey = els.apiKeyInput.value.trim();
             appState.modelName = els.modelInput.value.trim() || 'google/gemini-2.5-pro';
-            appState.stabilityApiKey = els.stabilityKeyInput.value.trim();
             
             localStorage.setItem('ai_api_key', appState.apiKey);
             localStorage.setItem('ai_model_name', appState.modelName);
-            localStorage.setItem('ai_stability_key', appState.stabilityApiKey);
             
             updateModelBadge();
             closeSettings();
@@ -283,9 +280,8 @@
                 localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
                 renderHistory();
             } catch (e) {
-                // Handle LocalStorage quota exceeded (common when saving base64 images)
                 if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                    alert("Storage limit reached! Base64 images consume a lot of space. Please clear some old chats to continue saving history.");
+                    alert("Storage limit reached! Please clear old chats to free up space.");
                 }
             }
         }
@@ -344,7 +340,6 @@
             renderHistory();
             const chat = appState.chats.find(c => c.id === chatId);
             
-            // Clear current messages
             Array.from(els.chatContainer.children).forEach(child => {
                 if (child.id !== 'emptyState') child.remove();
             });
@@ -412,30 +407,23 @@
             return loaderId;
         }
 
-        // --- API Integration ---
+        // --- Send Message & API Logic ---
         async function sendMessage() {
             const content = els.messageInput.value.trim();
             if (!content) return;
 
-            // Validation checks based on mode
-            if (isImageMode && !appState.stabilityApiKey) {
-                alert("Please configure your Stability AI API Key in settings for image generation.");
-                openSettings();
-                return;
-            } else if (!isImageMode && !appState.apiKey) {
+            if (!isImageMode && !appState.apiKey) {
                 alert("Please configure your OpenRouter API Key in settings first.");
                 openSettings();
                 return;
             }
 
-            // Get/Create Active Chat
             let chat = appState.chats.find(c => c.id === appState.currentChatId);
             if (!chat) {
                 startNewChat(false);
                 chat = appState.chats[0];
             }
 
-            // Update UI & State for User Message
             els.emptyState.classList.add('hidden');
             els.messageInput.value = '';
             els.messageInput.style.height = '';
@@ -444,7 +432,6 @@
             chat.messages.push({ role: 'user', content: content });
             chat.updatedAt = Date.now();
             
-            // Auto-generate title for first message
             if (chat.messages.length === 1) {
                 chat.title = content.substring(0, 30) + (content.length > 30 ? '...' : '');
             }
@@ -457,45 +444,21 @@
 
             try {
                 if (isImageMode) {
-                    // --- Stability AI Image Generation Logic ---
-                    const response = await fetch("https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${appState.stabilityApiKey}`,
-                            "Content-Type": "application/json",
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({
-                            text_prompts: [
-                                { text: content }
-                            ],
-                            cfg_scale: 7,
-                            height: 512,
-                            width: 512,
-                            samples: 1,
-                            steps: 30
-                        })
-                    });
+                    // --- Pollinations.ai 100% Free Image Generation ---
+                    const encodedPrompt = encodeURIComponent(content);
+                    const randomSeed = Math.floor(Math.random() * 1000000);
+                    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true&model=flux`;
 
                     document.getElementById(loaderId)?.remove();
 
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.message || `Stability API error: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    const base64Image = data.artifacts[0].base64;
-                    
-                    // Format as standard markdown image embed
-                    const aiResponse = `Here is your generated image for: *"${content}"*\n\n![Generated Image](data:image/png;base64,${base64Image})`;
+                    const aiResponse = `Here is your generated image for: *"${escapeHTML(content)}"*\n\n![Generated Image](${imageUrl})`;
                     
                     chat.messages.push({ role: 'assistant', content: aiResponse, isImage: true });
                     saveChatsToStorage();
                     appendMessageUI('assistant', aiResponse, true);
-                    
+
                 } else {
-                    // --- OpenRouter Text Generation Logic ---
+                    // --- OpenRouter Text Chat API ---
                     const apiMessages = chat.messages.map(m => ({ role: m.role, content: m.content }));
                     
                     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -531,7 +494,7 @@
                 document.getElementById(loaderId)?.remove();
                 console.error("API Error:", error);
                 
-                const errorMsg = `**Error:** ${error.message}\n\nPlease check your API keys in settings.`;
+                const errorMsg = `**Error:** ${error.message}\n\nPlease check your settings and try again.`;
                 chat.messages.push({ role: 'assistant', content: errorMsg });
                 saveChatsToStorage();
                 appendMessageUI('assistant', errorMsg);
@@ -542,7 +505,7 @@
             }
         }
 
-        // Utility: Basic HTML escape
+        // Utility: HTML escaping
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({
@@ -555,13 +518,7 @@
             );
         }
 
-        // Add tailwind fade-in animation
-        document.head.insertAdjacentHTML('beforeend', `<style>
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-            .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
-        </style>`);
-
-        // Boot
+        // Boot application
         init();
     </script>
 </body>
