@@ -1,1 +1,2 @@
+git rm --cached <index.html>
 index.html
