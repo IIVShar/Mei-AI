@@ -31,13 +31,11 @@
         }
     </script>
     <style>
-        /* Minimal Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         
-        /* Markdown Styling */
         .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; }
         .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
         .markdown-body pre code { background: transparent; padding: 0; color: inherit; }
@@ -46,19 +44,16 @@
         .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .markdown-body img { max-width: 100%; border-radius: 0.75rem; margin-top: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border: 1px solid #374151; }
 
-        /* Light mode markdown tweaks */
         html:not(.dark) .markdown-body pre { background: #f6f8fa; color: #24292e; border-color: #e1e4e8; }
         html:not(.dark) .markdown-body code { background: #f0f3f6; color: #d73a49; }
         html:not(.dark) .markdown-body p, html:not(.dark) .markdown-body ul, html:not(.dark) .markdown-body ol { color: #1f2937; }
         
-        /* Mobile Sidebar Drawer */
         @media (max-width: 768px) {
             #sidebar { transform: translateX(-100%); transition: transform 0.3s ease; position: absolute; z-index: 40; height: 100%; }
             #sidebar.open { transform: translateX(0); }
             #overlay.open { display: block; }
         }
 
-        /* Message Animations */
         @keyframes fadeIn { 
             from { opacity: 0; transform: translateY(8px); } 
             to { opacity: 1; transform: translateY(0); } 
@@ -68,10 +63,8 @@
 </head>
 <body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
-    <!-- Mobile Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
         <div class="p-4 flex items-center justify-between">
             <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition">
@@ -83,14 +76,11 @@
         </div>
         
         <div class="flex-1 overflow-y-auto p-3">
-            <div class="text-xs font-semibold text-gray-400 dark:text-gray-400 mb-2 px-2">Recent</div>
-            <ul id="historyList" class="space-y-1">
-                <!-- Dynamic Chat History -->
-            </ul>
+            <div class="text-xs font-semibold text-gray-400 mb-2 px-2">Recent</div>
+            <ul id="historyList" class="space-y-1"></ul>
         </div>
 
         <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
-            <!-- Theme Toggle Button -->
             <button onclick="toggleTheme()" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
                 <i id="themeIcon" class="fa-solid fa-moon"></i> <span id="themeText">Dark Mode</span>
             </button>
@@ -100,9 +90,7 @@
         </div>
     </aside>
 
-    <!-- Main Chat Area -->
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
-        <!-- Header -->
         <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden">
@@ -114,13 +102,11 @@
                 </span>
             </div>
             
-            <!-- Clear Chat Button -->
             <button onclick="clearCurrentChat()" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center" title="Clear current chat">
                 <i class="fa-solid fa-trash-can text-lg"></i>
             </button>
         </header>
 
-        <!-- Messages Container -->
         <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36">
             <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">How can I help you today?</h2>
@@ -128,18 +114,14 @@
             </div>
         </div>
 
-        <!-- Input Area -->
         <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent">
             <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
                 
-                <!-- Attached File/Image Preview Container -->
                 <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
                 <div class="flex items-end">
-                    <!-- Hidden File Input -->
                     <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json" onchange="handleFileSelect(event)">
                     
-                    <!-- File Attachment Button -->
                     <button onclick="document.getElementById('fileInput').click()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Attach Image or File">
                         <i class="fa-solid fa-plus"></i>
                     </button>
@@ -152,12 +134,10 @@
                         oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
                         onkeydown="handleEnter(event)"></textarea>
                 
-                    <!-- Toggle Image Generation Mode Button -->
                     <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Toggle Free Image Generation Mode">
                         <i class="fa-solid fa-image"></i>
                     </button>
 
-                    <!-- Send Message Button -->
                     <button id="sendBtn" onclick="sendMessage()" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
@@ -167,7 +147,6 @@
         </div>
     </main>
 
-    <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200">
             <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
@@ -184,9 +163,6 @@
                     <input type="text" id="modelInput" placeholder="e.g. google/gemini-2.5-pro" class="w-full bg-gray-50 dark:bg-[#131314] border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400">
                     <p class="text-xs text-gray-500 mt-1">Default: google/gemini-2.5-pro</p>
                 </div>
-                <div class="p-3 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/40 rounded-lg">
-                    <p class="text-xs text-purple-700 dark:text-purple-300"><i class="fa-solid fa-circle-info mr-1"></i> <strong>Image Generation:</strong> Free & unlimited via Pollinations.ai. No API key required.</p>
-                </div>
             </div>
             <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end gap-2">
                 <button onclick="closeSettings()" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition">Cancel</button>
@@ -195,9 +171,7 @@
         </div>
     </div>
 
-    <!-- Application Script -->
     <script>
-        // --- State Management ---
         let appState = {
             apiKey: localStorage.getItem('ai_api_key') || '',
             modelName: localStorage.getItem('ai_model_name') || 'google/gemini-2.5-pro',
@@ -207,9 +181,8 @@
         };
         
         let isImageMode = false;
-        let currentAttachments = []; // Holds attached files/images
+        let currentAttachments = [];
 
-        // --- DOM Elements ---
         const els = {
             sidebar: document.getElementById('sidebar'),
             overlay: document.getElementById('overlay'),
@@ -229,7 +202,6 @@
             fileInput: document.getElementById('fileInput')
         };
 
-        // --- Initialization ---
         function init() {
             applyTheme(appState.theme);
             updateModelBadge();
@@ -243,7 +215,6 @@
             }
         }
 
-        // --- Theme Management ---
         function toggleTheme() {
             appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
             localStorage.setItem('ai_theme', appState.theme);
@@ -262,7 +233,6 @@
             }
         }
 
-        // --- UI & Interactions ---
         function toggleSidebar() {
             els.sidebar.classList.toggle('open');
             els.overlay.classList.toggle('open');
@@ -300,10 +270,8 @@
         function saveSettings() {
             appState.apiKey = els.apiKeyInput.value.trim();
             appState.modelName = els.modelInput.value.trim() || 'google/gemini-2.5-pro';
-            
             localStorage.setItem('ai_api_key', appState.apiKey);
             localStorage.setItem('ai_model_name', appState.modelName);
-            
             updateModelBadge();
             closeSettings();
         }
@@ -324,7 +292,6 @@
             els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
         }
 
-        // --- File Attachment Handling ---
         function handleFileSelect(e) {
             const files = Array.from(e.target.files);
             files.forEach(file => {
@@ -334,7 +301,7 @@
                         name: file.name,
                         type: file.type,
                         size: file.size,
-                        data: event.target.result // Base64 or text content
+                        data: event.target.result
                     });
                     renderAttachmentPreviews();
                 };
@@ -368,7 +335,6 @@
             `).join('');
         }
 
-        // --- Chat Management ---
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
@@ -378,9 +344,7 @@
                 localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
                 renderHistory();
             } catch (e) {
-                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                    alert("Storage limit reached! Clear old chats to free up browser memory.");
-                }
+                alert("Storage limit reached!");
             }
         }
 
@@ -407,18 +371,15 @@
         function clearCurrentChat() {
             if (!appState.currentChatId) return;
             const chat = appState.chats.find(c => c.id === appState.currentChatId);
-            
             if (!chat || chat.messages.length === 0) return;
 
-            if (confirm("Are you sure you want to clear this chat? This cannot be undone.")) {
+            if (confirm("Clear this chat?")) {
                 appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
-                
                 if (appState.chats.length === 0) {
                     startNewChat(false);
                 } else {
                     appState.currentChatId = appState.chats[0].id;
                 }
-                
                 saveChatsToStorage();
                 renderChat(appState.currentChatId);
             }
@@ -437,7 +398,6 @@
         function renderChat(chatId) {
             renderHistory();
             const chat = appState.chats.find(c => c.id === chatId);
-            
             Array.from(els.chatContainer.children).forEach(child => {
                 if (child.id !== 'emptyState') child.remove();
             });
@@ -479,11 +439,7 @@
             } else {
                 let parsedContent = textContent;
                 if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
-                    try {
-                        parsedContent = marked.parse(textContent);
-                    } catch (e) {
-                        parsedContent = escapeHTML(textContent);
-                    }
+                    try { parsedContent = marked.parse(textContent); } catch (e) { parsedContent = escapeHTML(textContent); }
                 } else {
                     parsedContent = escapeHTML(textContent);
                 }
@@ -529,7 +485,6 @@
             return loaderId;
         }
 
-        // --- Send Message & API Logic ---
         async function sendMessage() {
             const content = els.messageInput.value.trim();
             if (!content && currentAttachments.length === 0) return;
@@ -575,22 +530,12 @@
                     const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true&model=flux`;
 
                     document.getElementById(loaderId)?.remove();
-
                     const aiResponse = `Here is your generated image for: *"${escapeHTML(content)}"*\n\n![Generated Image](${imageUrl})`;
                     
                     chat.messages.push({ role: 'assistant', content: aiResponse, isImage: true });
                     saveChatsToStorage();
                     appendMessageUI('assistant', aiResponse, true);
-
                 } else {
-                    // Combine text with text attachments if any
-                    let fullPrompt = content;
-                    messageAttachments.forEach(att => {
-                        if (!att.type.startsWith('image/')) {
-                            fullPrompt += `\n\n[Attached File: ${att.name}]\n${att.data}`;
-                        }
-                    });
-
                     const apiMessages = chat.messages.map(m => ({ 
                         role: m.role, 
                         content: m.content + (m.attachments ? m.attachments.filter(a => !a.type.startsWith('image/')).map(a => `\n[File: ${a.name}]\n${a.data}`).join('') : '') 
@@ -611,31 +556,20 @@
                     });
 
                     document.getElementById(loaderId)?.remove();
-
-                    let data;
-                    try {
-                        data = await response.json();
-                    } catch (parseErr) {
-                        throw new Error(`HTTP ${response.status}: Server returned non-JSON response.`);
-                    }
+                    const data = await response.json();
 
                     if (!response.ok) {
-                        const errMsg = data?.error?.message || `HTTP error! Status: ${response.status}`;
-                        throw new Error(errMsg);
+                        throw new Error(data?.error?.message || `HTTP error! Status: ${response.status}`);
                     }
 
                     const aiResponse = data?.choices?.[0]?.message?.content || "No response received from the model.";
-
                     chat.messages.push({ role: 'assistant', content: aiResponse });
                     saveChatsToStorage();
                     appendMessageUI('assistant', aiResponse);
                 }
-
             } catch (error) {
                 document.getElementById(loaderId)?.remove();
-                console.error("API Error:", error);
-                
-                const errorMsg = `**Error:** ${error.message || 'An unknown error occurred.'}\n\nPlease verify your API key and model name in Settings.`;
+                const errorMsg = `**Error:** ${error.message || 'An unknown error occurred.'}`;
                 chat.messages.push({ role: 'assistant', content: errorMsg });
                 saveChatsToStorage();
                 appendMessageUI('assistant', errorMsg);
@@ -646,7 +580,6 @@
             }
         }
 
-        // Utility: HTML escaping
         function escapeHTML(str) {
             if (typeof str !== 'string') return '';
             return str.replace(/[&<>'"]/g, 
@@ -660,7 +593,6 @@
             );
         }
 
-        // Boot application
         init();
     </script>
 </body>
