@@ -313,7 +313,11 @@
                     });
                     renderAttachmentPreviews();
                 };
-                reader.readAsDataURL(file); // Always read as Data URL for robust vision/file support
+                if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
             });
             els.fileInput.value = '';
         }
@@ -412,15 +416,7 @@
             }
 
             els.emptyState.classList.add('hidden');
-            chat.messages.forEach(msg => {
-                // Handle both simple string content and multimodal array content
-                let text = msg.content;
-                let atts = msg.attachments || [];
-                if (Array.isArray(msg.content)) {
-                    text = msg.content.find(item => item.type === 'text')?.text || '';
-                }
-                appendMessageUI(msg.role, text, msg.isImage, atts);
-            });
+            chat.messages.forEach(msg => appendMessageUI(msg.role, msg.content, msg.isImage, msg.attachments));
             scrollToBottom();
         }
 
@@ -522,28 +518,7 @@
             currentAttachments = [];
             renderAttachmentPreviews();
             
-            // Build message content payload supporting vision if images are attached
-            let userMessageContent = content;
-            if (messageAttachments.length > 0) {
-                userMessageContent = [];
-                if (content) {
-                    userMessageContent.push({ type: "text", text: content });
-                }
-                messageAttachments.forEach(att => {
-                    if (att.type.startsWith('image/')) {
-                        userMessageContent.push({
-                            type: "image_url",
-                            image_url: { url: att.data }
-                        });
-                    } else {
-                        // For non-image files, append text description
-                        userMessageContent[0] = userMessageContent[0] || { type: "text", text: content };
-                        userMessageContent[0].text += `\n\n[File: ${att.name}]`;
-                    }
-                });
-            }
-
-            chat.messages.push({ role: 'user', content: userMessageContent, attachments: messageAttachments });
+            chat.messages.push({ role: 'user', content: content, attachments: messageAttachments });
             chat.updatedAt = Date.now();
             
             if (chat.messages.length === 1) {
@@ -569,10 +544,9 @@
                     saveChatsToStorage();
                     appendMessageUI('assistant', aiResponse, true);
                 } else {
-                    // Map chat history for OpenRouter API
                     const apiMessages = chat.messages.map(m => ({ 
                         role: m.role, 
-                        content: m.content 
+                        content: m.content + (m.attachments ? m.attachments.filter(a => !a.type.startsWith('image/')).map(a => `\n[File: ${a.name}]\n${a.data}`).join('') : '') 
                     }));
                     
                     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
