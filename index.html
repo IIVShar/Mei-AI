@@ -66,7 +66,7 @@
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 z-20">
+    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
         <div class="p-4 flex items-center justify-between">
             <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition">
                 <i class="fa-solid fa-bars"></i>
@@ -98,11 +98,96 @@
                 <button onclick="toggleSidebar()" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden">
                     <i class="fa-solid fa-bars"></i>
                 </button>
+                <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
+                <span id="currentModelBadge" class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50">
+                    google/gemini-2.5-pro
+                </span>
+            </div>
+            
+            <button onclick="clearCurrentChat()" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center" title="Clear current chat">
+                <i class="fa-solid fa-trash-can text-lg"></i>
+            </button>
+        </header>
+
+        <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36">
+            <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
+                <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">How can I help you today?</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Ask me anything or upload files & images</p>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent">
+            <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
                 
-                <!-- Branding with Custom Image Logo[cite: 2] -->
-                <div class="flex items-center gap-2">
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAEQdJREFUeNrsnVt3G8cVxc8/l7Qoy1I8UmLb1kmd2jIu7XqWp2KVKqU3fsmrX6W+uXoV+Uj5pSodZSe+xV1X7bYj9s6N4v7Y8s0k3a2pL5LgN3E6e5hQABqF/Tee845kwsAIK01G9bOa1VVs3n5+bnn1/2h6zQn900d787d5+N26z4nN2m4O3s08H8F19f7wB9660W7q1Z57W32H2+93j1x40G32+d7/T4DdzvI/8P60+3c7xPq6h76+n1KzO8w+f+e86dO8YV454w83a2pPZ6F93fD26sO8wfv4+F1e1q6/r6+noLw7d30f3T4E4sKjM8c3sBw7p0n6H+2x2jLpZ6n7QvM4B6jB7YfX9Y6/34d31w6vO+7p3zGv/8Huv13b9/v282O2t1/94O95v94K9Y2+93m3d57F3d3283qT128e/A8Y/Z/Xff9d23V9f8H94s315+f9xvvV/h4d82f3mF3e/v+Pv2P+Y222q3x/9/8u75/f0dZ4n68j157yYcO8uO314r/Xn57rN2vX/h3vj67gG8P0v2y7/VjtfO84z/935wG8H1zYfX0z0178O2vN7a280d/b3L19w7Y/9Y3T+07m+/4f2e/+84393976eLgP75Y+/77t/3wzH3a3h+1z30773d/wD9w7u0f/37z+O/vD0G/h2tP/uXl+x+f9/3f3n3X37x+O/d3v9/n8w/t8H6jO978c7qP/9+4/Lw9x//qP3zD7t8/P/+4Xvvv3w+fH3WvP//9A7f//wNn5//9/7z37tL794/3+x1vv9z9379/c1fN/33c7L+3oE/c48uX9H1c9O/n/7fT988f/7d4H87n83d/vXz5c1d73j++O4/oP799c37Pvv9/99rZf70fH328vW8f7/n07X38v4H4Nf38Ld38/D1r3z+H3P7f6t3zN88f/+H3378vvv8+P/L+v7P6H6/vF88f72J9v5J32v7v9/PfP83v/vWf/uHv54fX9H8/32z/9z5+P/+bN/Pj//cO3vT7/9b3N+b3z2t3/3gD3//P3f/2qf788/r+sLv13/8v19+r5433xPj67vH9Pz073+d73+9+ff4A7vvv/vvf9H1f3j3r8c/v9P36/r7/v97b/f977/71+vvn8P338/fH4D/j79uPvvfP3P6vX9/f/1/36/r/0/O38w/f/f3+d7/ff9/393+/b3b//vn/v/Pf3/X93/f31/r/0/vffP2/f8H2f7fX+v/v/f3/f9//n/v/vrfP3/f+v9r6/f3p7//8P//7r//vP0uPrfv8L339PvP0vP3v/fP3r+P39/7vvvvvPf//89f9/f/f3+P39/vP3/v3vP33/f3/r//ffv/v9f//r/fP1v77t//v3t/P3vP3v31//3fv7b//v/f3/b//f+/v//v7///f////v//f/////v//v///v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//v//appState.chats.chats = JSON.parse(localStorage.getItem('ai_chats') || '[]');
-        appState.currentChatId = null;
+                <!-- Attached File/Image Preview Container -->
+                <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
+
+                <div class="flex items-end">
+                    <!-- Hidden File Input -->
+                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json" onchange="handleFileSelect(event)">
+                    
+                    <!-- File Attachment Button (+) -->
+                    <button onclick="document.getElementById('fileInput').click()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Attach Image or File">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                    <textarea 
+                        id="messageInput" 
+                        rows="1" 
+                        placeholder="Message Mei AI..."
+                        class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400"
+                        oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                        onkeydown="handleEnter(event)"></textarea>
+                
+                    <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Toggle Free Image Generation Mode">
+                        <i class="fa-solid fa-image"></i>
+                    </button>
+
+                    <button id="sendBtn" onclick="sendMessage()" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Mei AI may produce inaccurate information. Image generation powered by Pollinations AI (Free).</p>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Chat Settings</h3>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">OpenRouter API Key (Text Chat)</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-gray-50 dark:bg-[#131314] border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Text Model Name</label>
+                    <input type="text" id="modelInput" placeholder="e.g. google/gemini-2.5-pro" class="w-full bg-gray-50 dark:bg-[#131314] border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400">
+                    <p class="text-xs text-gray-500 mt-1">Default: google/gemini-2.5-pro</p>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end gap-2">
+                <button onclick="closeSettings()" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition">Cancel</button>
+                <button onclick="saveSettings()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        let appState = {
+            apiKey: localStorage.getItem('ai_api_key') || '',
+            modelName: localStorage.getItem('ai_model_name') || 'google/gemini-2.5-pro',
+            chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
+            currentChatId: null,
+            theme: localStorage.getItem('ai_theme') || 'dark'
+        };
+        
         let isImageMode = false;
         let currentAttachments = [];
 
@@ -228,7 +313,7 @@
                     });
                     renderAttachmentPreviews();
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file); // Always read as Data URL for robust vision/file support
             });
             els.fileInput.value = '';
         }
@@ -328,6 +413,7 @@
 
             els.emptyState.classList.add('hidden');
             chat.messages.forEach(msg => {
+                // Handle both simple string content and multimodal array content
                 let text = msg.content;
                 let atts = msg.attachments || [];
                 if (Array.isArray(msg.content)) {
@@ -436,6 +522,7 @@
             currentAttachments = [];
             renderAttachmentPreviews();
             
+            // Build message content payload supporting vision if images are attached
             let userMessageContent = content;
             if (messageAttachments.length > 0) {
                 userMessageContent = [];
@@ -449,6 +536,7 @@
                             image_url: { url: att.data }
                         });
                     } else {
+                        // For non-image files, append text description
                         userMessageContent[0] = userMessageContent[0] || { type: "text", text: content };
                         userMessageContent[0].text += `\n\n[File: ${att.name}]`;
                     }
@@ -481,6 +569,7 @@
                     saveChatsToStorage();
                     appendMessageUI('assistant', aiResponse, true);
                 } else {
+                    // Map chat history for OpenRouter API
                     const apiMessages = chat.messages.map(m => ({ 
                         role: m.role, 
                         content: m.content 
