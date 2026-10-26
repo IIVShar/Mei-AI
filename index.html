@@ -40,6 +40,7 @@
         .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
         .markdown-body pre code { background: transparent; padding: 0; color: inherit; }
         .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .markdown-body p:last-child { margin-bottom: 0; }
         .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .markdown-body img { max-width: 100%; border-radius: 0.75rem; margin-top: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border: 1px solid #374151; }
@@ -48,10 +49,19 @@
         html:not(.dark) .markdown-body code { background: #f0f3f6; color: #d73a49; }
         html:not(.dark) .markdown-body p, html:not(.dark) .markdown-body ul, html:not(.dark) .markdown-body ol { color: #1f2937; }
         
+        #sidebar {
+            transition: transform 0.3s ease;
+        }
         @media (max-width: 768px) {
-            #sidebar { transform: translateX(-100%); transition: transform 0.3s ease; position: absolute; z-index: 40; height: 100%; }
+            #sidebar { 
+                transform: translateX(-100%); 
+                position: fixed; 
+                z-index: 40; 
+                height: 100%; 
+                top: 0;
+                left: 0;
+            }
             #sidebar.open { transform: translateX(0); }
-            #overlay.open { display: block; }
         }
 
         @keyframes fadeIn { 
@@ -63,13 +73,14 @@
 </head>
 <body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
+    <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
+    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 h-full">
         <div class="p-4 flex items-center justify-between">
             <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition">
-                <i class="fa-solid fa-bars"></i>
+                <i class="fa-solid fa-xmark"></i>
             </button>
             <button onclick="startNewChat()" class="flex-1 ml-2 lg:ml-0 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-full shadow-sm transition text-sm font-medium border border-gray-200 dark:border-gray-700/50">
                 <i class="fa-solid fa-plus text-blue-500 dark:text-blue-400"></i> New chat
@@ -88,8 +99,9 @@
         </div>
     </aside>
 
-    <!-- Main Chat Area -->
+    <!-- Main Content Area -->
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <!-- Top Header Navigation -->
         <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden">
@@ -106,6 +118,7 @@
             </button>
         </header>
 
+        <!-- Scrollable Messages Area -->
         <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36">
             <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
@@ -113,6 +126,523 @@
             </div>
         </div>
 
-        <!-- Input Area -->
+        <!-- Sticky Bottom Input Area -->
         <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent">
-            <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow
+            <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
+                
+                <!-- Attached File/Image Preview Container -->
+                <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
+
+                <div class="flex items-end">
+                    <!-- Hidden File Input -->
+                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json" onchange="handleFileSelect(event)">
+                    
+                    <!-- File Attachment Button (+) -->
+                    <button onclick="document.getElementById('fileInput').click()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Attach Image or File">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                    <textarea 
+                        id="messageInput" 
+                        rows="1" 
+                        placeholder="Message Mei..."
+                        class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400"
+                        oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                        onkeydown="handleEnter(event)"></textarea>
+                
+                    <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Toggle Free Flux Image Generation Mode">
+                        <i class="fa-solid fa-image"></i>
+                    </button>
+
+                    <button id="sendBtn" onclick="sendMessage()" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Powered by Pollinations AI (100% Free, Keyless).</p>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Settings</h3>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Theme Switcher -->
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Appearance</label>
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-[#282a2c] rounded-xl border border-gray-200 dark:border-gray-700">
+                        <button id="themeLightBtn" onclick="setTheme('light')" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition">
+                            <i class="fa-solid fa-sun text-yellow-500"></i> Light
+                        </button>
+                        <button id="themeDarkBtn" onclick="setTheme('dark')" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition">
+                            <i class="fa-solid fa-moon text-blue-400"></i> Dark
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Model Selector -->
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model</label>
+                    <select id="modelSelect" onchange="handleModelChange()" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400">
+                        <option value="auto">Auto (Smart Fallback)</option>
+                        <option value="openai">OpenAI (GPT-4o Mini)</option>
+                        <option value="mistral">Mistral</option>
+                        <option value="qwen-coder">Qwen Coder</option>
+                        <option value="qwen">Qwen 2.5</option>
+                        <option value="llama">Llama 3.3</option>
+                    </select>
+                </div>
+
+                <p class="text-xs text-gray-500 dark:text-gray-400">Mei AI uses Pollinations AI endpoints. No API key required.</p>
+            </div>
+
+            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end">
+                <button onclick="closeSettings()" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript logic -->
+    <script>
+        const SYSTEM_PROMPT = "Your name is Mei. You are a helpful, friendly AI assistant. You must always identify yourself as Mei when asked about your name or identity.";
+
+        let appState = {
+            chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
+            currentChatId: null,
+            theme: localStorage.getItem('ai_theme') || 'dark',
+            model: localStorage.getItem('ai_model') || 'auto'
+        };
+        
+        let isImageMode = false;
+        let currentAttachments = [];
+
+        const els = {
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('overlay'),
+            historyList: document.getElementById('historyList'),
+            chatContainer: document.getElementById('chatContainer'),
+            emptyState: document.getElementById('emptyState'),
+            messageInput: document.getElementById('messageInput'),
+            sendBtn: document.getElementById('sendBtn'),
+            imageModeBtn: document.getElementById('imageModeBtn'),
+            settingsModal: document.getElementById('settingsModal'),
+            attachmentPreview: document.getElementById('attachmentPreview'),
+            fileInput: document.getElementById('fileInput'),
+            modelSelect: document.getElementById('modelSelect'),
+            activeModelBadge: document.getElementById('activeModelBadge'),
+            themeLightBtn: document.getElementById('themeLightBtn'),
+            themeDarkBtn: document.getElementById('themeDarkBtn')
+        };
+
+        function init() {
+            applyTheme(appState.theme);
+            initModelSettings();
+
+            if (!Array.isArray(appState.chats) || appState.chats.length === 0) {
+                appState.chats = [];
+                startNewChat(false);
+            } else {
+                appState.currentChatId = appState.chats[0].id;
+                renderHistory();
+                renderChat(appState.currentChatId);
+            }
+        }
+
+        function setTheme(theme) {
+            appState.theme = theme;
+            localStorage.setItem('ai_theme', theme);
+            applyTheme(theme);
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white dark:bg-[#1e1e20] shadow-sm text-blue-400 font-semibold";
+                els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200";
+            } else {
+                document.documentElement.classList.remove('dark');
+                els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white shadow-sm text-yellow-600 font-semibold";
+                els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200";
+            }
+        }
+
+        function initModelSettings() {
+            els.modelSelect.value = appState.model;
+            updateActiveModelBadge();
+        }
+
+        function handleModelChange() {
+            appState.model = els.modelSelect.value;
+            localStorage.setItem('ai_model', appState.model);
+            updateActiveModelBadge();
+        }
+
+        function updateActiveModelBadge() {
+            if (appState.model === 'auto') {
+                els.activeModelBadge.textContent = 'Auto (Smart Fallback)';
+            } else {
+                const label = els.modelSelect.options[els.modelSelect.selectedIndex]?.text || appState.model;
+                els.activeModelBadge.textContent = label;
+            }
+        }
+
+        function toggleSidebar() {
+            els.sidebar.classList.toggle('open');
+            els.overlay.classList.toggle('hidden');
+        }
+
+        function toggleImageMode() {
+            isImageMode = !isImageMode;
+            if (isImageMode) {
+                els.imageModeBtn.classList.replace('text-gray-500', 'text-purple-500');
+                els.imageModeBtn.classList.replace('dark:text-gray-400', 'dark:text-purple-400');
+                els.imageModeBtn.classList.add('bg-purple-100', 'dark:bg-purple-900/30');
+                els.messageInput.placeholder = "Describe an image for Mei to generate (Free Flux)...";
+                els.sendBtn.classList.replace('text-blue-600', 'text-purple-600');
+                els.sendBtn.classList.replace('dark:text-blue-400', 'dark:text-purple-400');
+            } else {
+                els.imageModeBtn.classList.replace('text-purple-500', 'text-gray-500');
+                els.imageModeBtn.classList.replace('dark:text-purple-400', 'dark:text-gray-400');
+                els.imageModeBtn.classList.remove('bg-purple-100', 'dark:bg-purple-900/30');
+                els.messageInput.placeholder = "Message Mei...";
+                els.sendBtn.classList.replace('text-purple-600', 'text-blue-600');
+                els.sendBtn.classList.replace('dark:text-purple-400', 'dark:text-blue-400');
+            }
+        }
+
+        function openSettings() {
+            els.settingsModal.classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            els.settingsModal.classList.add('hidden');
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function scrollToBottom() {
+            els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentAttachments.push({
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: event.target.result
+                    });
+                    renderAttachmentPreviews();
+                };
+                if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+            els.fileInput.value = '';
+        }
+
+        function removeAttachment(index) {
+            currentAttachments.splice(index, 1);
+            renderAttachmentPreviews();
+        }
+
+        function renderAttachmentPreviews() {
+            if (currentAttachments.length === 0) {
+                els.attachmentPreview.classList.add('hidden');
+                els.attachmentPreview.innerHTML = '';
+                return;
+            }
+            els.attachmentPreview.classList.remove('hidden');
+            els.attachmentPreview.innerHTML = currentAttachments.map((att, idx) => `
+                <div class="relative flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs">
+                    ${att.type.startsWith('image/') ? `<img src="${att.data}" class="w-8 h-8 object-cover rounded">` : `<i class="fa-solid fa-file-lines text-blue-500"></i>`}
+                    <span class="truncate max-w-[120px]">${escapeHTML(att.name)}</span>
+                    <button onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function saveChatsToStorage() {
+            try {
+                localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+                renderHistory();
+            } catch (e) {
+                alert("Storage limit reached!");
+            }
+        }
+
+        function startNewChat(render = true) {
+            const newChat = {
+                id: generateId(),
+                title: 'New Chat',
+                messages: [],
+                updatedAt: Date.now()
+            };
+            appState.chats.unshift(newChat);
+            appState.currentChatId = newChat.id;
+            saveChatsToStorage();
+            if (render) renderChat(newChat.id);
+            if (window.innerWidth <= 768 && els.sidebar.classList.contains('open')) toggleSidebar();
+        }
+
+        function switchChat(chatId) {
+            appState.currentChatId = chatId;
+            renderChat(chatId);
+            if (window.innerWidth <= 768 && els.sidebar.classList.contains('open')) toggleSidebar();
+        }
+
+        function clearCurrentChat() {
+            if (!appState.currentChatId) return;
+            const chat = appState.chats.find(c => c.id === appState.currentChatId);
+            if (!chat || chat.messages.length === 0) return;
+
+            if (confirm("Clear this chat?")) {
+                appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
+                if (appState.chats.length === 0) {
+                    startNewChat(false);
+                } else {
+                    appState.currentChatId = appState.chats[0].id;
+                }
+                saveChatsToStorage();
+                renderChat(appState.currentChatId);
+            }
+        }
+
+        function renderHistory() {
+            els.historyList.innerHTML = appState.chats.map(chat => `
+                <li>
+                    <button onclick="switchChat('${chat.id}')" class="w-full text-left px-3 py-2 rounded-lg text-sm truncate transition ${chat.id === appState.currentChatId ? 'bg-gray-100 dark:bg-[#282a2c] text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] hover:text-gray-900 dark:hover:text-gray-200'}">
+                        <i class="fa-regular fa-message mr-2 opacity-70"></i> ${escapeHTML(chat.title)}
+                    </button>
+                </li>
+            `).join('');
+        }
+
+        function renderChat(chatId) {
+            renderHistory();
+            const chat = appState.chats.find(c => c.id === chatId);
+            Array.from(els.chatContainer.children).forEach(child => {
+                if (child.id !== 'emptyState') child.remove();
+            });
+
+            if (!chat || !Array.isArray(chat.messages) || chat.messages.length === 0) {
+                els.emptyState.classList.remove('hidden');
+                return;
+            }
+
+            els.emptyState.classList.add('hidden');
+            chat.messages.forEach(msg => appendMessageUI(msg.role, msg.content, msg.isImage, msg.attachments));
+            scrollToBottom();
+        }
+
+        function appendMessageUI(role, content, isImgResponse = false, attachments = []) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full animate-fade-in`;
+            
+            let attachmentsHTML = '';
+            if (Array.isArray(attachments) && attachments.length > 0) {
+                attachmentsHTML = `<div class="flex flex-wrap gap-2 mb-2">` + attachments.map(att => 
+                    att.type.startsWith('image/') 
+                        ? `<img src="${att.data}" class="max-w-xs max-h-48 rounded-lg border border-gray-300 dark:border-gray-700">`
+                        : `<div class="bg-gray-200 dark:bg-gray-800 p-2 rounded text-xs"><i class="fa-solid fa-file-lines mr-1"></i> ${escapeHTML(att.name)}</div>`
+                ).join('') + `</div>`;
+            }
+
+            const textContent = content || '';
+
+            if (role === 'user') {
+                msgDiv.innerHTML = `
+                    <div class="flex-1 flex justify-end">
+                        <div class="bg-gray-200 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 px-5 py-3 rounded-2xl rounded-tr-sm max-w-[85%] text-sm whitespace-pre-wrap">
+                            ${attachmentsHTML}
+                            ${escapeHTML(textContent)}
+                        </div>
+                    </div>
+                `;
+            } else {
+                let parsedContent = textContent;
+                if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+                    try { parsedContent = marked.parse(textContent); } catch (e) { parsedContent = escapeHTML(textContent); }
+                } else {
+                    parsedContent = escapeHTML(textContent);
+                }
+
+                const iconColor = isImgResponse ? 'from-purple-600 to-pink-500' : 'from-blue-600 to-indigo-500';
+                const iconClass = isImgResponse ? 'fa-image' : 'fa-sparkles';
+                
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${iconColor} flex-shrink-0 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid ${iconClass} text-white text-xs"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="markdown-body text-gray-800 dark:text-gray-200 text-sm">${parsedContent}</div>
+                    </div>
+                `;
+            }
+            els.chatContainer.appendChild(msgDiv);
+        }
+
+        function appendLoadingUI(isImg = false) {
+            const loaderId = 'loader-' + Date.now();
+            const msgDiv = document.createElement('div');
+            msgDiv.id = loaderId;
+            msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full`;
+            
+            const iconColor = isImg ? 'from-purple-600 to-pink-500' : 'from-blue-600 to-indigo-500';
+            const iconClass = isImg ? 'fa-image' : 'fa-sparkles';
+
+            msgDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${iconColor} flex-shrink-0 flex items-center justify-center animate-pulse">
+                    <i class="fa-solid ${iconClass} text-white text-xs"></i>
+                </div>
+                <div class="flex-1 flex items-center">
+                    <div class="flex space-x-1.5">
+                        <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                        <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                        <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                    </div>
+                </div>
+            `;
+            els.chatContainer.appendChild(msgDiv);
+            scrollToBottom();
+            return loaderId;
+        }
+
+        async function sendMessage() {
+            const content = els.messageInput.value.trim();
+            if (!content && currentAttachments.length === 0) return;
+
+            let chat = appState.chats.find(c => c.id === appState.currentChatId);
+            if (!chat) {
+                startNewChat(false);
+                chat = appState.chats[0];
+            }
+
+            els.emptyState.classList.add('hidden');
+            els.messageInput.value = '';
+            els.messageInput.style.height = '';
+            els.sendBtn.disabled = true;
+            
+            const messageAttachments = [...currentAttachments];
+            currentAttachments = [];
+            renderAttachmentPreviews();
+            
+            chat.messages.push({ role: 'user', content: content, attachments: messageAttachments });
+            chat.updatedAt = Date.now();
+            
+            if (chat.messages.length === 1) {
+                chat.title = (content || messageAttachments[0]?.name || 'Chat').substring(0, 30);
+            }
+            
+            saveChatsToStorage();
+            appendMessageUI('user', content, false, messageAttachments);
+            scrollToBottom();
+
+            const loaderId = appendLoadingUI(isImageMode);
+
+            try {
+                if (isImageMode) {
+                    const encodedPrompt = encodeURIComponent(content);
+                    const randomSeed = Math.floor(Math.random() * 1000000);
+                    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true&model=flux`;
+
+                    document.getElementById(loaderId)?.remove();
+                    const aiResponse = `Here is your generated image:\n\n![Generated Image](${imageUrl})`;
+                    
+                    chat.messages.push({ role: 'assistant', content: aiResponse, isImage: true });
+                    saveChatsToStorage();
+                    appendMessageUI('assistant', aiResponse, true);
+                } else {
+                    const recentMessages = chat.messages.slice(-6);
+                    let formattedPrompt = `[System Instructions: ${SYSTEM_PROMPT}]\n\n`;
+                    formattedPrompt += recentMessages.map(m => `${m.role === 'user' ? 'User' : 'Mei'}: ${m.content}`).join('\n') + '\nMei:';
+                    
+                    if (messageAttachments.length > 0) {
+                        formattedPrompt += messageAttachments.filter(a => !a.type.startsWith('image/')).map(a => `\n[File Context (${a.name}):\n${a.data.slice(0, 500)}]`).join('');
+                    }
+
+                    const encodedPrompt = encodeURIComponent(formattedPrompt);
+                    
+                    let modelsToTry = [];
+                    if (appState.model === 'auto') {
+                        modelsToTry = ['openai', 'mistral', 'qwen-coder', 'qwen', 'llama'];
+                    } else {
+                        modelsToTry = [appState.model, 'openai', 'mistral'];
+                    }
+
+                    let aiResponse = null;
+                    let lastError = null;
+
+                    for (const model of modelsToTry) {
+                        try {
+                            const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=${model}&json=false`);
+                            if (res.ok) {
+                                aiResponse = await res.text();
+                                if (aiResponse && aiResponse.trim().length > 0) break;
+                            } else {
+                                lastError = `HTTP ${res.status} from ${model}`;
+                            }
+                        } catch (err) {
+                            lastError = err.message;
+                        }
+                    }
+
+                    document.getElementById(loaderId)?.remove();
+
+                    if (!aiResponse || aiResponse.trim().length === 0) {
+                        throw new Error(lastError || 'Failed to reach text generation endpoint.');
+                    }
+
+                    chat.messages.push({ role: 'assistant', content: aiResponse });
+                    saveChatsToStorage();
+                    appendMessageUI('assistant', aiResponse);
+                }
+            } catch (error) {
+                document.getElementById(loaderId)?.remove();
+                const errorMsg = `**Error:** ${error.message || 'An error occurred while generating response.'}`;
+                chat.messages.push({ role: 'assistant', content: errorMsg });
+                saveChatsToStorage();
+                appendMessageUI('assistant', errorMsg);
+            } finally {
+                els.sendBtn.disabled = false;
+                els.messageInput.focus();
+                scrollToBottom();
+            }
+        }
+
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag])
+            );
+        }
+
+        init();
+    </script>
+</body>
+</html>
