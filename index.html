@@ -199,7 +199,6 @@
                         <option value="auto">Auto (Smart Fallback)</option>
                         <option value="openai">OpenAI (GPT-4o Mini)</option>
                         <option value="mistral">Mistral</option>
-                        <option value="qwen-coder">Qwen Coder</option>
                         <option value="qwen">Qwen 2.5</option>
                         <option value="llama">Llama 3.3</option>
                     </select>
@@ -609,7 +608,6 @@
                             
                             if (res.ok) {
                                 const text = await res.text();
-                                // Ensure response is valid text and not an error or empty string
                                 if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE html>') && !text.includes('Error')) {
                                     aiResponse = text.trim();
                                     break;
