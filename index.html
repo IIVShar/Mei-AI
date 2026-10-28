@@ -86,10 +86,10 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 h-full">
         <div class="p-4 flex items-center justify-between">
-            <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition">
+            <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <button onclick="startNewChat()" class="flex-1 ml-2 lg:ml-0 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-full shadow-sm transition text-sm font-medium border border-gray-200 dark:border-gray-700/50">
+            <button onclick="startNewChat()" class="flex-1 ml-2 lg:ml-0 flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-full shadow-sm transition text-sm font-medium border border-gray-200 dark:border-gray-700/50 cursor-pointer">
                 <i class="fa-solid fa-plus text-blue-500 dark:text-blue-400"></i> New chat
             </button>
         </div>
@@ -100,7 +100,7 @@
         </div>
 
         <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
-            <button onclick="openSettings()" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
+            <button onclick="openSettings()" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
                 <i class="fa-solid fa-cog"></i> Settings
             </button>
         </div>
@@ -111,7 +111,7 @@
         <!-- Top Header Navigation -->
         <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden">
+                <button onclick="toggleSidebar()" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden cursor-pointer">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <div class="flex items-center gap-2.5">
@@ -124,7 +124,7 @@
                 </span>
             </div>
             
-            <button onclick="clearCurrentChat()" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center" title="Clear current chat">
+            <button onclick="clearCurrentChat()" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center cursor-pointer" title="Clear current chat">
                 <i class="fa-solid fa-trash-can text-lg"></i>
             </button>
         </header>
@@ -139,7 +139,7 @@
         </div>
 
         <!-- Sticky Bottom Input Area -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent">
+        <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent z-20 pointer-events-auto">
             <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
                 
                 <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
@@ -147,7 +147,7 @@
                 <div class="flex items-end">
                     <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json" onchange="handleFileSelect(event)">
                     
-                    <button onclick="document.getElementById('fileInput').click()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Attach Image or File">
+                    <button onclick="document.getElementById('fileInput').click()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach Image or File">
                         <i class="fa-solid fa-plus"></i>
                     </button>
 
@@ -159,11 +159,11 @@
                         oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
                         onkeydown="handleEnter(event)"></textarea>
                 
-                    <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0" title="Toggle Free Flux Image Generation Mode">
+                    <button id="imageModeBtn" onclick="toggleImageMode()" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Toggle Free Flux Image Generation Mode">
                         <i class="fa-solid fa-image"></i>
                     </button>
 
-                    <button id="sendBtn" onclick="sendMessage()" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <button id="sendBtn" onclick="sendMessage()" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
@@ -177,17 +177,17 @@
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4">
             <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
                 <h3 class="text-lg font-semibold">Settings</h3>
-                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="p-6 space-y-6">
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Appearance</label>
                     <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-[#282a2c] rounded-xl border border-gray-200 dark:border-gray-700">
-                        <button id="themeLightBtn" onclick="setTheme('light')" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition">
+                        <button id="themeLightBtn" onclick="setTheme('light')" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer">
                             <i class="fa-solid fa-sun text-yellow-500"></i> Light
                         </button>
-                        <button id="themeDarkBtn" onclick="setTheme('dark')" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition">
+                        <button id="themeDarkBtn" onclick="setTheme('dark')" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer">
                             <i class="fa-solid fa-moon text-blue-400"></i> Dark
                         </button>
                     </div>
@@ -208,7 +208,7 @@
             </div>
 
             <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end">
-                <button onclick="closeSettings()" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition">Done</button>
+                <button onclick="closeSettings()" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">Done</button>
             </div>
         </div>
     </div>
@@ -268,12 +268,12 @@
         function applyTheme(theme) {
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
-                els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white dark:bg-[#1e1e20] shadow-sm text-blue-400 font-semibold";
-                els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200";
+                els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white dark:bg-[#1e1e20] shadow-sm text-blue-400 font-semibold cursor-pointer";
+                els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer";
             } else {
                 document.documentElement.classList.remove('dark');
-                els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white shadow-sm text-yellow-600 font-semibold";
-                els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200";
+                els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white shadow-sm text-yellow-600 font-semibold cursor-pointer";
+                els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer";
             }
         }
 
@@ -371,7 +371,7 @@
                 <div class="relative flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs">
                     ${att.type.startsWith('image/') ? `<img src="${att.data}" class="w-8 h-8 object-cover rounded">` : `<i class="fa-solid fa-file-lines text-blue-500"></i>`}
                     <span class="truncate max-w-[120px]">${escapeHTML(att.name)}</span>
-                    <button onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             `).join('');
         }
@@ -419,7 +419,7 @@
         function renderHistory() {
             els.historyList.innerHTML = appState.chats.map(chat => `
                 <li>
-                    <button onclick="switchChat('${chat.id}')" class="w-full text-left px-3 py-2 rounded-lg text-sm truncate transition ${chat.id === appState.currentChatId ? 'bg-gray-100 dark:bg-[#282a2c] text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] hover:text-gray-900 dark:hover:text-gray-200'}">
+                    <button onclick="switchChat('${chat.id}')" class="w-full text-left px-3 py-2 rounded-lg text-sm truncate transition cursor-pointer ${chat.id === appState.currentChatId ? 'bg-gray-100 dark:bg-[#282a2c] text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] hover:text-gray-900 dark:hover:text-gray-200'}">
                         <i class="fa-regular fa-message mr-2 opacity-70"></i> ${escapeHTML(chat.title)}
                     </button>
                 </li>
