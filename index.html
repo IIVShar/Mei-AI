@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mei AI</title>
     
-    <!-- Fallback CSS in case CDN is slow/blocked -->
     <style>
-        body { margin: 0; padding: 0; background-color: #131314; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; }
+        body { margin: 0; padding: 0; background-color: #131314; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; height: 100vh; width: 100vw; display: flex; overflow: hidden; }
     </style>
 
     <!-- Tailwind CSS -->
@@ -217,7 +216,7 @@
 
     <!-- Application JavaScript logic -->
     <script>
-        const SYSTEM_PROMPT = "Your name is Mei. You are a helpful, friendly AI assistant. You must always identify yourself as Mei when asked about your name or identity.";
+        const SYSTEM_PROMPT = "You are Mei, a helpful, friendly AI assistant. Always identify yourself as Mei when asked about your name or identity.";
 
         let appState = {
             chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
@@ -583,44 +582,48 @@
                     saveChatsToStorage();
                     appendMessageUI('assistant', aiResponse, true);
                 } else {
-                    const recentMessages = chat.messages.slice(-6);
-                    let formattedPrompt = `[System Instructions: ${SYSTEM_PROMPT}]\n\n`;
-                    formattedPrompt += recentMessages.map(m => `${m.role === 'user' ? 'User' : 'Mei'}: ${m.content}`).join('\n') + '\nMei:';
+                    const recentMessages = chat.messages.slice(-4);
+                    let cleanPrompt = `${SYSTEM_PROMPT}\n\n` + recentMessages.map(m => `${m.role === 'user' ? 'User' : 'Mei'}: ${m.content}`).join('\n') + '\nMei:';
                     
                     if (messageAttachments.length > 0) {
-                        formattedPrompt += messageAttachments.filter(a => !a.type.startsWith('image/')).map(a => `\n[File Context (${a.name}):\n${a.data.slice(0, 500)}]`).join('');
+                        cleanPrompt += messageAttachments.filter(a => !a.type.startsWith('image/')).map(a => `\nFile Content (${a.name}):\n${a.data.slice(0, 300)}`).join('');
                     }
 
-                    const encodedPrompt = encodeURIComponent(formattedPrompt);
+                    const encodedPrompt = encodeURIComponent(cleanPrompt);
                     
                     let modelsToTry = [];
                     if (appState.model === 'auto') {
-                        modelsToTry = ['openai', 'mistral', 'qwen-coder', 'qwen', 'llama'];
+                        modelsToTry = ['openai', 'mistral', 'qwen', 'llama'];
                     } else {
                         modelsToTry = [appState.model, 'openai', 'mistral'];
                     }
 
                     let aiResponse = null;
-                    let lastError = null;
 
                     for (const model of modelsToTry) {
                         try {
-                            const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=${model}&json=false`);
+                            const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=${model}&json=false`, {
+                                method: 'GET',
+                                headers: { 'Accept': 'text/plain' }
+                            });
+                            
                             if (res.ok) {
-                                aiResponse = await res.text();
-                                if (aiResponse && aiResponse.trim().length > 0) break;
-                            } else {
-                                lastError = `HTTP ${res.status} from ${model}`;
+                                const text = await res.text();
+                                // Ensure response is valid text and not an error or empty string
+                                if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE html>') && !text.includes('Error')) {
+                                    aiResponse = text.trim();
+                                    break;
+                                }
                             }
                         } catch (err) {
-                            lastError = err.message;
+                            console.warn(`Model ${model} failed, trying next...`);
                         }
                     }
 
                     document.getElementById(loaderId)?.remove();
 
                     if (!aiResponse || aiResponse.trim().length === 0) {
-                        throw new Error(lastError || 'Failed to reach text generation endpoint.');
+                        aiResponse = "I'm currently receiving too many requests or the server is busy. Please try sending your message again in a moment!";
                     }
 
                     chat.messages.push({ role: 'assistant', content: aiResponse });
@@ -629,7 +632,7 @@
                 }
             } catch (error) {
                 document.getElementById(loaderId)?.remove();
-                const errorMsg = `**Error:** ${error.message || 'An error occurred while generating response.'}`;
+                const errorMsg = "Sorry, I couldn't reach the AI service right now. Please check your connection or try again.";
                 chat.messages.push({ role: 'assistant', content: errorMsg });
                 saveChatsToStorage();
                 appendMessageUI('assistant', errorMsg);
@@ -644,11 +647,11 @@
             if (typeof str !== 'string') return '';
             return str.replace(/[&<>'"]/g, 
                 tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
+                    '&': '&',
+                    '<': '<',
+                    '>': '>',
+                    "'": ''',
+                    '"': '"'
                 }[tag])
             );
         }
