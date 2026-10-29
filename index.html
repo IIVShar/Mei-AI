@@ -120,7 +120,7 @@
                     <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                 </div>
                 <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
-                    Auto (Smart Fallback)
+                    Auto (20 Models Router)
                 </span>
             </div>
             
@@ -168,7 +168,6 @@
                     </button>
                 </div>
             </div>
-            <!-- Custom disclaimer note -->
             <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-2">Mei is not human, It is an AI, so note that it can make mistakes.</p>
         </div>
     </main>
@@ -195,12 +194,12 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model (20+ Open Source Models)</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model</label>
                     <select id="modelSelect" onchange="handleModelChange()" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
-                        <option value="auto">Auto (Smart Fallback Router)</option>
+                        <option value="auto">Auto (Smart Router across 20 Models)</option>
                         
                         <optgroup label="Qwen Series">
-                            <option value="qwen-coder">Qwen 2.5 Coder 32B (Coding Expert)</option>
+                            <option value="qwen-coder">Qwen 2.5 Coder 32B</option>
                             <option value="qwen">Qwen 2.5 72B Instruct</option>
                             <option value="qwen-math">Qwen 2.5 Math 72B</option>
                         </optgroup>
@@ -254,6 +253,14 @@
     <!-- Application JavaScript logic -->
     <script>
         const SYSTEM_PROMPT = "You are Mei, a helpful, friendly AI assistant. Always identify yourself as Mei when asked about your name or identity.";
+
+        // List of 20 models for the Auto Smart Router to cycle through
+        const AUTO_20_MODELS = [
+            'qwen-coder', 'openai', 'mistral', 'llama', 'deepseek', 
+            'qwen', 'gemma', 'phi', 'nemotron', 'hermes', 
+            'command-r', 'codestral', 'mistral-nemo', 'llama-3.1-8b', 'gemma-9b', 
+            'phi-vision', 'qwen-math', 'deepseek-coder', 'sur', 'llama-guard'
+        ];
 
         let appState = {
             chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
@@ -328,7 +335,7 @@
 
         function updateActiveModelBadge() {
             if (appState.model === 'auto') {
-                els.activeModelBadge.textContent = 'Auto (Smart Fallback)';
+                els.activeModelBadge.textContent = 'Auto (20 Models Router)';
             } else {
                 const label = els.modelSelect.options[els.modelSelect.selectedIndex]?.text.split('(')[0] || appState.model;
                 els.activeModelBadge.textContent = label;
@@ -667,12 +674,13 @@
 
                     let modelsToTry = [];
                     if (appState.model === 'auto') {
-                        modelsToTry = ['qwen-coder', 'openai', 'mistral', 'llama', 'qwen'];
+                        modelsToTry = AUTO_20_MODELS; // Runs through all 20 models sequentially
                     } else {
-                        modelsToTry = [appState.model, 'qwen-coder', 'openai', 'mistral'];
+                        modelsToTry = [appState.model, ...AUTO_20_MODELS.filter(m => m !== appState.model)];
                     }
 
                     let aiResponse = null;
+                    let lastStatus = null;
 
                     for (const model of modelsToTry) {
                         try {
@@ -686,6 +694,8 @@
                                 })
                             });
                             
+                            lastStatus = res.status;
+
                             if (res.ok) {
                                 const text = await res.text();
                                 if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE html>') && !text.includes('Error')) {
@@ -694,14 +704,18 @@
                                 }
                             }
                         } catch (err) {
-                            console.warn(`Model ${model} failed via POST, trying next...`);
+                            console.warn(`Model ${model} failed, trying next model in 20-model router...`);
                         }
                     }
 
                     document.getElementById(loaderId)?.remove();
 
                     if (!aiResponse || aiResponse.trim().length === 0) {
-                        aiResponse = "I'm currently receiving too many requests or the server is busy. Please try sending your message again in a moment!";
+                        if (lastStatus === 422) {
+                            aiResponse = "An error occurred (HTTP 422). Please try switching to a different AI model in Settings or try again later.";
+                        } else {
+                            aiResponse = "I'm currently receiving too many requests or the selected models are busy. Please try switching models in Settings or try again later!";
+                        }
                     }
 
                     chat.messages.push({ role: 'assistant', content: aiResponse });
@@ -710,7 +724,7 @@
                 }
             } catch (error) {
                 document.getElementById(loaderId)?.remove();
-                const errorMsg = "Sorry, I couldn't reach the AI service right now. Please check your connection or try again.";
+                const errorMsg = "An error occurred (HTTP 422 or connection lost). Please try switching to a different AI model in Settings or try again later.";
                 chat.messages.push({ role: 'assistant', content: errorMsg });
                 saveChatsToStorage();
                 appendMessageUI('assistant', errorMsg);
@@ -725,11 +739,11 @@
             if (typeof str !== 'string') return '';
             return str.replace(/[&<>'"]/g, 
                 tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
+                    '&': '&',
+                    '<': '<',
+                    '>': '>',
+                    "'": ''',
+                    '"': '"'
                 }[tag])
             );
         }
