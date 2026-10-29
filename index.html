@@ -84,7 +84,7 @@
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 h-full">
+    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 h-full z-40">
         <div class="p-4 flex items-center justify-between">
             <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
@@ -195,7 +195,7 @@
 
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model</label>
-                    <select id="modelSelect" onchange="handleModelChange()" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400">
+                    <select id="modelSelect" onchange="handleModelChange()" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
                         <option value="auto">Auto (Smart Fallback)</option>
                         <option value="openai">OpenAI (GPT-4o Mini)</option>
                         <option value="mistral">Mistral</option>
@@ -582,14 +582,14 @@
                     appendMessageUI('assistant', aiResponse, true);
                 } else {
                     const recentMessages = chat.messages.slice(-4);
-                    let cleanPrompt = `${SYSTEM_PROMPT}\n\n` + recentMessages.map(m => `${m.role === 'user' ? 'User' : 'Mei'}: ${m.content}`).join('\n') + '\nMei:';
-                    
-                    if (messageAttachments.length > 0) {
-                        cleanPrompt += messageAttachments.filter(a => !a.type.startsWith('image/')).map(a => `\nFile Content (${a.name}):\n${a.data.slice(0, 300)}`).join('');
-                    }
+                    let messagesPayload = [
+                        { role: "system", content: SYSTEM_PROMPT },
+                        ...recentMessages.map(m => ({
+                            role: m.role === 'user' ? 'user' : 'assistant',
+                            content: m.content
+                        }))
+                    ];
 
-                    const encodedPrompt = encodeURIComponent(cleanPrompt);
-                    
                     let modelsToTry = [];
                     if (appState.model === 'auto') {
                         modelsToTry = ['openai', 'mistral', 'qwen', 'llama'];
@@ -601,9 +601,14 @@
 
                     for (const model of modelsToTry) {
                         try {
-                            const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=${model}&json=false`, {
-                                method: 'GET',
-                                headers: { 'Accept': 'text/plain' }
+                            const res = await fetch('https://text.pollinations.ai/', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    messages: messagesPayload,
+                                    model: model,
+                                    json: false
+                                })
                             });
                             
                             if (res.ok) {
@@ -614,7 +619,7 @@
                                 }
                             }
                         } catch (err) {
-                            console.warn(`Model ${model} failed, trying next...`);
+                            console.warn(`Model ${model} failed via POST, trying next...`);
                         }
                     }
 
@@ -645,11 +650,11 @@
             if (typeof str !== 'string') return '';
             return str.replace(/[&<>'"]/g, 
                 tag => ({
-                    '&': '&',
-                    '<': '<',
-                    '>': '>',
-                    "'": ''',
-                    '"': '"'
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
                 }[tag])
             );
         }
