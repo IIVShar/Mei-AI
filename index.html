@@ -80,7 +80,7 @@
 </head>
 <body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
-    <!-- Custom Modal Container for Dialog Replacements -->
+    <!-- Custom Modal Container -->
     <div id="customModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl p-6 text-gray-800 dark:text-gray-200 animate-fade-in">
             <h4 id="modalTitle" class="text-lg font-semibold mb-2">Notice</h4>
@@ -126,7 +126,6 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <div class="flex items-center gap-2.5">
-                    <!-- Glowing Gradient Capsule Logo -->
                     <div class="w-2.5 h-6 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_10px_rgba(168,85,247,0.6)] flex-shrink-0"></div>
                     <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                 </div>
@@ -603,7 +602,6 @@
             els.chatContainer.appendChild(msgDiv);
         }
 
-        // ChatGPT-style streaming typing effect
         async function appendStreamingMessageUI(fullText, isImgResponse = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full animate-fade-in`;
