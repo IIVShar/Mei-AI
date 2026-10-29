@@ -106,7 +106,7 @@
         </div>
     </aside>
 
-    <!-- Main Content Area (Flex Column layout to completely prevent overlaps) -->
+    <!-- Main Content Area -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f9fafb] dark:bg-gemini-bg relative">
         <!-- Top Header Navigation -->
         <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
@@ -129,16 +129,16 @@
             </button>
         </header>
 
-        <!-- Scrollable Messages Area (Flex-1 so it scrolls independently and never overlaps footer) -->
+        <!-- Scrollable Messages Area -->
         <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth">
             <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
                 <div class="w-4 h-12 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_16px_rgba(168,85,247,0.7)] mb-4"></div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">How can I help you today? Ask me anything, generate images, or attach files.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">How can I help you today? Ask me anything, generate free images, or attach files.</p>
             </div>
         </div>
 
-        <!-- Sticky Bottom Input Area (Flex-shrink-0 footer container) -->
+        <!-- Sticky Bottom Input Area -->
         <div class="flex-shrink-0 p-4 lg:p-6 bg-transparent z-20">
             <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
                 
@@ -168,7 +168,8 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-2">Powered by Pollinations AI (100% Free, Keyless).</p>
+            <!-- Custom disclaimer note -->
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-2">Mei is not human, It is an AI, so note that it can make mistakes.</p>
         </div>
     </main>
 
@@ -180,7 +181,7 @@
                 <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="p-6 space-y-6">
+            <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Appearance</label>
                     <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-[#282a2c] rounded-xl border border-gray-200 dark:border-gray-700">
@@ -194,17 +195,54 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model (20+ Open Source Models)</label>
                     <select id="modelSelect" onchange="handleModelChange()" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
-                        <option value="auto">Auto (Smart Fallback)</option>
-                        <option value="openai">OpenAI (GPT-4o Mini)</option>
-                        <option value="mistral">Mistral</option>
-                        <option value="qwen">Qwen 2.5</option>
-                        <option value="llama">Llama 3.3</option>
+                        <option value="auto">Auto (Smart Fallback Router)</option>
+                        
+                        <optgroup label="Qwen Series">
+                            <option value="qwen-coder">Qwen 2.5 Coder 32B (Coding Expert)</option>
+                            <option value="qwen">Qwen 2.5 72B Instruct</option>
+                            <option value="qwen-math">Qwen 2.5 Math 72B</option>
+                        </optgroup>
+
+                        <optgroup label="Meta Llama Series">
+                            <option value="llama">Llama 3.3 70B Instruct</option>
+                            <option value="llama-3.1-8b">Llama 3.1 8B Instruct</option>
+                            <option value="llama-guard">Llama Guard Safety Model</option>
+                        </optgroup>
+
+                        <optgroup label="Mistral AI Series">
+                            <option value="mistral">Mistral Large 2</option>
+                            <option value="mistral-nemo">Mistral Nemo 12B</option>
+                            <option value="codestral">Codestral 22B</option>
+                        </optgroup>
+
+                        <optgroup label="DeepSeek AI">
+                            <option value="deepseek">DeepSeek V3 / R1 Reasoner</option>
+                            <option value="deepseek-coder">DeepSeek Coder V2</option>
+                        </optgroup>
+
+                        <optgroup label="Google Gemma Series">
+                            <option value="gemma">Gemma 2 27B Instruct</option>
+                            <option value="gemma-9b">Gemma 2 9B Instruct</option>
+                        </optgroup>
+
+                        <optgroup label="Microsoft Phi Series">
+                            <option value="phi">Phi 3.5 Mini Instruct</option>
+                            <option value="phi-vision">Phi 3.5 Vision</option>
+                        </optgroup>
+
+                        <optgroup label="NVIDIA & Specialized Open Models">
+                            <option value="nemotron">NVIDIA Llama 3.1 Nemotron 70B</option>
+                            <option value="hermes">Hermes 3 Llama 3.1 405B</option>
+                            <option value="command-r">Cohere Command R+</option>
+                            <option value="openai">OpenAI GPT-4o Mini</option>
+                            <option value="sur">Sur AI (Multilingual)</option>
+                        </optgroup>
                     </select>
                 </div>
 
-                <p class="text-xs text-gray-500 dark:text-gray-400">Mei AI uses Pollinations AI endpoints. No API key required.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Mei AI operates keyless via Pollinations AI open endpoints.</p>
             </div>
 
             <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end">
@@ -292,7 +330,7 @@
             if (appState.model === 'auto') {
                 els.activeModelBadge.textContent = 'Auto (Smart Fallback)';
             } else {
-                const label = els.modelSelect.options[els.modelSelect.selectedIndex]?.text || appState.model;
+                const label = els.modelSelect.options[els.modelSelect.selectedIndex]?.text.split('(')[0] || appState.model;
                 els.activeModelBadge.textContent = label;
             }
         }
@@ -510,6 +548,43 @@
             els.chatContainer.appendChild(msgDiv);
         }
 
+        // ChatGPT word-by-word streaming effect
+        async function appendStreamingMessageUI(fullText, isImgResponse = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full animate-fade-in`;
+            
+            const iconColor = isImgResponse ? 'from-purple-600 to-pink-500' : 'from-blue-600 to-indigo-500';
+            const iconClass = isImgResponse ? 'fa-image' : 'fa-sparkles';
+            
+            msgDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${iconColor} flex-shrink-0 flex items-center justify-center shadow-sm">
+                    <i class="fa-solid ${iconClass} text-white text-xs"></i>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <div class="markdown-body text-gray-800 dark:text-gray-200 text-sm"></div>
+                </div>
+            `;
+            els.chatContainer.appendChild(msgDiv);
+            scrollToBottom();
+
+            const bodyEl = msgDiv.querySelector('.markdown-body');
+            
+            if (isImgResponse) {
+                bodyEl.innerHTML = marked.parse(fullText);
+                scrollToBottom();
+                return;
+            }
+
+            let currentText = "";
+            const words = fullText.split(" ");
+            for (let i = 0; i < words.length; i++) {
+                currentText += (i === 0 ? "" : " ") + words[i];
+                bodyEl.innerHTML = marked.parse(currentText);
+                scrollToBottom();
+                await new Promise(r => setTimeout(r, 12));
+            }
+        }
+
         function appendLoadingUI(isImg = false) {
             const loaderId = 'loader-' + Date.now();
             const msgDiv = document.createElement('div');
@@ -579,31 +654,36 @@
                     
                     chat.messages.push({ role: 'assistant', content: aiResponse, isImage: true });
                     saveChatsToStorage();
-                    appendMessageUI('assistant', aiResponse, true);
+                    await appendStreamingMessageUI(aiResponse, true);
                 } else {
-                    const recentMessages = chat.messages.slice(-4);
-                    let cleanPrompt = `${SYSTEM_PROMPT}\n\n` + recentMessages.map(m => `${m.role === 'user' ? 'User' : 'Mei'}: ${m.content}`).join('\n') + '\nMei:';
-                    
-                    if (messageAttachments.length > 0) {
-                        cleanPrompt += messageAttachments.filter(a => !a.type.startsWith('image/')).map(a => `\nFile Content (${a.name}):\n${a.data.slice(0, 300)}`).join('');
-                    }
+                    const recentMessages = chat.messages.slice(-6);
+                    let messagesPayload = [
+                        { role: "system", content: SYSTEM_PROMPT },
+                        ...recentMessages.map(m => ({
+                            role: m.role === 'user' ? 'user' : 'assistant',
+                            content: m.content
+                        }))
+                    ];
 
-                    const encodedPrompt = encodeURIComponent(cleanPrompt);
-                    
                     let modelsToTry = [];
                     if (appState.model === 'auto') {
-                        modelsToTry = ['openai', 'mistral', 'qwen', 'llama'];
+                        modelsToTry = ['qwen-coder', 'openai', 'mistral', 'llama', 'qwen'];
                     } else {
-                        modelsToTry = [appState.model, 'openai', 'mistral'];
+                        modelsToTry = [appState.model, 'qwen-coder', 'openai', 'mistral'];
                     }
 
                     let aiResponse = null;
 
                     for (const model of modelsToTry) {
                         try {
-                            const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=${model}&json=false`, {
-                                method: 'GET',
-                                headers: { 'Accept': 'text/plain' }
+                            const res = await fetch('https://text.pollinations.ai/', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    messages: messagesPayload,
+                                    model: model,
+                                    json: false
+                                })
                             });
                             
                             if (res.ok) {
@@ -614,7 +694,7 @@
                                 }
                             }
                         } catch (err) {
-                            console.warn(`Model ${model} failed, trying next...`);
+                            console.warn(`Model ${model} failed via POST, trying next...`);
                         }
                     }
 
@@ -626,7 +706,7 @@
 
                     chat.messages.push({ role: 'assistant', content: aiResponse });
                     saveChatsToStorage();
-                    appendMessageUI('assistant', aiResponse);
+                    await appendStreamingMessageUI(aiResponse, false);
                 }
             } catch (error) {
                 document.getElementById(loaderId)?.remove();
