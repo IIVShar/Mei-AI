@@ -80,11 +80,22 @@
 </head>
 <body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
+    <!-- Custom Modal Container for Dialog Replacements -->
+    <div id="customModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl p-6 text-gray-800 dark:text-gray-200 animate-fade-in">
+            <h4 id="modalTitle" class="text-lg font-semibold mb-2">Notice</h4>
+            <p id="modalMessage" class="text-sm text-gray-600 dark:text-gray-300 mb-6"></p>
+            <div id="modalActions" class="flex justify-end gap-3">
+                <button id="modalConfirmBtn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">OK</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 h-full z-40">
+    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-colors duration-200 h-full">
         <div class="p-4 flex items-center justify-between">
             <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
@@ -107,7 +118,7 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f9fafb] dark:bg-gemini-bg relative">
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
         <!-- Top Header Navigation -->
         <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
             <div class="flex items-center gap-3">
@@ -130,16 +141,16 @@
         </header>
 
         <!-- Scrollable Messages Area -->
-        <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth">
+        <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36">
             <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
                 <div class="w-4 h-12 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_16px_rgba(168,85,247,0.7)] mb-4"></div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">How can I help you today? Ask me anything, generate free images, or attach files.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">How can I help you today? Ask me anything, generate images, or attach files.</p>
             </div>
         </div>
 
         <!-- Sticky Bottom Input Area -->
-        <div class="flex-shrink-0 p-4 lg:p-6 bg-transparent z-20">
+        <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent z-20 pointer-events-auto">
             <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
                 
                 <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
@@ -168,7 +179,7 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-2">Mei is not human, It is an AI, so note that it can make mistakes.</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Mei is not human, It is an AI, so note that it can make mistakes.</p>
         </div>
     </main>
 
@@ -194,7 +205,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model (20+ Open Source Models)</label>
                     <select id="modelSelect" onchange="handleModelChange()" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
                         <option value="auto">Auto (Smart Router across 20 Models)</option>
                         
@@ -254,7 +265,6 @@
     <script>
         const SYSTEM_PROMPT = "You are Mei, a helpful, friendly AI assistant. Always identify yourself as Mei when asked about your name or identity.";
 
-        // List of 20 models for the Auto Smart Router to cycle through
         const AUTO_20_MODELS = [
             'qwen-coder', 'openai', 'mistral', 'llama', 'deepseek', 
             'qwen', 'gemma', 'phi', 'nemotron', 'hermes', 
@@ -287,8 +297,46 @@
             modelSelect: document.getElementById('modelSelect'),
             activeModelBadge: document.getElementById('activeModelBadge'),
             themeLightBtn: document.getElementById('themeLightBtn'),
-            themeDarkBtn: document.getElementById('themeDarkBtn')
+            themeDarkBtn: document.getElementById('themeDarkBtn'),
+            customModal: document.getElementById('customModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalMessage: document.getElementById('modalMessage'),
+            modalActions: document.getElementById('modalActions'),
+            modalConfirmBtn: document.getElementById('modalConfirmBtn')
         };
+
+        function showCustomAlert(title, message, isConfirm = false, onConfirm = null) {
+            els.modalTitle.textContent = title;
+            els.modalMessage.textContent = message;
+            
+            els.modalActions.innerHTML = '';
+            
+            if (isConfirm) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = "px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer";
+                cancelBtn.textContent = "Cancel";
+                cancelBtn.onclick = () => els.customModal.classList.add('hidden');
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = "px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-xl transition cursor-pointer";
+                confirmBtn.textContent = "Confirm";
+                confirmBtn.onclick = () => {
+                    els.customModal.classList.add('hidden');
+                    if (onConfirm) onConfirm();
+                };
+                
+                els.modalActions.appendChild(cancelBtn);
+                els.modalActions.appendChild(confirmBtn);
+            } else {
+                const okBtn = document.createElement('button');
+                okBtn.className = "px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer";
+                okBtn.textContent = "OK";
+                okBtn.onclick = () => els.customModal.classList.add('hidden');
+                els.modalActions.appendChild(okBtn);
+            }
+            
+            els.customModal.classList.remove('hidden');
+        }
 
         function init() {
             applyTheme(appState.theme);
@@ -428,7 +476,7 @@
                 localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
                 renderHistory();
             } catch (e) {
-                alert("Storage limit reached!");
+                showCustomAlert("Storage Limit", "Browser local storage limit reached.");
             }
         }
 
@@ -452,13 +500,13 @@
             const chat = appState.chats.find(c => c.id === appState.currentChatId);
             if (!chat || chat.messages.length === 0) return;
 
-            if (confirm("Clear this chat?")) {
+            showCustomAlert("Clear Chat", "Are you sure you want to delete this chat session?", true, () => {
                 appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
                 if (appState.chats.length === 0) startNewChat(false);
                 else appState.currentChatId = appState.chats[0].id;
                 saveChatsToStorage();
                 renderChat(appState.currentChatId);
-            }
+            });
         }
 
         function renderHistory() {
@@ -555,7 +603,7 @@
             els.chatContainer.appendChild(msgDiv);
         }
 
-        // ChatGPT word-by-word streaming effect
+        // ChatGPT-style streaming typing effect
         async function appendStreamingMessageUI(fullText, isImgResponse = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full animate-fade-in`;
@@ -674,7 +722,7 @@
 
                     let modelsToTry = [];
                     if (appState.model === 'auto') {
-                        modelsToTry = AUTO_20_MODELS; // Runs through all 20 models sequentially
+                        modelsToTry = AUTO_20_MODELS;
                     } else {
                         modelsToTry = [appState.model, ...AUTO_20_MODELS.filter(m => m !== appState.model)];
                     }
@@ -704,7 +752,7 @@
                                 }
                             }
                         } catch (err) {
-                            console.warn(`Model ${model} failed, trying next model in 20-model router...`);
+                            console.warn(`Model ${model} failed, trying next...`);
                         }
                     }
 
@@ -714,7 +762,7 @@
                         if (lastStatus === 422) {
                             aiResponse = "An error occurred (HTTP 422). Please try switching to a different AI model in Settings or try again later.";
                         } else {
-                            aiResponse = "I'm currently receiving too many requests or the selected models are busy. Please try switching models in Settings or try again later!";
+                            aiResponse = "An error occurred (HTTP 422 or models busy). Please try switching to a different AI model in Settings or try again later.";
                         }
                     }
 
@@ -724,7 +772,7 @@
                 }
             } catch (error) {
                 document.getElementById(loaderId)?.remove();
-                const errorMsg = "An error occurred (HTTP 422 or connection lost). Please try switching to a different AI model in Settings or try again later.";
+                const errorMsg = "An error occurred (HTTP 422). Please try switching to a different AI model in Settings or try again later.";
                 chat.messages.push({ role: 'assistant', content: errorMsg });
                 saveChatsToStorage();
                 appendMessageUI('assistant', errorMsg);
