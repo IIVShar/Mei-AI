@@ -80,17 +80,6 @@
 </head>
 <body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
-    <!-- Custom Modal Container -->
-    <div id="customModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm p-4">
-        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl p-6 text-gray-800 dark:text-gray-200 animate-fade-in">
-            <h4 id="modalTitle" class="text-lg font-semibold mb-2">Notice</h4>
-            <p id="modalMessage" class="text-sm text-gray-600 dark:text-gray-300 mb-6"></p>
-            <div id="modalActions" class="flex justify-end gap-3">
-                <button id="modalConfirmBtn" type="button" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">OK</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden"></div>
 
@@ -352,10 +341,6 @@
                 activeModelBadge: document.getElementById('activeModelBadge'),
                 themeLightBtn: document.getElementById('themeLightBtn'),
                 themeDarkBtn: document.getElementById('themeDarkBtn'),
-                customModal: document.getElementById('customModal'),
-                modalTitle: document.getElementById('modalTitle'),
-                modalMessage: document.getElementById('modalMessage'),
-                modalConfirmBtn: document.getElementById('modalConfirmBtn'),
                 attachBtn: document.getElementById('attachBtn'),
                 closeSettingsBtn: document.getElementById('closeSettingsBtn'),
                 saveSettingsBtn: document.getElementById('saveSettingsBtn'),
@@ -365,8 +350,7 @@
                 sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
                 headerExploreBtn: document.getElementById('headerExploreBtn'),
                 sidebarExploreBtn: document.getElementById('sidebarExploreBtn'),
-                exploreMiniBar: document.getElementById('exploreMiniBar'),
-                exploreModelsBtn: document.getElementById('exploreModelsBtn')
+                exploreMiniBar: document.getElementById('exploreMiniBar')
             };
         }
 
@@ -591,7 +575,6 @@
             const chat = getCurrentChat();
             if (!chat || chat.messages.length === 0) {
                 els.emptyState.classList.remove('hidden');
-                // Remove all message elements except empty state
                 Array.from(els.chatContainer.children).forEach(child => {
                     if (child.id !== 'emptyState') child.remove();
                 });
@@ -660,7 +643,6 @@
 
             if (role === 'assistant') {
                 contentDiv.innerHTML = marked.parse(content || '');
-                // Add copy buttons to code blocks
                 contentDiv.querySelectorAll('pre').forEach(pre => {
                     const copyBtn = document.createElement('button');
                     copyBtn.className = 'code-copy-btn';
@@ -705,7 +687,6 @@
                 chat.title = text.length > 30 ? text.substring(0, 30) + '...' : text;
             }
 
-            // Image generation mode check
             if (isImageMode) {
                 chat.messages.push({ role: 'user', content: text, attachments: attachmentsCopy });
                 appendMessageDOM('user', text, attachmentsCopy);
@@ -721,7 +702,7 @@
                 appendMessageDOM('assistant', aiResponse);
                 saveChatsToStorage();
 
-                toggleImageMode(); // Reset image mode after generation
+                toggleImageMode();
                 return;
             }
 
@@ -729,7 +710,6 @@
             appendMessageDOM('user', text, attachmentsCopy);
             saveChatsToStorage();
 
-            // Prepare Assistant placeholder
             const assistantMsgIndex = chat.messages.length;
             chat.messages.push({ role: 'assistant', content: '' });
             
@@ -762,7 +742,6 @@
                 ];
 
                 if (appState.model === 'custom') {
-                    // Custom endpoint integration
                     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                         method: 'POST',
                         headers: {
@@ -784,9 +763,7 @@
                         const { done, value } = await reader.read();
                         if (done) break;
                         const chunk = decoder.decode(value, { stream: true });
-                        // Parse SSE stream
-                        const lines = chunk.split('
-');
+                        const lines = chunk.split('\n');
                         for (const line of lines) {
                             if (line.startsWith('data: ')) {
                                 const jsonStr = line.replace('data: ', '').trim();
@@ -802,7 +779,6 @@
                         }
                     }
                 } else {
-                    // Pollinations AI / Open router routing
                     let modelToUse = appState.model;
                     if (modelToUse === 'auto') {
                         modelToUse = AUTO_20_MODELS[Math.floor(Math.random() * AUTO_20_MODELS.length)];
@@ -927,17 +903,14 @@
             }
             renderHistorySidebar();
 
-            // Event Listeners
             if (els.newChatBtn) els.newChatBtn.onclick = newChat;
             if (els.sidebarToggleBtn) els.sidebarToggleBtn.onclick = toggleSidebar;
             if (els.overlay) els.overlay.onclick = toggleSidebar;
             if (els.headerExploreBtn) els.headerExploreBtn.onclick = toggleExploreBar;
             if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = () => { toggleSidebar(); toggleExploreBar(); };
             
-            
             if (els.settingsOpenBtn) els.settingsOpenBtn.onclick = openSettings;
             if (els.closeSettingsBtn) els.closeSettingsBtn.onclick = closeSettings;
-            if (els.saveSettingsBtn) els.saveSettingsValues = saveSettingsValues; // wait
             if (els.saveSettingsBtn) els.saveSettingsBtn.onclick = saveSettingsValues;
 
             if (els.themeLightBtn) els.themeLightBtn.onclick = () => setTheme('light');
