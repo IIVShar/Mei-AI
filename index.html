@@ -27,6 +27,20 @@
                             accent: '#a8c7fa',
                             border: '#3c4043'
                         }
+                    },
+                    keyframes: {
+                        meiPulse: {
+                            '0%, 100%': { transform: 'scaleY(1) scaleX(1)', opacity: '0.8' },
+                            '50%': { transform: 'scaleY(1.25) scaleX(1.15)', opacity: '1' }
+                        },
+                        meiGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.9', transform: 'scale(1.3)' }
+                        }
+                    },
+                    animation: {
+                        'mei-thinking': 'meiPulse 1.2s ease-in-out infinite',
+                        'mei-glow': 'meiGlow 1.2s ease-in-out infinite'
                     }
                 }
             }
@@ -69,7 +83,7 @@
         <div class="p-3 flex flex-col gap-3">
             <div class="flex items-center justify-between px-2 py-1">
                 <div class="flex items-center gap-2.5 cursor-pointer" onclick="startNewChat()">
-                    <!-- Exact Mei Logo: Vertical Glowing Multi-Color Pill Gradient -->
+                    <!-- Mei Logo: Vertical Glowing Multi-Color Pill Gradient -->
                     <div class="relative flex items-center justify-center w-7 h-8">
                         <div class="absolute inset-y-0 w-2.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[3px] opacity-80"></div>
                         <div class="relative w-2 h-7 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-md"></div>
@@ -87,9 +101,10 @@
                 <span>New Chat</span>
             </button>
 
-            <a href="wbots.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
+            <!-- Explore Wbots Button -->
+            <a href="wbots.html" class="flex items-center gap-3 bg-gray-800/60 hover:bg-gray-800 text-gray-200 px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/40 shadow-sm">
                 <i class="fa-solid fa-compass text-purple-400"></i>
-                <span>Explore Wbots</span>
+                <span>Explore Custom Wbots</span>
             </a>
         </div>
 
@@ -127,7 +142,7 @@
         <!-- MESSAGES CONTAINER -->
         <div id="chatMessages" class="flex-1 overflow-y-auto px-4 md:px-24 py-6 space-y-6">
             <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4">
-                <!-- Exact Mei Logo: Vertical Glowing Multi-Color Pill -->
+                <!-- Mei Welcome Logo -->
                 <div class="relative flex items-center justify-center w-12 h-16 mx-auto">
                     <div class="absolute inset-y-0 w-4 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[6px] opacity-80"></div>
                     <div class="relative w-3.5 h-14 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-xl"></div>
@@ -170,6 +185,22 @@
         let sessions = JSON.parse(localStorage.getItem('mei_chat_sessions') || '[]');
         let currentSessionId = sessions.length > 0 ? sessions[0].id : null;
         let isGenerating = false;
+
+        // Static Mei Logo Avatar
+        const meiLogoAvatarHtml = `
+            <div class="relative flex items-center justify-center w-full h-full">
+                <div class="absolute inset-y-1 w-1.5 bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 rounded-full blur-[1px]"></div>
+                <div class="relative w-1.5 h-5 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-sm"></div>
+            </div>
+        `;
+
+        // Animated Mei Logo Avatar (Used while thinking)
+        const meiThinkingAvatarHtml = `
+            <div class="relative flex items-center justify-center w-full h-full">
+                <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-full animate-mei-glow blur-[2px]"></div>
+                <div class="relative w-1.5 h-5 rounded-full bg-gradient-to-b from-blue-300 via-purple-400 to-pink-400 shadow-lg animate-mei-thinking"></div>
+            </div>
+        `;
 
         function startNewChat() {
             const newId = 'session_' + Date.now();
@@ -279,8 +310,8 @@
 
             if (!isUser) {
                 const avatar = document.createElement('div');
-                avatar.className = 'w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1';
-                avatar.innerHTML = `<div class="relative flex items-center justify-center w-4 h-5"><div class="absolute inset-y-0 w-1.5 bg-gradient-to-b from-blue-300 via-purple-300 to-pink-300 rounded-full"></div></div>`;
+                avatar.className = 'w-8 h-8 rounded-full bg-gray-800 border border-gray-700/60 flex items-center justify-center shadow flex-shrink-0 mt-1 overflow-hidden';
+                avatar.innerHTML = meiLogoAvatarHtml;
                 wrapper.appendChild(avatar);
             }
 
@@ -375,9 +406,10 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'flex gap-4 max-w-4xl mx-auto w-full justify-start';
 
+            // Avatar container with dynamic ID so we can toggle back to static logo after thinking
             const avatar = document.createElement('div');
-            avatar.className = 'w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1';
-            avatar.innerHTML = `<div class="relative flex items-center justify-center w-4 h-5"><div class="absolute inset-y-0 w-1.5 bg-gradient-to-b from-blue-300 via-purple-300 to-pink-300 rounded-full"></div></div>`;
+            avatar.className = 'w-8 h-8 rounded-full bg-gray-800 border border-gray-700/60 flex items-center justify-center shadow flex-shrink-0 mt-1 overflow-hidden relative';
+            avatar.innerHTML = meiThinkingAvatarHtml;
             wrapper.appendChild(avatar);
 
             const bubble = document.createElement('div');
@@ -405,6 +437,8 @@
             } catch (err) {
                 bubble.innerHTML = '<span class="text-red-400">Error connecting to AI endpoint. Please try again.</span>';
             } finally {
+                // Revert avatar from animated thinking state back to standard static logo state
+                avatar.innerHTML = meiLogoAvatarHtml;
                 isGenerating = false;
             }
         }
