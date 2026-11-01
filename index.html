@@ -160,9 +160,9 @@
                     <i class="fa-solid fa-circle-info text-blue-400"></i> About Mei AI
                 </a>
                 
-                <button id="exploreModelsBtn" type="button" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50 cursor-pointer">
+                <a href="wbots.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
                     <i class="fa-solid fa-brain text-purple-400"></i> Explore Models
-                </button>
+                </a>
 
                 <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 px-2">|</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">Keyless 20+ Model Router & Flux Generator</span>
@@ -284,7 +284,7 @@
                     </select>
                 </div>
 
-                <!-- Custom API & Model Input Section (Dynamically appears only when 'custom' is selected) -->
+                <!-- Custom API & Model Input Section -->
                 <div id="customApiSection" class="hidden space-y-4 pt-3 border-t border-gray-200 dark:border-gray-800">
                     <div>
                         <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Custom API Key</label>
@@ -390,7 +390,6 @@
             if (els.settingsModal) els.settingsModal.classList.remove('hidden');
             if (els.exploreMiniBar) els.exploreMiniBar.classList.add('hidden');
             
-            // Sync values
             if (els.modelSelect) els.modelSelect.value = appState.model;
             if (els.customApiKeyInput) els.customApiKeyInput.value = appState.customApiKey;
             if (els.customModelInput) els.customModelInput.value = appState.customModel;
@@ -525,7 +524,7 @@
                 titleSpan.onclick = () => switchChat(chat.id);
 
                 const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 transition';
+                deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 rounded transition cursor-pointer';
                 deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can text-xs"></i>';
                 deleteBtn.onclick = (e) => {
                     e.stopPropagation();
@@ -538,67 +537,76 @@
             });
         }
 
+        function switchChat(chatId) {
+            appState.currentChatId = chatId;
+            renderHistorySidebar();
+            renderCurrentChatMessages();
+            if (window.innerWidth < 1024) toggleSidebar();
+        }
+
+        function newChat() {
+            const newC = {
+                id: generateId(),
+                title: 'New Chat',
+                messages: []
+            };
+            appState.chats.unshift(newC);
+            appState.currentChatId = newC.id;
+            saveChatsToStorage();
+            renderCurrentChatMessages();
+            if (window.innerWidth < 1024 && els.sidebar && els.sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
         function deleteChat(chatId) {
             appState.chats = appState.chats.filter(c => c.id !== chatId);
             if (appState.currentChatId === chatId) {
-                if (appState.chats.length > 0) {
-                    appState.currentChatId = appState.chats[0].id;
-                } else {
-                    startNewChat(false);
-                }
+                appState.currentChatId = appState.chats.length > 0 ? appState.chats[0].id : null;
             }
             saveChatsToStorage();
-            renderChat(appState.currentChatId);
-        }
-
-        function startNewChat(render = true) {
-            const newChat = { id: generateId(), title: 'New Chat', messages: [], updatedAt: Date.now() };
-            appState.chats.unshift(newChat);
-            appState.currentChatId = newChat.id;
-            saveChatsToStorage();
-            if (render) renderChat(newChat.id);
-            if (window.innerWidth <= 768 && els.sidebar && els.sidebar.classList.contains('open')) toggleSidebar();
-        }
-
-        function switchChat(chatId) {
-            appState.currentChatId = chatId;
-            renderChat(chatId);
-            if (window.innerWidth <= 768 && els.sidebar && els.sidebar.classList.contains('open')) toggleSidebar();
+            renderCurrentChatMessages();
         }
 
         function clearCurrentChat() {
             if (!appState.currentChatId) return;
             const chat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (!chat || chat.messages.length === 0) return;
-
-            showCustomAlert("Clear Chat", "Are you sure you want to delete this chat session?", true, () => {
-                appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
-                if (appState.chats.length === 0) startNewChat(false);
-                else appState.currentChatId = appState.chats[0].id;
+            if (chat) {
+                chat.messages = [];
+                chat.title = 'New Chat';
                 saveChatsToStorage();
-                renderChat(appState.currentChatId);
-            });
+                renderCurrentChatMessages();
+            }
         }
 
-        function renderChat(chatId) {
-            if (!els.chatContainer) return;
-            const chat = appState.chats.find(c => c.id === chatId);
-            
-            els.chatContainer.innerHTML = '';
-            
-            if (!chat || chat.messages.length === 0) {
-                if (els.emptyState) {
-                    els.chatContainer.appendChild(els.emptyState);
-                    els.emptyState.classList.remove('hidden');
-                }
-            } else {
-                if (els.emptyState) els.emptyState.classList.add('hidden');
-                chat.messages.forEach(msg => {
-                    appendMessageUI(msg.role, msg.content, false, msg.attachments || []);
-                });
+        function getCurrentChat() {
+            if (!appState.currentChatId) {
+                newChat();
             }
+            return appState.chats.find(c => c.id === appState.currentChatId);
+        }
+
+        function renderCurrentChatMessages() {
+            if (!els.chatContainer || !els.emptyState) return;
+            const chat = getCurrentChat();
+            if (!chat || chat.messages.length === 0) {
+                els.emptyState.classList.remove('hidden');
+                // Remove all message elements except empty state
+                Array.from(els.chatContainer.children).forEach(child => {
+                    if (child.id !== 'emptyState') child.remove();
+                });
+                return;
+            }
+
+            els.emptyState.classList.add('hidden');
+            Array.from(els.chatContainer.children).forEach(child => {
+                if (child.id !== 'emptyState') child.remove();
+            });
+
+            chat.messages.forEach(msg => {
+                appendMessageDOM(msg.role, msg.content, msg.attachments, false);
+            });
             scrollToBottom();
-            renderHistorySidebar();
         }
 
         function scrollToBottom() {
@@ -607,15 +615,260 @@
             }
         }
 
-        function handleFileSelect(e) {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
+        function appendMessageDOM(role, content, attachments = [], scroll = true) {
+            if (!els.chatContainer) return;
+            if (els.emptyState) els.emptyState.classList.add('hidden');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex mb-6 w-full ${role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`;
+
+            const inner = document.createElement('div');
+            inner.className = `max-w-[85%] lg:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm ${
+                role === 'user' 
+                    ? 'bg-gray-100 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 rounded-br-xs' 
+                    : 'bg-white dark:bg-gemini-card border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-xs w-full'
+            }`;
+
+            if (role === 'assistant') {
+                const header = document.createElement('div');
+                header.className = 'flex items-center gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-gray-800 text-xs font-semibold text-purple-500 dark:text-purple-400';
+                header.innerHTML = '<div class="w-2.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div> Mei AI';
+                inner.appendChild(header);
+            }
+
+            if (attachments && attachments.length > 0) {
+                const attContainer = document.createElement('div');
+                attContainer.className = 'flex flex-wrap gap-2 mb-3';
+                attachments.forEach(att => {
+                    if (att.type && att.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = att.data;
+                        img.className = 'w-24 h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-700';
+                        attContainer.appendChild(img);
+                    } else {
+                        const fileBadge = document.createElement('div');
+                        fileBadge.className = 'flex items-center gap-1.5 bg-gray-200 dark:bg-[#333538] text-xs px-3 py-1.5 rounded-lg';
+                        fileBadge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> ${att.name || 'File'}`;
+                        attContainer.appendChild(fileBadge);
+                    }
+                });
+                inner.appendChild(attContainer);
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = role === 'assistant' ? 'markdown-body text-sm' : 'text-sm whitespace-pre-wrap';
+
+            if (role === 'assistant') {
+                contentDiv.innerHTML = marked.parse(content || '');
+                // Add copy buttons to code blocks
+                contentDiv.querySelectorAll('pre').forEach(pre => {
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'code-copy-btn';
+                    copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy';
+                    copyBtn.onclick = () => {
+                        const codeText = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                        navigator.clipboard.writeText(codeText);
+                        copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
+                        setTimeout(() => copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy', 2000);
+                    };
+                    pre.appendChild(copyBtn);
+                });
+            } else {
+                contentDiv.textContent = content;
+            }
+
+            inner.appendChild(contentDiv);
+            wrapper.appendChild(inner);
+            els.chatContainer.appendChild(wrapper);
+
+            if (scroll) scrollToBottom();
+        }
+
+        async function handleSendMessage() {
+            const text = els.messageInput ? els.messageInput.value.trim() : '';
+            if ((!text && currentAttachments.length === 0) || isGenerating) return;
+
+            if (els.messageInput) {
+                els.messageInput.value = '';
+                els.messageInput.style.height = 'auto';
+            }
+
+            const attachmentsCopy = [...currentAttachments];
+            currentAttachments = [];
+            if (els.attachmentPreview) {
+                els.attachmentPreview.innerHTML = '';
+                els.attachmentPreview.classList.add('hidden');
+            }
+
+            const chat = getCurrentChat();
+            if (chat.messages.length === 0 && text) {
+                chat.title = text.length > 30 ? text.substring(0, 30) + '...' : text;
+            }
+
+            // Image generation mode check
+            if (isImageMode) {
+                chat.messages.push({ role: 'user', content: text, attachments: attachmentsCopy });
+                appendMessageDOM('user', text, attachmentsCopy);
+                saveChatsToStorage();
+
+                const promptEncoded = encodeURIComponent(text);
+                const imageUrl = `https://pollinations.ai/p/${promptEncoded}?width=1024&height=1024&nologo=true`;
+                
+                const aiResponse = `Here is the image generated by Flux for your prompt: "${text}"
+
+![Generated Image](${imageUrl})`;
+                chat.messages.push({ role: 'assistant', content: aiResponse });
+                appendMessageDOM('assistant', aiResponse);
+                saveChatsToStorage();
+
+                toggleImageMode(); // Reset image mode after generation
+                return;
+            }
+
+            chat.messages.push({ role: 'user', content: text, attachments: attachmentsCopy });
+            appendMessageDOM('user', text, attachmentsCopy);
+            saveChatsToStorage();
+
+            // Prepare Assistant placeholder
+            const assistantMsgIndex = chat.messages.length;
+            chat.messages.push({ role: 'assistant', content: '' });
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex mb-6 w-full justify-start animate-fade-in';
+            const inner = document.createElement('div');
+            inner.className = 'max-w-[85%] lg:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm bg-white dark:bg-gemini-card border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-xs w-full';
+            
+            const header = document.createElement('div');
+            header.className = 'flex items-center gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-gray-800 text-xs font-semibold text-purple-500 dark:text-purple-400';
+            header.innerHTML = '<div class="w-2.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div> Mei AI';
+            inner.appendChild(header);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'markdown-body text-sm';
+            contentDiv.innerHTML = '<span class="inline-block animate-pulse">Thinking...</span>';
+            inner.appendChild(contentDiv);
+            wrapper.appendChild(inner);
+            els.chatContainer.appendChild(wrapper);
+            scrollToBottom();
+
+            setGeneratingState(true);
+            activeAbortController = new AbortController();
+
+            try {
+                let fullResponse = '';
+                const apiMessages = [
+                    { role: 'system', content: SYSTEM_PROMPT },
+                    ...chat.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content }))
+                ];
+
+                if (appState.model === 'custom') {
+                    // Custom endpoint integration
+                    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${appState.customApiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: appState.customModel || 'openai/gpt-4o-mini',
+                            messages: apiMessages,
+                            stream: true
+                        }),
+                        signal: activeAbortController.signal
+                    });
+                    if (!res.ok) throw new Error('Custom API error: ' + res.statusText);
+                    
+                    const reader = res.body.getReader();
+                    const decoder = new TextDecoder();
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value, { stream: true });
+                        // Parse SSE stream
+                        const lines = chunk.split('
+');
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const jsonStr = line.replace('data: ', '').trim();
+                                if (jsonStr === '[DONE]') continue;
+                                try {
+                                    const parsed = JSON.parse(jsonStr);
+                                    const delta = parsed.choices?.[0]?.delta?.content || '';
+                                    fullResponse += delta;
+                                    contentDiv.innerHTML = marked.parse(fullResponse);
+                                    scrollToBottom();
+                                } catch (e) {}
+                            }
+                        }
+                    }
+                } else {
+                    // Pollinations AI / Open router routing
+                    let modelToUse = appState.model;
+                    if (modelToUse === 'auto') {
+                        modelToUse = AUTO_20_MODELS[Math.floor(Math.random() * AUTO_20_MODELS.length)];
+                    }
+
+                    const res = await fetch(`https://text.pollinations.ai/openai`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: modelToUse,
+                            messages: apiMessages,
+                            jsonMode: false
+                        }),
+                        signal: activeAbortController.signal
+                    });
+
+                    if (!res.ok) throw new Error('AI Generation failed');
+                    fullResponse = await res.text();
+                    contentDiv.innerHTML = marked.parse(fullResponse);
+                    scrollToBottom();
+                }
+
+                chat.messages[assistantMsgIndex].content = fullResponse;
+                saveChatsToStorage();
+
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    contentDiv.innerHTML = '<span class="text-yellow-500">Generation stopped.</span>';
+                } else {
+                    contentDiv.innerHTML = '<span class="text-red-500">Error generating response. Please check your network or settings.</span>';
+                }
+            } finally {
+                setGeneratingState(false);
+                activeAbortController = null;
+            }
+        }
+
+        function setGeneratingState(generating) {
+            isGenerating = generating;
+            if (els.sendBtn && els.stopBtn) {
+                if (generating) {
+                    els.sendBtn.classList.add('hidden');
+                    els.stopBtn.classList.remove('hidden');
+                } else {
+                    els.sendBtn.classList.remove('hidden');
+                    els.stopBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        function stopGeneration() {
+            if (activeAbortController) {
+                activeAbortController.abort();
+            }
+        }
+
+        function handleFileUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = (event) => {
                     currentAttachments.push({
                         name: file.name,
                         type: file.type,
-                        size: file.size,
                         data: event.target.result
                     });
                     renderAttachmentPreviews();
@@ -626,347 +879,65 @@
                     reader.readAsText(file);
                 }
             });
-            e.target.value = '';
         }
 
         function renderAttachmentPreviews() {
             if (!els.attachmentPreview) return;
-            els.attachmentPreview.innerHTML = '';
             if (currentAttachments.length === 0) {
                 els.attachmentPreview.classList.add('hidden');
+                els.attachmentPreview.innerHTML = '';
                 return;
             }
             els.attachmentPreview.classList.remove('hidden');
+            els.attachmentPreview.innerHTML = '';
+
             currentAttachments.forEach((att, idx) => {
                 const badge = document.createElement('div');
-                badge.className = 'flex items-center gap-1.5 bg-gray-100 dark:bg-[#282a2c] text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-xs border border-gray-200 dark:border-gray-700';
+                badge.className = 'relative flex items-center gap-1.5 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 text-xs px-2.5 py-1.5 rounded-xl';
                 
-                const icon = document.createElement('i');
-                icon.className = att.type.startsWith('image/') ? 'fa-solid fa-image text-purple-400' : 'fa-solid fa-file-lines text-blue-400';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'truncate max-w-[120px]';
-                nameSpan.textContent = att.name;
+                if (att.type && att.type.startsWith('image/')) {
+                    badge.innerHTML = `<img src="${att.data}" class="w-6 h-6 object-cover rounded"> <span class="truncate max-w-[100px]">${att.name || 'Image'}</span>`;
+                } else {
+                    badge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> <span class="truncate max-w-[100px]">${att.name || 'File'}</span>`;
+                }
 
                 const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'text-gray-400 hover:text-red-500 ml-1';
+                removeBtn.className = 'ml-1 text-gray-400 hover:text-red-500 cursor-pointer';
                 removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
                 removeBtn.onclick = () => {
                     currentAttachments.splice(idx, 1);
                     renderAttachmentPreviews();
                 };
 
-                badge.appendChild(icon);
-                badge.appendChild(nameSpan);
                 badge.appendChild(removeBtn);
                 els.attachmentPreview.appendChild(badge);
             });
         }
 
-        function appendMessageUI(role, content, isStreaming = false, attachments = []) {
-            if (els.emptyState && !els.emptyState.classList.contains('hidden')) {
-                els.emptyState.classList.add('hidden');
-            }
-
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex gap-4 my-6 max-w-4xl mx-auto px-4 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
-
-            const inner = document.createElement('div');
-            if (role === 'user') {
-                inner.className = 'bg-gray-100 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 px-5 py-3.5 rounded-3xl max-w-2xl text-sm leading-relaxed shadow-sm border border-gray-200 dark:border-gray-700/50';
-                
-                if (attachments.length > 0) {
-                    const attGrid = document.createElement('div');
-                    attGrid.className = 'flex flex-wrap gap-2 mb-3';
-                    attachments.forEach(att => {
-                        if (att.type && att.type.startsWith('image/')) {
-                            const img = document.createElement('img');
-                            img.src = att.data;
-                            img.className = 'w-32 h-32 object-cover rounded-xl border border-gray-700';
-                            attGrid.appendChild(img);
-                        } else {
-                            const fileTag = document.createElement('div');
-                            fileTag.className = 'bg-black/30 text-xs px-2.5 py-1 rounded-lg border border-gray-700';
-                            fileTag.textContent = att.name;
-                            attGrid.appendChild(fileTag);
-                        }
-                    });
-                    inner.appendChild(attGrid);
-                }
-
-                const p = document.createElement('p');
-                p.className = 'whitespace-pre-wrap';
-                p.textContent = content;
-                inner.appendChild(p);
-            } else {
-                inner.className = 'w-full text-gray-800 dark:text-gray-200 text-sm leading-relaxed space-y-3';
-                
-                const headerRow = document.createElement('div');
-                headerRow.className = 'flex items-center gap-2 mb-1';
-                headerRow.innerHTML = '<div class="w-2.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div><span class="font-medium text-xs text-gray-500 dark:text-gray-400">Mei AI</span>';
-                inner.appendChild(headerRow);
-
-                const bodyDiv = document.createElement('div');
-                bodyDiv.className = 'markdown-body';
-                if (isStreaming) {
-                    bodyDiv.innerHTML = marked.parse(content || 'Thinking...');
-                } else {
-                    bodyDiv.innerHTML = marked.parse(content);
-                }
-
-                // Add code copy buttons
-                bodyDiv.querySelectorAll('pre').forEach(pre => {
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'code-copy-btn';
-                    copyBtn.textContent = 'Copy';
-                    copyBtn.onclick = () => {
-                        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-                        const textArea = document.createElement('textarea');
-                        textArea.value = code;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        try {
-                            document.execCommand('copy');
-                            copyBtn.textContent = 'Copied!';
-                            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
-                        } catch (err) {
-                            console.error('Failed to copy', err);
-                        }
-                        document.body.removeChild(textArea);
-                    };
-                    pre.appendChild(copyBtn);
-                });
-
-                inner.appendChild(bodyDiv);
-            }
-
-            wrapper.appendChild(inner);
-            els.chatContainer.appendChild(wrapper);
-            scrollToBottom();
-            return inner;
-        }
-
-        async function handleSendMessage() {
-            const text = els.messageInput ? els.messageInput.value.trim() : '';
-            if ((!text && currentAttachments.length === 0) || isGenerating) return;
-
-            if (!appState.currentChatId) {
-                startNewChat(false);
-            }
-
-            const chat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (chat && chat.messages.length === 0) {
-                chat.title = text.substring(0, 32) || (isImageMode ? 'Image Generation' : 'New Chat');
-            }
-
-            const userMsgAttachments = [...currentAttachments];
-            const userMsgContent = text;
-
-            chat.messages.push({ role: 'user', content: userMsgContent, attachments: userMsgAttachments });
-            saveChatsToStorage();
-
-            appendMessageUI('user', userMsgContent, false, userMsgAttachments);
-
-            if (els.messageInput) {
-                els.messageInput.value = '';
-                els.messageInput.style.height = 'auto';
-            }
-            currentAttachments = [];
-            renderAttachmentPreviews();
-
-            // Image generation mode via Flux
-            if (isImageMode) {
-                isGenerating = true;
-                if (els.sendBtn) els.sendBtn.classList.add('hidden');
-                if (els.stopBtn) els.stopBtn.classList.remove('hidden');
-
-                const assistantInner = appendMessageUI('assistant', 'Generating your high-definition Flux artwork...', true);
-                const bodyDiv = assistantInner.querySelector('.markdown-body');
-
-                try {
-                    const encodedPrompt = encodeURIComponent(userMsgContent);
-                    const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true`;
-                    
-                    const imgCheck = new Image();
-                    imgCheck.src = imageUrl;
-                    await new Promise((resolve, reject) => {
-                        imgCheck.onload = resolve;
-                        imgCheck.onerror = reject;
-                        setTimeout(resolve, 15000); // timeout safeguard
-                    });
-
-                    const responseMarkdown = `Here is your generated artwork for: "*${userMsgContent}*"\n\n![Generated Image](${imageUrl})`;
-                    chat.messages.push({ role: 'assistant', content: responseMarkdown });
-                    saveChatsToStorage();
-
-                    bodyDiv.innerHTML = marked.parse(responseMarkdown);
-                } catch (err) {
-                    const errorMsg = 'Failed to generate image. Please try a different description.';
-                    chat.messages.push({ role: 'assistant', content: errorMsg });
-                    saveChatsToStorage();
-                    bodyDiv.innerHTML = marked.parse(errorMsg);
-                } finally {
-                    isGenerating = false;
-                    if (els.sendBtn) els.sendBtn.classList.remove('hidden');
-                    if (els.stopBtn) els.stopBtn.classList.add('hidden');
-                    scrollToBottom();
-                }
-                return;
-            }
-
-            // Text / Multimodal Generation
-            isGenerating = true;
-            if (els.sendBtn) els.sendBtn.classList.add('hidden');
-            if (els.stopBtn) els.stopBtn.classList.remove('hidden');
-
-            const assistantInner = appendMessageUI('assistant', '', true);
-            const bodyDiv = assistantInner.querySelector('.markdown-body');
-
-            activeAbortController = new AbortController();
-
-            try {
-                let aiResponseText = '';
-                
-                // Determine model endpoint
-                let selectedModelToUse = appState.model;
-                if (selectedModelToUse === 'auto') {
-                    const randomIndex = Math.floor(Math.random() * AUTO_20_MODELS.length);
-                    selectedModelToUse = AUTO_20_MODELS[randomIndex];
-                }
-
-                if (selectedModelToUse === 'custom' && appState.customModel) {
-                    selectedModelToUse = appState.customModel;
-                }
-
-                // If user supplied custom API key, use direct OpenAI / Gemini style fetch if needed or Pollinations
-                let apiMessages = [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    ...chat.messages.map(m => ({ role: m.role, content: m.content }))
-                ];
-
-                let endpoint = `https://text.pollinations.ai/openai`;
-                let headers = { 'Content-Type': 'application/json' };
-                
-                if (appState.model === 'custom' && appState.customApiKey) {
-                    headers['Authorization'] = `Bearer ${appState.customApiKey}`;
-                }
-
-                const payload = {
-                    model: selectedModelToUse === 'custom' ? 'openai' : selectedModelToUse,
-                    messages: apiMessages,
-                    jsonMode: false
-                };
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(payload),
-                    signal: activeAbortController.signal
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Server returned status ${response.status}`);
-                }
-
-                const data = await response.json();
-                aiResponseText = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "I'm here to help!";
-
-                chat.messages.push({ role: 'assistant', content: aiResponseText });
-                saveChatsToStorage();
-
-                bodyDiv.innerHTML = marked.parse(aiResponseText);
-                bodyDiv.querySelectorAll('pre').forEach(pre => {
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'code-copy-btn';
-                    copyBtn.textContent = 'Copy';
-                    copyBtn.onclick = () => {
-                        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-                        const textArea = document.createElement('textarea');
-                        textArea.value = code;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        try {
-                            document.execCommand('copy');
-                            copyBtn.textContent = 'Copied!';
-                            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
-                        } catch (err) {}
-                        document.body.removeChild(textArea);
-                    };
-                    pre.appendChild(copyBtn);
-                });
-
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    aiResponseText = '*Generation stopped by user.*';
-                } else {
-                    aiResponseText = '⚠️ Network connection or model routing timeout. Please try again.';
-                }
-                chat.messages.push({ role: 'assistant', content: aiResponseText });
-                saveChatsToStorage();
-                bodyDiv.innerHTML = marked.parse(aiResponseText);
-            } finally {
-                isGenerating = false;
-                if (els.sendBtn) els.sendBtn.classList.remove('hidden');
-                if (els.stopBtn) els.stopBtn.classList.add('hidden');
-                activeAbortController = null;
-                scrollToBottom();
-            }
-        }
-
-        function showCustomAlert(title, message, isConfirm = false, onConfirm = null) {
-            if (!els.customModal) return;
-            if (els.modalTitle) els.modalTitle.textContent = title;
-            if (els.modalMessage) els.modalMessage.textContent = message;
-            
-            if (els.modalActions) {
-                els.modalActions.innerHTML = '';
-                if (isConfirm) {
-                    const cancelBtn = document.createElement('button');
-                    cancelBtn.type = 'button';
-                    cancelBtn.className = 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#282a2c] hover:bg-gray-200 dark:hover:bg-[#333538] rounded-xl transition cursor-pointer';
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.onclick = () => els.customModal.classList.add('hidden');
-                    els.modalActions.appendChild(cancelBtn);
-                }
-
-                const okBtn = document.createElement('button');
-                okBtn.type = 'button';
-                okBtn.className = 'px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer';
-                okBtn.textContent = 'OK';
-                okBtn.onclick = () => {
-                    els.customModal.classList.add('hidden');
-                    if (onConfirm) onConfirm();
-                };
-                els.modalActions.appendChild(okBtn);
-            }
-
-            els.customModal.classList.remove('hidden');
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             cacheElements();
             applyTheme(appState.theme);
             updateActiveModelBadge();
 
             if (appState.chats.length === 0) {
-                startNewChat(false);
+                newChat();
             } else {
                 appState.currentChatId = appState.chats[0].id;
+                renderCurrentChatMessages();
             }
-            renderChat(appState.currentChatId);
+            renderHistorySidebar();
 
             // Event Listeners
-            if (els.newChatBtn) els.newChatBtn.onclick = () => startNewChat(true);
+            if (els.newChatBtn) els.newChatBtn.onclick = newChat;
             if (els.sidebarToggleBtn) els.sidebarToggleBtn.onclick = toggleSidebar;
             if (els.overlay) els.overlay.onclick = toggleSidebar;
-            
             if (els.headerExploreBtn) els.headerExploreBtn.onclick = toggleExploreBar;
-            if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = toggleExploreBar;
-            if (els.exploreModelsBtn) els.exploreModelsBtn.onclick = openSettings;
-
+            if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = () => { toggleSidebar(); toggleExploreBar(); };
+            
+            
             if (els.settingsOpenBtn) els.settingsOpenBtn.onclick = openSettings;
             if (els.closeSettingsBtn) els.closeSettingsBtn.onclick = closeSettings;
+            if (els.saveSettingsBtn) els.saveSettingsValues = saveSettingsValues; // wait
             if (els.saveSettingsBtn) els.saveSettingsBtn.onclick = saveSettingsValues;
 
             if (els.themeLightBtn) els.themeLightBtn.onclick = () => setTheme('light');
@@ -978,15 +949,11 @@
 
             if (els.attachBtn && els.fileInput) {
                 els.attachBtn.onclick = () => els.fileInput.click();
-                els.fileInput.onchange = handleFileSelect;
+                els.fileInput.onchange = handleFileUpload;
             }
 
             if (els.sendBtn) els.sendBtn.onclick = handleSendMessage;
-            if (els.stopBtn) {
-                els.stopBtn.onclick = () => {
-                    if (activeAbortController) activeAbortController.abort();
-                };
-            }
+            if (els.stopBtn) els.stopBtn.onclick = stopGeneration;
 
             if (els.messageInput) {
                 els.messageInput.oninput = function() {
