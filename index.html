@@ -1,716 +1,433 @@
-                        
-                        <optgroup label="Top Open Models">
-                            <option value="openai">OpenAI GPT-4o Mini</option>
-                            <option value="llama">Llama 3.3 70B Instruct</option>
-                            <option value="deepseek">DeepSeek V3 / R1</option>
-                            <option value="mistral">Mistral Large 2</option>
-                            <option value="qwen">Qwen 2.5 72B Instruct</option>
-                            <option value="gemma">Gemma 2 27B Instruct</option>
-                        </optgroup>
-                    </select>
-                </div>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mei AI - Advanced Multi-Model Workspace</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-                <!-- Custom API & Model Input Section -->
-                <div id="customApiSection" class="hidden space-y-4 pt-3 border-t border-gray-200 dark:border-gray-800">
-                    <div>
-                        <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Custom API Key</label>
-                        <input type="password" id="customApiKeyInput" placeholder="Enter API Key" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Custom Model Name</label>
-                        <input type="text" id="customModelInput" placeholder="e.g., custom-model-id" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500">
-                    </div>
-                </div>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gemini: {
+                            bg: '#131314',
+                            sidebar: '#1e1e20',
+                            card: '#282a2c',
+                            cardHover: '#333538',
+                            userBubble: '#2b2d30',
+                            accent: '#a8c7fa',
+                            border: '#3c4043'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; position: relative; }
+        .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
+        .markdown-body pre code { background: transparent; padding: 0; color: #e6edf3; }
+        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #f8fafc; }
+        
+        .code-copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6edf3;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .code-copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body class="bg-gemini-bg text-gray-100 font-sans h-screen flex overflow-hidden">
 
-                <p class="text-xs text-gray-500 dark:text-gray-400">Mei AI uses a multi-endpoint rotation pool to eliminate rate limits and cool-down delays.</p>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-gemini-sidebar flex flex-col justify-between border-r border-gray-800 transition-all duration-300 z-20">
+        <div class="p-3 flex flex-col gap-3">
+            <div class="flex items-center justify-between px-2 py-1">
+                <div class="flex items-center gap-2.5 cursor-pointer" onclick="startNewChat()">
+                    <div class="relative flex items-center justify-center w-7 h-8">
+                        <div class="absolute inset-y-0 w-2.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[3px] opacity-80"></div>
+                        <div class="relative w-2 h-7 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-md"></div>
+                    </div>
+                    <span class="font-semibold text-base tracking-tight text-gray-200">Mei AI</span>
+                </div>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
             </div>
 
-            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end">
-                <button id="saveSettingsBtn" type="button" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">Done</button>
+            <!-- New Chat Button -->
+            <button onclick="startNewChat()" class="flex items-center gap-3 bg-gray-800 hover:bg-gray-700/80 text-gray-200 px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/50 shadow-sm cursor-pointer">
+                <i class="fa-solid fa-plus text-blue-400"></i>
+                <span>New Chat</span>
+            </button>
+
+            <a href="wbots.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
+                <i class="fa-solid fa-compass text-purple-400"></i>
+                <span>Explore Wbots</span>
+            </a>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+            <div class="text-xs font-semibold text-gray-400 px-3 mb-2 uppercase tracking-wider">Chat History</div>
+            <div id="chatHistoryList" class="space-y-1"></div>
+        </div>
+
+        <div class="p-3 border-t border-gray-800 flex items-center justify-between text-xs text-gray-400">
+            <span>Multi-API Pool Active</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT WORKSPACE -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-gemini-bg relative">
+
+        <!-- TOP BAR -->
+        <div class="h-14 px-6 border-b border-gray-800 flex items-center justify-between bg-gemini-bg/80 backdrop-blur z-10">
+            <div class="flex items-center gap-3">
+                <select id="modelSelector" class="bg-gemini-card text-gray-200 text-xs font-medium px-3 py-1.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-blue-500 transition cursor-pointer">
+                    <option value="openai">OpenAI (Default High-Speed)</option>
+                    <option value="deepseek">DeepSeek Reasoner</option>
+                    <option value="qwen">Qwen Coder</option>
+                    <option value="flux">Flux Image Generation Mode</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="clearChatHistory()" class="text-gray-400 hover:text-white text-xs px-3 py-1.5 rounded-lg hover:bg-gray-800 transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> Clear History
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Application JavaScript logic -->
+        <!-- MESSAGES CONTAINER -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto px-4 md:px-24 py-6 space-y-6">
+            <!-- Welcome screen if empty -->
+            <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">How can Mei help you today?</h2>
+                <p class="text-xs text-gray-400 leading-relaxed">Powered by the Multi-API Round-Robin Rotation Pool. Bypasses rate limits instantly for seamless chat and code generation.</p>
+            </div>
+        </div>
+
+        <!-- INPUT AREA -->
+        <div class="p-4 md:px-24 bg-gemini-bg">
+            <div class="max-w-4xl mx-auto bg-gemini-card rounded-2xl border border-gray-700/60 p-3 shadow-lg focus-within:border-blue-500 transition">
+                <textarea id="chatInput" rows="1" placeholder="Ask Mei anything or request image generation..." onkeydown="handleKeydown(event)"
+                    class="w-full bg-transparent text-gray-100 placeholder-gray-400 text-sm resize-none focus:outline-none max-h-32"></textarea>
+                <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-700/40">
+                    <div class="flex items-center gap-2 text-gray-400 text-xs">
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                        <span>Round-Robin Rotator Active</span>
+                    </div>
+                    <button onclick="sendMessage()" id="sendBtn" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-xl flex items-center justify-center transition shadow cursor-pointer">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="text-center mt-2 text-[11px] text-gray-500">
+                Mei AI can make mistakes. Verify important code and facts.
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CLIENT SCRIPT -->
     <script>
-        const SYSTEM_PROMPT = "You are Mei, a helpful, friendly AI assistant. Always identify yourself as Mei when asked about your name or identity.";
-
-        const AUTO_20_MODELS = [
-            'openai', 'phi-vision', 'sur', 'qwen-coder', 'mistral', 
-            'llama', 'deepseek', 'qwen', 'gemma', 'phi', 
-            'nemotron', 'hermes', 'command-r', 'codestral', 'mistral-nemo', 
-            'llama-3.1-8b', 'gemma-9b', 'qwen-math', 'deepseek-coder', 'llama-guard'
-        ];
-
-        // Multi-API Rotation Pool to surpass 1 reply/45s limits
         const API_ENDPOINTS = [
             { type: 'pollinations_openai', url: 'https://text.pollinations.ai/openai' },
-            { type: 'pollinations_direct', url: 'https://text.pollinations.ai/' },
-            { type: 'pollinations_alt', url: 'https://text.pollinations.ai/openai' }
+            { type: 'pollinations_direct', url: 'https://text.pollinations.ai/' }
         ];
         let currentEndpointIndex = 0;
 
-        let appState = {
-            chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
-            currentChatId: null,
-            theme: localStorage.getItem('ai_theme') || 'dark',
-            model: localStorage.getItem('ai_model') || 'auto',
-            customApiKey: localStorage.getItem('ai_custom_key') || '',
-            customModel: localStorage.getItem('ai_custom_model') || ''
-        };
-        
-        let isImageMode = false;
-        let currentAttachments = [];
-        let els = {};
-        let activeAbortController = null;
+        let sessions = JSON.parse(localStorage.getItem('mei_chat_sessions') || '[]');
+        let currentSessionId = sessions.length > 0 ? sessions[0].id : null;
         let isGenerating = false;
 
-        function cacheElements() {
-            els = {
-                sidebar: document.getElementById('sidebar'),
-                overlay: document.getElementById('overlay'),
-                historyList: document.getElementById('historyList'),
-                chatContainer: document.getElementById('chatContainer'),
-                emptyState: document.getElementById('emptyState'),
-                messageInput: document.getElementById('messageInput'),
-                sendBtn: document.getElementById('sendBtn'),
-                stopBtn: document.getElementById('stopBtn'),
-                imageModeBtn: document.getElementById('imageModeBtn'),
-                settingsModal: document.getElementById('settingsModal'),
-                attachmentPreview: document.getElementById('attachmentPreview'),
-                fileInput: document.getElementById('fileInput'),
-                modelSelect: document.getElementById('modelSelect'),
-                customApiSection: document.getElementById('customApiSection'),
-                customApiKeyInput: document.getElementById('customApiKeyInput'),
-                customModelInput: document.getElementById('customModelInput'),
-                activeModelBadge: document.getElementById('activeModelBadge'),
-                themeLightBtn: document.getElementById('themeLightBtn'),
-                themeDarkBtn: document.getElementById('themeDarkBtn'),
-                customModal: document.getElementById('customModal'),
-                modalTitle: document.getElementById('modalTitle'),
-                modalMessage: document.getElementById('modalMessage'),
-                modalConfirmBtn: document.getElementById('modalConfirmBtn'),
-                attachBtn: document.getElementById('attachBtn'),
-                closeSettingsBtn: document.getElementById('closeSettingsBtn'),
-                saveSettingsBtn: document.getElementById('saveSettingsBtn'),
-                newChatBtn: document.getElementById('newChatBtn'),
-                settingsOpenBtn: document.getElementById('settingsOpenBtn'),
-                clearChatBtn: document.getElementById('clearChatBtn'),
-                sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
-                headerExploreBtn: document.getElementById('headerExploreBtn'),
-                sidebarExploreBtn: document.getElementById('sidebarExploreBtn'),
-                exploreMiniBar: document.getElementById('exploreMiniBar')
-            };
-        }
-
-        function toggleSidebar() {
-            if (els.sidebar) {
-                els.sidebar.classList.toggle('open');
-                if (window.innerWidth >= 1024) {
-                    els.sidebar.classList.toggle('hidden');
-                }
-            }
-            if (els.overlay && window.innerWidth < 1024) els.overlay.classList.toggle('hidden');
-        }
-
-        function toggleExploreBar() {
-            if (els.exploreMiniBar) {
-                els.exploreMiniBar.classList.toggle('hidden');
-            }
-        }
-
-        function openSettings() {
-            if (els.settingsModal) els.settingsModal.classList.remove('hidden');
-            if (els.exploreMiniBar) els.exploreMiniBar.classList.add('hidden');
-            
-            if (els.modelSelect) els.modelSelect.value = appState.model;
-            if (els.customApiKeyInput) els.customApiKeyInput.value = appState.customApiKey;
-            if (els.customModelInput) els.customModelInput.value = appState.customModel;
-            
-            if (els.customApiSection) {
-                if (appState.model === 'custom') {
-                    els.customApiSection.classList.remove('hidden');
-                } else {
-                    els.customApiSection.classList.add('hidden');
-                }
-            }
-        }
-
-        function closeSettings() {
-            if (els.settingsModal) els.settingsModal.classList.add('hidden');
-        }
-
-        function applyTheme(theme) {
-            const htmlEl = document.documentElement;
-            if (theme === 'dark') {
-                htmlEl.classList.add('dark');
-                if (els.themeDarkBtn) els.themeDarkBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow transition cursor-pointer';
-                if (els.themeLightBtn) els.themeLightBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333538] transition cursor-pointer';
-            } else {
-                htmlEl.classList.remove('dark');
-                if (els.themeLightBtn) els.themeLightBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow transition cursor-pointer';
-                if (els.themeDarkBtn) els.themeDarkBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333538] transition cursor-pointer';
-            }
-        }
-
-        function setTheme(theme) {
-            appState.theme = theme;
-            localStorage.setItem('ai_theme', theme);
-            applyTheme(theme);
-        }
-
-        function updateActiveModelBadge() {
-            if (!els.activeModelBadge) return;
-            if (appState.model === 'auto') {
-                els.activeModelBadge.textContent = "Auto (Multi-API Rotator)";
-            } else if (appState.model === 'custom') {
-                els.activeModelBadge.textContent = `Custom (${appState.customModel || 'API'})`;
-            } else {
-                els.activeModelBadge.textContent = `Model: ${appState.model}`;
-            }
-        }
-
-        function handleModelChange() {
-            if (els.modelSelect) {
-                appState.model = els.modelSelect.value;
-                localStorage.setItem('ai_model', appState.model);
-
-                if (els.customApiSection) {
-                    if (appState.model === 'custom') {
-                        els.customApiSection.classList.remove('hidden');
-                    } else {
-                        els.customApiSection.classList.add('hidden');
-                    }
-                }
-                updateActiveModelBadge();
-            }
-        }
-
-        function saveSettingsValues() {
-            if (els.modelSelect) appState.model = els.modelSelect.value;
-            if (els.customApiKeyInput) appState.customApiKey = els.customApiKeyInput.value.trim();
-            if (els.customModelInput) appState.customModel = els.customModelInput.value.trim();
-
-            localStorage.setItem('ai_model', appState.model);
-            localStorage.setItem('ai_custom_key', appState.customApiKey);
-            localStorage.setItem('ai_custom_model', appState.customModel);
-
-            updateActiveModelBadge();
-            closeSettings();
-        }
-
-        function toggleImageMode() {
-            isImageMode = !isImageMode;
-            if (isImageMode) {
-                if (els.imageModeBtn) {
-                    els.imageModeBtn.classList.replace('text-gray-500', 'text-purple-500');
-                    els.imageModeBtn.classList.replace('dark:text-gray-400', 'dark:text-purple-400');
-                    els.imageModeBtn.classList.add('bg-purple-100', 'dark:bg-purple-900/30');
-                }
-                if (els.messageInput) els.messageInput.placeholder = "Describe an image for Mei to generate (Free Flux)...";
-                if (els.sendBtn) {
-                    els.sendBtn.classList.replace('text-blue-600', 'text-purple-600');
-                    els.sendBtn.classList.replace('dark:text-blue-400', 'dark:text-purple-400');
-                }
-            } else {
-                if (els.imageModeBtn) {
-                    els.imageModeBtn.classList.replace('text-purple-500', 'text-gray-500');
-                    els.imageModeBtn.classList.replace('dark:text-purple-400', 'dark:text-gray-400');
-                    els.imageModeBtn.classList.remove('bg-purple-100', 'dark:bg-purple-900/30');
-                }
-                if (els.messageInput) els.messageInput.placeholder = "Message Mei...";
-                if (els.sendBtn) {
-                    els.sendBtn.classList.replace('text-purple-600', 'text-blue-600');
-                    els.sendBtn.classList.replace('dark:text-purple-400', 'dark:text-blue-400');
-                }
-            }
-        }
-
-        function generateId() {
-            return 'chat_' + Math.random().toString(36).substring(2, 9);
-        }
-
-        function saveChatsToStorage() {
-            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
-            renderHistorySidebar();
-        }
-
-        function renderHistorySidebar() {
-            if (!els.historyList) return;
-            els.historyList.innerHTML = '';
-            
-            if (appState.chats.length === 0) {
-                els.historyList.innerHTML = '<li class="text-xs text-gray-400 px-2 py-1">No recent chats</li>';
-                return;
-            }
-
-            appState.chats.forEach(chat => {
-                const li = document.createElement('li');
-                const isActive = chat.id === appState.currentChatId;
-                li.className = `group flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition ${
-                    isActive ? 'bg-gray-100 dark:bg-[#282a2c] text-gray-900 dark:text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#202225]'
-                }`;
-                
-                const titleSpan = document.createElement('span');
-                titleSpan.className = 'truncate flex-1';
-                titleSpan.textContent = chat.title || 'New Chat';
-                titleSpan.onclick = () => switchChat(chat.id);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 rounded transition cursor-pointer';
-                deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can text-xs"></i>';
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteChat(chat.id);
-                };
-
-                li.appendChild(titleSpan);
-                li.appendChild(deleteBtn);
-                els.historyList.appendChild(li);
-            });
-        }
-
-        function switchChat(chatId) {
-            appState.currentChatId = chatId;
-            renderHistorySidebar();
-            renderCurrentChatMessages();
-            if (window.innerWidth < 1024) toggleSidebar();
-        }
-
-        function newChat() {
-            const newC = {
-                id: generateId(),
-                title: 'New Chat',
+        function startNewChat() {
+            const newId = 'session_' + Date.now();
+            const newSession = {
+                id: newId,
+                title: 'New Conversation',
                 messages: []
             };
-            appState.chats.unshift(newC);
-            appState.currentChatId = newC.id;
-            saveChatsToStorage();
-            renderCurrentChatMessages();
-            if (window.innerWidth < 1024 && els.sidebar && els.sidebar.classList.contains('open')) {
-                toggleSidebar();
-            }
+            sessions.unshift(newSession);
+            saveSessions();
+            currentSessionId = newId;
+            renderSessionsList();
+            loadCurrentSession();
         }
 
-        function deleteChat(chatId) {
-            appState.chats = appState.chats.filter(c => c.id !== chatId);
-            if (appState.currentChatId === chatId) {
-                appState.currentChatId = appState.chats.length > 0 ? appState.chats[0].id : null;
-            }
-            saveChatsToStorage();
-            renderCurrentChatMessages();
+        function saveSessions() {
+            localStorage.setItem('mei_chat_sessions', JSON.stringify(sessions));
         }
 
-        function clearCurrentChat() {
-            if (!appState.currentChatId) return;
-            const chat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (chat) {
-                chat.messages = [];
-                chat.title = 'New Chat';
-                saveChatsToStorage();
-                renderCurrentChatMessages();
-            }
+        function renderSessionsList() {
+            const list = document.getElementById('chatHistoryList');
+            list.innerHTML = '';
+
+            sessions.forEach(s => {
+                const item = document.createElement('div');
+                const isActive = s.id === currentSessionId;
+                item.className = `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition ${
+                    isActive ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
+                }`;
+                item.onclick = () => {
+                    currentSessionId = s.id;
+                    renderSessionsList();
+                    loadCurrentSession();
+                };
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5 truncate flex-1">
+                        <i class="fa-solid fa-message text-[10px] text-blue-400"></i>
+                        <span class="truncate">${s.title}</span>
+                    </div>
+                    <button onclick="event.stopPropagation(); deleteSession('${s.id}')" class="text-gray-500 hover:text-red-400 p-1">
+                        <i class="fa-solid fa-xmark text-[10px]"></i>
+                    </button>
+                `;
+                list.appendChild(item);
+            });
         }
 
-        function getCurrentChat() {
-            if (!appState.currentChatId) {
-                newChat();
+        function deleteSession(id) {
+            sessions = sessions.filter(s => s.id !== id);
+            saveSessions();
+            if (currentSessionId === id) {
+                if (sessions.length > 0) {
+                    currentSessionId = sessions[0].id;
+                } else {
+                    startNewChat();
+                    return;
+                }
             }
-            return appState.chats.find(c => c.id === appState.currentChatId);
+            renderSessionsList();
+            loadCurrentSession();
         }
 
-        function renderCurrentChatMessages() {
-            if (!els.chatContainer || !els.emptyState) return;
-            const chat = getCurrentChat();
-            if (!chat || chat.messages.length === 0) {
-                els.emptyState.classList.remove('hidden');
-                Array.from(els.chatContainer.children).forEach(child => {
-                    if (child.id !== 'emptyState') child.remove();
-                });
+        function clearChatHistory() {
+            sessions = [];
+            startNewChat();
+        }
+
+        function loadCurrentSession() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (!session || session.messages.length === 0) {
+                container.innerHTML = `
+                    <div id="welcomeScreen" class="h-full flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl shadow-lg">
+                            <i class="fa-solid fa-sparkles"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-white">How can Mei help you today?</h2>
+                        <p class="text-xs text-gray-400 leading-relaxed">Powered by the Multi-API Round-Robin Rotation Pool. Bypasses rate limits instantly for seamless chat and code generation.</p>
+                    </div>
+                `;
                 return;
             }
 
-            els.emptyState.classList.add('hidden');
-            Array.from(els.chatContainer.children).forEach(child => {
-                if (child.id !== 'emptyState') child.remove();
-            });
-
-            chat.messages.forEach(msg => {
-                appendMessageDOM(msg.role, msg.content, msg.attachments, false);
+            session.messages.forEach(msg => {
+                appendMessageNode(msg.role, msg.content, msg.isImage);
             });
             scrollToBottom();
         }
 
         function scrollToBottom() {
-            if (els.chatContainer) {
-                els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
-            }
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
         }
 
-        function appendMessageDOM(role, content, attachments = [], scroll = true) {
-            if (!els.chatContainer) return;
-            if (els.emptyState) els.emptyState.classList.add('hidden');
+        function appendMessageNode(role, text, isImage = false) {
+            const container = document.getElementById('chatMessages');
+            const welcome = document.getElementById('welcomeScreen');
+            if (welcome) welcome.remove();
 
+            const isUser = role === 'user';
             const wrapper = document.createElement('div');
-            wrapper.className = `flex mb-6 w-full ${role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`;
+            wrapper.className = `flex gap-4 max-w-4xl mx-auto w-full ${isUser ? 'justify-end' : 'justify-start'}`;
 
-            const inner = document.createElement('div');
-            inner.className = `max-w-[85%] lg:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm ${
-                role === 'user' 
-                    ? 'bg-gray-100 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 rounded-br-xs' 
-                    : 'bg-white dark:bg-gemini-card border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-xs w-full'
-            }`;
-
-            if (role === 'assistant') {
-                const header = document.createElement('div');
-                header.className = 'flex items-center gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-gray-800 text-xs font-semibold text-purple-500 dark:text-purple-400';
-                header.innerHTML = '<div class="w-2.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div> Mei AI';
-                inner.appendChild(header);
+            if (!isUser) {
+                const avatar = document.createElement('div');
+                avatar.className = 'w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1';
+                avatar.innerHTML = `<i class="fa-solid fa-robot"></i>`;
+                wrapper.appendChild(avatar);
             }
 
-            if (attachments && attachments.length > 0) {
-                const attContainer = document.createElement('div');
-                attContainer.className = 'flex flex-wrap gap-2 mb-3';
-                attachments.forEach(att => {
-                    if (att.type && att.type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = att.data;
-                        img.className = 'w-24 h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-700';
-                        attContainer.appendChild(img);
-                    } else {
-                        const fileBadge = document.createElement('div');
-                        fileBadge.className = 'flex items-center gap-1.5 bg-gray-200 dark:bg-[#333538] text-xs px-3 py-1.5 rounded-lg';
-                        fileBadge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> ${att.name || 'File'}`;
-                        attContainer.appendChild(fileBadge);
-                    }
-                });
-                inner.appendChild(attContainer);
-            }
+            const bubble = document.createElement('div');
+            bubble.className = isUser 
+                ? 'bg-gemini-userBubble text-gray-100 px-4 py-3 rounded-2xl text-sm max-w-[85%] md:max-w-[75%] shadow-sm' 
+                : 'text-gray-200 text-sm max-w-[85%] md:max-w-[75%] leading-relaxed markdown-body pt-1 w-full';
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = role === 'assistant' ? 'markdown-body text-sm' : 'text-sm whitespace-pre-wrap';
-
-            if (role === 'assistant') {
-                contentDiv.innerHTML = marked.parse(content || '');
-                contentDiv.querySelectorAll('pre').forEach(pre => {
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'code-copy-btn';
-                    copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy';
-                    copyBtn.onclick = () => {
-                        const codeText = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-                        navigator.clipboard.writeText(codeText);
-                        copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
-                        setTimeout(() => copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy', 2000);
-                    };
-                    pre.appendChild(copyBtn);
-                });
+            if (isUser) {
+                bubble.textContent = text;
             } else {
-                contentDiv.textContent = content;
+                if (isImage) {
+                    bubble.innerHTML = `<img src="${text}" alt="Generated Image" class="rounded-xl shadow-lg max-w-full border border-gray-700">`;
+                } else {
+                    bubble.innerHTML = marked.parse(text || '');
+                    bubble.querySelectorAll('pre').forEach(pre => {
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'code-copy-btn';
+                        copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy';
+                        copyBtn.onclick = () => {
+                            const codeText = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                            navigator.clipboard.writeText(codeText);
+                            copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
+                            setTimeout(() => copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy', 2000);
+                        };
+                        pre.appendChild(copyBtn);
+                    });
+                }
             }
 
-            inner.appendChild(contentDiv);
-            wrapper.appendChild(inner);
-            els.chatContainer.appendChild(wrapper);
-
-            if (scroll) scrollToBottom();
+            wrapper.appendChild(bubble);
+            container.appendChild(wrapper);
+            scrollToBottom();
         }
 
-        // Multi-API Rotation Request Handler to bypass single-endpoint rate limits
-        async function sendMultiApiRequest(apiMessages, modelToUse, signal) {
+        async function sendMultiApiRequest(apiMessages, modelToUse) {
             let lastError = null;
-            
             for (let i = 0; i < API_ENDPOINTS.length; i++) {
                 const endpoint = API_ENDPOINTS[currentEndpointIndex];
                 currentEndpointIndex = (currentEndpointIndex + 1) % API_ENDPOINTS.length;
 
                 try {
                     let res;
-                    if (endpoint.type.includes('openai') || endpoint.type.includes('alt')) {
+                    if (endpoint.type.includes('openai')) {
                         res = await fetch(endpoint.url, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                model: modelToUse,
-                                messages: apiMessages,
-                                seed: Math.floor(Math.random() * 999999)
-                            }),
-                            signal: signal
+                            body: JSON.stringify({ model: modelToUse, messages: apiMessages, seed: Math.floor(Math.random() * 999999) })
                         });
                     } else {
                         res = await fetch(endpoint.url, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                messages: apiMessages,
-                                model: modelToUse
-                            }),
-                            signal: signal
+                            body: JSON.stringify({ messages: apiMessages, model: modelToUse })
                         });
                     }
-
                     if (res && res.ok) {
-                        const textResult = await res.text();
-                        if (textResult && textResult.trim().length > 0) {
-                            return textResult;
-                        }
+                        const txt = await res.text();
+                        if (txt && txt.trim().length > 0) return txt;
                     }
                 } catch (err) {
-                    if (err.name === 'AbortError') throw err;
                     lastError = err;
                 }
             }
-            
-            // Fallback to direct GET query
-            const lastUserMsg = apiMessages[apiMessages.length - 1].content;
-            const fallbackRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(lastUserMsg)}?model=${modelToUse}`, { signal });
-            if (!fallbackRes.ok) throw lastError || new Error('All API rotation channels exhausted.');
-            return await fallbackRes.text();
+            const lastMsg = apiMessages[apiMessages.length - 1].content;
+            const fb = await fetch(`https://text.pollinations.ai/${encodeURIComponent(lastMsg)}?model=${modelToUse}`);
+            if (!fb.ok) throw lastError || new Error('All rotation channels exhausted.');
+            return await fb.text();
         }
 
-        async function handleSendMessage() {
-            const text = els.messageInput ? els.messageInput.value.trim() : '';
-            if ((!text && currentAttachments.length === 0) || isGenerating) return;
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            const selectedModel = document.getElementById('modelSelector').value;
+            if (!text || isGenerating) return;
 
-            if (els.messageInput) {
-                els.messageInput.value = '';
-                els.messageInput.style.height = 'auto';
+            input.value = '';
+            input.style.height = 'auto';
+
+            if (!currentSessionId) startNewChat();
+            const session = sessions.find(s => s.id === currentSessionId);
+            if (session.messages.length === 0) {
+                session.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
             }
 
-            const attachmentsCopy = [...currentAttachments];
-            currentAttachments = [];
-            if (els.attachmentPreview) {
-                els.attachmentPreview.innerHTML = '';
-                els.attachmentPreview.classList.add('hidden');
-            }
+            appendMessageNode('user', text);
+            session.messages.push({ role: 'user', content: text, isImage: false });
+            saveSessions();
+            renderSessionsList();
 
-            const chat = getCurrentChat();
-            if (chat.messages.length === 0 && text) {
-                chat.title = text.length > 30 ? text.substring(0, 30) + '...' : text;
-            }
-
-            // Image generation mode check
-            if (isImageMode) {
-                chat.messages.push({ role: 'user', content: text, attachments: attachmentsCopy });
-                appendMessageDOM('user', text, attachmentsCopy);
-                saveChatsToStorage();
-
-                const promptEncoded = encodeURIComponent(text);
-                const imageUrl = `https://pollinations.ai/p/${promptEncoded}?width=1024&height=1024&nologo=true`;
-                
-                const aiResponse = `Here is the image generated by Flux for your prompt: "${text}"
-
-![Generated Image](${imageUrl})`;
-                chat.messages.push({ role: 'assistant', content: aiResponse });
-                appendMessageDOM('assistant', aiResponse);
-                saveChatsToStorage();
-
-                toggleImageMode();
-                return;
-            }
-
-            chat.messages.push({ role: 'user', content: text, attachments: attachmentsCopy });
-            appendMessageDOM('user', text, attachmentsCopy);
-            saveChatsToStorage();
-
-            const assistantMsgIndex = chat.messages.length;
-            chat.messages.push({ role: 'assistant', content: '' });
-            
+            const container = document.getElementById('chatMessages');
             const wrapper = document.createElement('div');
-            wrapper.className = 'flex mb-6 w-full justify-start animate-fade-in';
-            const inner = document.createElement('div');
-            inner.className = 'max-w-[85%] lg:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm bg-white dark:bg-gemini-card border border-gray-200/80 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-xs w-full';
-            
-            const header = document.createElement('div');
-            header.className = 'flex items-center gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-gray-800 text-xs font-semibold text-purple-500 dark:text-purple-400';
-            header.innerHTML = '<div class="w-2.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div> Mei AI';
-            inner.appendChild(header);
+            wrapper.className = 'flex gap-4 max-w-4xl mx-auto w-full justify-start';
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'markdown-body text-sm';
-            contentDiv.innerHTML = '<span class="inline-block animate-pulse">Thinking...</span>';
-            inner.appendChild(contentDiv);
-            wrapper.appendChild(inner);
-            els.chatContainer.appendChild(wrapper);
+            const avatar = document.createElement('div');
+            avatar.className = 'w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1';
+            avatar.innerHTML = `<i class="fa-solid fa-robot"></i>`;
+            wrapper.appendChild(avatar);
+
+            const bubble = document.createElement('div');
+            bubble.className = 'text-gray-200 text-sm max-w-[85%] md:max-w-[75%] leading-relaxed markdown-body pt-1 w-full';
+            bubble.innerHTML = '<span class="animate-pulse text-purple-400">Thinking...</span>';
+            wrapper.appendChild(bubble);
+            container.appendChild(wrapper);
             scrollToBottom();
 
-            setGeneratingState(true);
-            activeAbortController = new AbortController();
+            isGenerating = true;
 
             try {
-                let fullResponse = '';
-                const apiMessages = [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    ...chat.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content }))
-                ];
-
-                if (appState.model === 'custom') {
-                    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.customApiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: appState.customModel || 'openai/gpt-4o-mini',
-                            messages: apiMessages,
-                            stream: false
-                        }),
-                        signal: activeAbortController.signal
-                    });
-                    if (!res.ok) throw new Error('Custom API error: ' + res.statusText);
-                    const json = await res.json();
-                    fullResponse = json.choices?.[0]?.message?.content || '';
+                if (selectedModel === 'flux') {
+                    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(text)}?width=1024&height=1024&nologo=true`;
+                    bubble.innerHTML = `<img src="${imageUrl}" alt="Generated Image" class="rounded-xl shadow-lg max-w-full border border-gray-700">`;
+                    session.messages.push({ role: 'assistant', content: imageUrl, isImage: true });
                 } else {
-                    let modelToUse = appState.model;
-                    if (modelToUse === 'auto') {
-                        modelToUse = AUTO_20_MODELS[Math.floor(Math.random() * AUTO_20_MODELS.length)];
-                    }
-
-                    // Utilize multi-API rotator pool to bypass rate limits
-                    fullResponse = await sendMultiApiRequest(apiMessages, modelToUse, activeAbortController.signal);
+                    const apiMessages = session.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content }));
+                    const fullResponse = await sendMultiApiRequest(apiMessages, selectedModel === 'deepseek' ? 'deepseek' : selectedModel === 'qwen' ? 'qwen' : 'openai');
+                    bubble.innerHTML = marked.parse(fullResponse);
+                    session.messages.push({ role: 'assistant', content: fullResponse, isImage: false });
                 }
-
-                contentDiv.innerHTML = marked.parse(fullResponse);
+                saveSessions();
                 scrollToBottom();
-                chat.messages[assistantMsgIndex].content = fullResponse;
-                saveChatsToStorage();
-
             } catch (err) {
-                if (err.name === 'AbortError') {
-                    contentDiv.innerHTML = '<span class="text-yellow-500">Generation stopped.</span>';
-                } else {
-                    contentDiv.innerHTML = '<span class="text-red-500">Error generating response. Multi-API pool is recovering, please try again.</span>';
-                }
+                bubble.innerHTML = '<span class="text-red-400">Error connecting to AI endpoint. Please try again.</span>';
             } finally {
-                setGeneratingState(false);
-                activeAbortController = null;
+                isGenerating = false;
             }
         }
 
-        function setGeneratingState(generating) {
-            isGenerating = generating;
-            if (els.sendBtn && els.stopBtn) {
-                if (generating) {
-                    els.sendBtn.classList.add('hidden');
-                    els.stopBtn.classList.remove('hidden');
-                } else {
-                    els.sendBtn.classList.remove('hidden');
-                    els.stopBtn.classList.add('hidden');
-                }
-            }
-        }
-
-        function stopGeneration() {
-            if (activeAbortController) {
-                activeAbortController.abort();
-            }
-        }
-
-        function handleFileUpload(e) {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
-
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    currentAttachments.push({
-                        name: file.name,
-                        type: file.type,
-                        data: event.target.result
-                    });
-                    renderAttachmentPreviews();
-                };
-                if (file.type.startsWith('image/')) {
-                    reader.readAsDataURL(file);
-                } else {
-                    reader.readAsText(file);
-                }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('w-64');
+            sidebar.classList.toggle('w-16');
+            sidebar.querySelectorAll('span').forEach(span => {
+                if (!span.closest('.border-t')) span.classList.toggle('hidden');
             });
         }
 
-        function renderAttachmentPreviews() {
-            if (!els.attachmentPreview) return;
-            if (currentAttachments.length === 0) {
-                els.attachmentPreview.classList.add('hidden');
-                els.attachmentPreview.innerHTML = '';
-                return;
+        function handleKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
-            els.attachmentPreview.classList.remove('hidden');
-            els.attachmentPreview.innerHTML = '';
-
-            currentAttachments.forEach((att, idx) => {
-                const badge = document.createElement('div');
-                badge.className = 'relative flex items-center gap-1.5 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 text-xs px-2.5 py-1.5 rounded-xl';
-                
-                if (att.type && att.type.startsWith('image/')) {
-                    badge.innerHTML = `<img src="${att.data}" class="w-6 h-6 object-cover rounded"> <span class="truncate max-w-[100px]">${att.name || 'Image'}</span>`;
-                } else {
-                    badge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> <span class="truncate max-w-[100px]">${att.name || 'File'}</span>`;
-                }
-
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'ml-1 text-gray-400 hover:text-red-500 cursor-pointer';
-                removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-                removeBtn.onclick = () => {
-                    currentAttachments.splice(idx, 1);
-                    renderAttachmentPreviews();
-                };
-
-                badge.appendChild(removeBtn);
-                els.attachmentPreview.appendChild(badge);
-            });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            cacheElements();
-            applyTheme(appState.theme);
-            updateActiveModelBadge();
-
-            if (appState.chats.length === 0) {
-                newChat();
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessions.length === 0) {
+                startNewChat();
             } else {
-                appState.currentChatId = appState.chats[0].id;
-                renderCurrentChatMessages();
-            }
-            renderHistorySidebar();
-
-            // Event Listeners
-            if (els.newChatBtn) els.newChatBtn.onclick = newChat;
-            if (els.sidebarToggleBtn) els.sidebarToggleBtn.onclick = toggleSidebar;
-            if (els.overlay) els.overlay.onclick = toggleSidebar;
-            if (els.headerExploreBtn) els.headerExploreBtn.onclick = toggleExploreBar;
-            if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = () => { toggleSidebar(); toggleExploreBar(); };
-            
-            if (els.settingsOpenBtn) els.settingsOpenBtn.onclick = openSettings;
-            if (els.closeSettingsBtn) els.closeSettingsBtn.onclick = closeSettings;
-            if (els.saveSettingsBtn) els.saveSettingsBtn.onclick = saveSettingsValues;
-
-            if (els.themeLightBtn) els.themeLightBtn.onclick = () => setTheme('light');
-            if (els.themeDarkBtn) els.themeDarkBtn.onclick = () => setTheme('dark');
-            if (els.modelSelect) els.modelSelect.onchange = handleModelChange;
-
-            if (els.imageModeBtn) els.imageModeBtn.onclick = toggleImageMode;
-            if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
-
-            if (els.attachBtn && els.fileInput) {
-                els.attachBtn.onclick = () => els.fileInput.click();
-                els.fileInput.onchange = handleFileUpload;
-            }
-
-            if (els.sendBtn) els.sendBtn.onclick = handleSendMessage;
-            if (els.stopBtn) els.stopBtn.onclick = stopGeneration;
-
-            if (els.messageInput) {
-                els.messageInput.oninput = function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                };
-                els.messageInput.onkeydown = function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }
-                };
+                renderSessionsList();
+                loadCurrentSession();
             }
         });
     </script>
