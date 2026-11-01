@@ -130,7 +130,7 @@
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
                 <div class="flex items-center gap-2.5">
-                    <!-- Exact User Logo Capsule Pill -->
+                    <!-- Capsule Logo Badge -->
                     <div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0"></div>
                     <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                 </div>
@@ -172,7 +172,6 @@
         <!-- Scrollable Messages Area -->
         <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36 relative">
             <div id="emptyState" class="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
-                <!-- Exact User Logo Capsule Pill for Hello Greeting Section -->
                 <div class="w-5 h-14 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] mb-4 animate-pulse"></div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">How can I help you today? Ask me anything, generate images, or attach files.</p>
@@ -240,6 +239,7 @@
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model (20+ Open Source Models)</label>
                     <select id="modelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
                         <option value="auto">Auto (Smart Router across 20 Models)</option>
+                        <option value="custom">Custom (Custom Endpoint & Key)</option>
                         
                         <optgroup label="Vision Supported Models">
                             <option value="openai">OpenAI GPT-4o Mini (Vision Enabled)</option>
@@ -284,6 +284,18 @@
                     </select>
                 </div>
 
+                <!-- Custom API & Model Input Section (Dynamically appears only when 'custom' is selected) -->
+                <div id="customApiSection" class="hidden space-y-4 pt-3 border-t border-gray-200 dark:border-gray-800">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Custom API Key</label>
+                        <input type="password" id="customApiKeyInput" placeholder="Enter API Key (e.g., AIzaSy... or sk-...)" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Custom Model Name</label>
+                        <input type="text" id="customModelInput" placeholder="e.g., gemini-2.5-flash or custom-model-id" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400">
+                    </div>
+                </div>
+
                 <p class="text-xs text-gray-500 dark:text-gray-400">Mei AI operates keyless via Pollinations AI open endpoints with a 60-second processing timeout guard.</p>
             </div>
 
@@ -304,13 +316,13 @@
             'llama-3.1-8b', 'gemma-9b', 'qwen-math', 'deepseek-coder', 'llama-guard'
         ];
 
-        const VISION_CAPABLE_MODELS = ['openai', 'phi-vision', 'sur', 'qwen'];
-
         let appState = {
             chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
             currentChatId: null,
             theme: localStorage.getItem('ai_theme') || 'dark',
-            model: localStorage.getItem('ai_model') || 'auto'
+            model: localStorage.getItem('ai_model') || 'auto',
+            customApiKey: localStorage.getItem('ai_custom_key') || '',
+            customModel: localStorage.getItem('ai_custom_model') || ''
         };
         
         let isImageMode = false;
@@ -334,13 +346,16 @@
                 attachmentPreview: document.getElementById('attachmentPreview'),
                 fileInput: document.getElementById('fileInput'),
                 modelSelect: document.getElementById('modelSelect'),
+                customApiSection: document.getElementById('customApiSection'),
+                customApiKeyInput: document.getElementById('customApiKeyInput'),
+                customModelInput: document.getElementById('customModelInput'),
                 activeModelBadge: document.getElementById('activeModelBadge'),
                 themeLightBtn: document.getElementById('themeLightBtn'),
                 themeDarkBtn: document.getElementById('themeDarkBtn'),
                 customModal: document.getElementById('customModal'),
                 modalTitle: document.getElementById('modalTitle'),
                 modalMessage: document.getElementById('modalMessage'),
-                modalActions: document.getElementById('modalActions'),
+                modalConfirmBtn: document.getElementById('modalConfirmBtn'),
                 attachBtn: document.getElementById('attachBtn'),
                 closeSettingsBtn: document.getElementById('closeSettingsBtn'),
                 saveSettingsBtn: document.getElementById('saveSettingsBtn'),
@@ -374,6 +389,19 @@
         function openSettings() {
             if (els.settingsModal) els.settingsModal.classList.remove('hidden');
             if (els.exploreMiniBar) els.exploreMiniBar.classList.add('hidden');
+            
+            // Sync values
+            if (els.modelSelect) els.modelSelect.value = appState.model;
+            if (els.customApiKeyInput) els.customApiKeyInput.value = appState.customApiKey;
+            if (els.customModelInput) els.customModelInput.value = appState.customModel;
+            
+            if (els.customApiSection) {
+                if (appState.model === 'custom') {
+                    els.customApiSection.classList.remove('hidden');
+                } else {
+                    els.customApiSection.classList.add('hidden');
+                }
+            }
         }
 
         function closeSettings() {
@@ -384,8 +412,12 @@
             const htmlEl = document.documentElement;
             if (theme === 'dark') {
                 htmlEl.classList.add('dark');
+                if (els.themeDarkBtn) els.themeDarkBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow transition cursor-pointer';
+                if (els.themeLightBtn) els.themeLightBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333538] transition cursor-pointer';
             } else {
                 htmlEl.classList.remove('dark');
+                if (els.themeLightBtn) els.themeLightBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow transition cursor-pointer';
+                if (els.themeDarkBtn) els.themeDarkBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333538] transition cursor-pointer';
             }
         }
 
@@ -399,6 +431,8 @@
             if (!els.activeModelBadge) return;
             if (appState.model === 'auto') {
                 els.activeModelBadge.textContent = "Auto (20 Models Router)";
+            } else if (appState.model === 'custom') {
+                els.activeModelBadge.textContent = `Custom (${appState.customModel || 'API'})`;
             } else {
                 els.activeModelBadge.textContent = `Model: ${appState.model}`;
             }
@@ -408,8 +442,29 @@
             if (els.modelSelect) {
                 appState.model = els.modelSelect.value;
                 localStorage.setItem('ai_model', appState.model);
+
+                if (els.customApiSection) {
+                    if (appState.model === 'custom') {
+                        els.customApiSection.classList.remove('hidden');
+                    } else {
+                        els.customApiSection.classList.add('hidden');
+                    }
+                }
                 updateActiveModelBadge();
             }
+        }
+
+        function saveSettingsValues() {
+            if (els.modelSelect) appState.model = els.modelSelect.value;
+            if (els.customApiKeyInput) appState.customApiKey = els.customApiKeyInput.value.trim();
+            if (els.customModelInput) appState.customModel = els.customModelInput.value.trim();
+
+            localStorage.setItem('ai_model', appState.model);
+            localStorage.setItem('ai_custom_key', appState.customApiKey);
+            localStorage.setItem('ai_custom_model', appState.customModel);
+
+            updateActiveModelBadge();
+            closeSettings();
         }
 
         function toggleImageMode() {
@@ -529,7 +584,6 @@
             if (!els.chatContainer) return;
             const chat = appState.chats.find(c => c.id === chatId);
             
-            // Clear message container except empty state
             els.chatContainer.innerHTML = '';
             
             if (!chat || chat.messages.length === 0) {
@@ -572,341 +626,291 @@
                     reader.readAsText(file);
                 }
             });
-            if (els.fileInput) els.fileInput.value = '';
+            e.target.value = '';
         }
 
         function renderAttachmentPreviews() {
             if (!els.attachmentPreview) return;
+            els.attachmentPreview.innerHTML = '';
             if (currentAttachments.length === 0) {
                 els.attachmentPreview.classList.add('hidden');
-                els.attachmentPreview.innerHTML = '';
                 return;
             }
             els.attachmentPreview.classList.remove('hidden');
-            els.attachmentPreview.innerHTML = '';
-
             currentAttachments.forEach((att, idx) => {
-                const chip = document.createElement('div');
-                chip.className = 'flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 px-3 py-1 rounded-xl text-xs';
+                const badge = document.createElement('div');
+                badge.className = 'flex items-center gap-1.5 bg-gray-100 dark:bg-[#282a2c] text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-xs border border-gray-200 dark:border-gray-700';
                 
-                if (att.type.startsWith('image/')) {
-                    chip.innerHTML = `<img src="${att.data}" class="w-6 h-6 object-cover rounded-md"> <span class="truncate max-w-[120px]">${att.name}</span> <button type="button" onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>`;
-                } else {
-                    chip.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> <span class="truncate max-w-[120px]">${att.name}</span> <button type="button" onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>`;
-                }
-                els.attachmentPreview.appendChild(chip);
+                const icon = document.createElement('i');
+                icon.className = att.type.startsWith('image/') ? 'fa-solid fa-image text-purple-400' : 'fa-solid fa-file-lines text-blue-400';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'truncate max-w-[120px]';
+                nameSpan.textContent = att.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'text-gray-400 hover:text-red-500 ml-1';
+                removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                removeBtn.onclick = () => {
+                    currentAttachments.splice(idx, 1);
+                    renderAttachmentPreviews();
+                };
+
+                badge.appendChild(icon);
+                badge.appendChild(nameSpan);
+                badge.appendChild(removeBtn);
+                els.attachmentPreview.appendChild(badge);
             });
         }
 
-        window.removeAttachment = function(index) {
-            currentAttachments.splice(index, 1);
-            renderAttachmentPreviews();
-        };
-
         function appendMessageUI(role, content, isStreaming = false, attachments = []) {
-            if (!els.chatContainer) return;
-            
-            const isUser = role === 'user';
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex gap-4 max-w-4xl mx-auto my-6 px-4 ${isUser ? 'justify-end' : 'justify-start'}`;
-
-            const bubble = document.createElement('div');
-            bubble.className = `flex flex-col rounded-2xl p-4 text-sm leading-relaxed max-w-[85%] ${
-                isUser ? 'bg-gemini-userBubble text-gray-100 rounded-br-none' : 'bg-transparent text-gray-200 w-full'
-            }`;
-
-            if (attachments.length > 0) {
-                const attGrid = document.createElement('div');
-                attGrid.className = 'flex flex-wrap gap-2 mb-3';
-                attachments.forEach(att => {
-                    if (att.type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = att.data;
-                        img.className = 'max-h-48 rounded-xl border border-gray-700 object-cover';
-                        attGrid.appendChild(img);
-                    } else {
-                        const fileBadge = document.createElement('div');
-                        fileBadge.className = 'bg-gray-800 border border-gray-700 p-2 rounded-xl text-xs flex items-center gap-2';
-                        fileBadge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> <span>${att.name}</span>`;
-                        attGrid.appendChild(fileBadge);
-                    }
-                });
-                bubble.appendChild(attGrid);
+            if (els.emptyState && !els.emptyState.classList.contains('hidden')) {
+                els.emptyState.classList.add('hidden');
             }
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'markdown-body';
-            
-            if (isUser) {
-                contentDiv.textContent = content;
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-4 my-6 max-w-4xl mx-auto px-4 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            const inner = document.createElement('div');
+            if (role === 'user') {
+                inner.className = 'bg-gray-100 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 px-5 py-3.5 rounded-3xl max-w-2xl text-sm leading-relaxed shadow-sm border border-gray-200 dark:border-gray-700/50';
+                
+                if (attachments.length > 0) {
+                    const attGrid = document.createElement('div');
+                    attGrid.className = 'flex flex-wrap gap-2 mb-3';
+                    attachments.forEach(att => {
+                        if (att.type && att.type.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = att.data;
+                            img.className = 'w-32 h-32 object-cover rounded-xl border border-gray-700';
+                            attGrid.appendChild(img);
+                        } else {
+                            const fileTag = document.createElement('div');
+                            fileTag.className = 'bg-black/30 text-xs px-2.5 py-1 rounded-lg border border-gray-700';
+                            fileTag.textContent = att.name;
+                            attGrid.appendChild(fileTag);
+                        }
+                    });
+                    inner.appendChild(attGrid);
+                }
+
+                const p = document.createElement('p');
+                p.className = 'whitespace-pre-wrap';
+                p.textContent = content;
+                inner.appendChild(p);
             } else {
-                contentDiv.innerHTML = marked.parse(content || '');
-                enhanceCodeBlocks(contentDiv);
+                inner.className = 'w-full text-gray-800 dark:text-gray-200 text-sm leading-relaxed space-y-3';
+                
+                const headerRow = document.createElement('div');
+                headerRow.className = 'flex items-center gap-2 mb-1';
+                headerRow.innerHTML = '<div class="w-2.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div><span class="font-medium text-xs text-gray-500 dark:text-gray-400">Mei AI</span>';
+                inner.appendChild(headerRow);
+
+                const bodyDiv = document.createElement('div');
+                bodyDiv.className = 'markdown-body';
+                if (isStreaming) {
+                    bodyDiv.innerHTML = marked.parse(content || 'Thinking...');
+                } else {
+                    bodyDiv.innerHTML = marked.parse(content);
+                }
+
+                // Add code copy buttons
+                bodyDiv.querySelectorAll('pre').forEach(pre => {
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'code-copy-btn';
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.onclick = () => {
+                        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                        const textArea = document.createElement('textarea');
+                        textArea.value = code;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+                        } catch (err) {
+                            console.error('Failed to copy', err);
+                        }
+                        document.body.removeChild(textArea);
+                    };
+                    pre.appendChild(copyBtn);
+                });
+
+                inner.appendChild(bodyDiv);
             }
 
-            bubble.appendChild(contentDiv);
-            wrapper.appendChild(bubble);
+            wrapper.appendChild(inner);
             els.chatContainer.appendChild(wrapper);
             scrollToBottom();
-            return contentDiv;
+            return inner;
         }
 
-        function appendLoadingUI(isImageGen = false) {
-            const loaderId = 'loader-' + Date.now();
-            const wrapper = document.createElement('div');
-            wrapper.id = loaderId;
-            wrapper.className = 'flex gap-4 max-w-4xl mx-auto my-6 px-4 justify-start';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'flex items-center gap-3 bg-transparent text-gray-400 p-4 text-sm';
-            bubble.innerHTML = `
-                <div class="w-3 h-3 rounded-full bg-blue-500 animate-ping"></div>
-                <span>${isImageGen ? 'Mei is painting your image with Flux...' : 'Mei is thinking...'}</span>
-            `;
-            wrapper.appendChild(bubble);
-            els.chatContainer.appendChild(wrapper);
-            scrollToBottom();
-            return loaderId;
-        }
+        async function handleSendMessage() {
+            const text = els.messageInput ? els.messageInput.value.trim() : '';
+            if ((!text && currentAttachments.length === 0) || isGenerating) return;
 
-        async function appendStreamingMessageUI(fullText, isImage = false) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'flex gap-4 max-w-4xl mx-auto my-6 px-4 justify-start';
+            if (!appState.currentChatId) {
+                startNewChat(false);
+            }
 
-            const bubble = document.createElement('div');
-            bubble.className = 'flex flex-col rounded-2xl p-4 text-sm leading-relaxed text-gray-200 w-full';
+            const chat = appState.chats.find(c => c.id === appState.currentChatId);
+            if (chat && chat.messages.length === 0) {
+                chat.title = text.substring(0, 32) || (isImageMode ? 'Image Generation' : 'New Chat');
+            }
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'markdown-body';
-            bubble.appendChild(contentDiv);
-            wrapper.appendChild(bubble);
-            els.chatContainer.appendChild(wrapper);
+            const userMsgAttachments = [...currentAttachments];
+            const userMsgContent = text;
 
-            if (isImage) {
-                contentDiv.innerHTML = marked.parse(fullText);
-                scrollToBottom();
+            chat.messages.push({ role: 'user', content: userMsgContent, attachments: userMsgAttachments });
+            saveChatsToStorage();
+
+            appendMessageUI('user', userMsgContent, false, userMsgAttachments);
+
+            if (els.messageInput) {
+                els.messageInput.value = '';
+                els.messageInput.style.height = 'auto';
+            }
+            currentAttachments = [];
+            renderAttachmentPreviews();
+
+            // Image generation mode via Flux
+            if (isImageMode) {
+                isGenerating = true;
+                if (els.sendBtn) els.sendBtn.classList.add('hidden');
+                if (els.stopBtn) els.stopBtn.classList.remove('hidden');
+
+                const assistantInner = appendMessageUI('assistant', 'Generating your high-definition Flux artwork...', true);
+                const bodyDiv = assistantInner.querySelector('.markdown-body');
+
+                try {
+                    const encodedPrompt = encodeURIComponent(userMsgContent);
+                    const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true`;
+                    
+                    const imgCheck = new Image();
+                    imgCheck.src = imageUrl;
+                    await new Promise((resolve, reject) => {
+                        imgCheck.onload = resolve;
+                        imgCheck.onerror = reject;
+                        setTimeout(resolve, 15000); // timeout safeguard
+                    });
+
+                    const responseMarkdown = `Here is your generated artwork for: "*${userMsgContent}*"\n\n![Generated Image](${imageUrl})`;
+                    chat.messages.push({ role: 'assistant', content: responseMarkdown });
+                    saveChatsToStorage();
+
+                    bodyDiv.innerHTML = marked.parse(responseMarkdown);
+                } catch (err) {
+                    const errorMsg = 'Failed to generate image. Please try a different description.';
+                    chat.messages.push({ role: 'assistant', content: errorMsg });
+                    saveChatsToStorage();
+                    bodyDiv.innerHTML = marked.parse(errorMsg);
+                } finally {
+                    isGenerating = false;
+                    if (els.sendBtn) els.sendBtn.classList.remove('hidden');
+                    if (els.stopBtn) els.stopBtn.classList.add('hidden');
+                    scrollToBottom();
+                }
                 return;
             }
 
-            let currentText = '';
-            for (let i = 0; i < fullText.length; i++) {
-                currentText += fullText[i];
-                contentDiv.innerHTML = marked.parse(currentText);
-                if (i % 5 === 0) scrollToBottom();
-                await new Promise(r => setTimeout(r, 8));
-            }
-            enhanceCodeBlocks(contentDiv);
-            scrollToBottom();
-        }
-
-        function enhanceCodeBlocks(container) {
-            const preTags = container.querySelectorAll('pre');
-            preTags.forEach(pre => {
-                if (pre.querySelector('.code-copy-btn')) return;
-                const code = pre.querySelector('code');
-                const textToCopy = code ? code.innerText : pre.innerText;
-
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'code-copy-btn';
-                copyBtn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i> Copy';
-                copyBtn.onclick = () => {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = textToCopy;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
-                        setTimeout(() => { copyBtn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i> Copy'; }, 2000);
-                    } catch (err) {
-                        console.error('Failed to copy', err);
-                    }
-                    document.body.removeChild(textArea);
-                };
-                pre.appendChild(copyBtn);
-            });
-        }
-
-        function stopResponse() {
-            if (activeAbortController) {
-                activeAbortController.abort();
-                activeAbortController = null;
-            }
-            isGenerating = false;
-            if (els.sendBtn) els.sendBtn.classList.remove('hidden');
-            if (els.stopBtn) els.stopBtn.classList.add('hidden');
-            
-            const loaders = document.querySelectorAll('[id^="loader-"]');
-            loaders.forEach(l => l.remove());
-        }
-
-        function buildOpenAIMultimodalPayload(messages) {
-            const recent = messages.slice(-6);
-            return recent.map((m, idx) => {
-                const isLast = idx === recent.length - 1;
-                let role = m.role === 'user' ? 'user' : 'assistant';
-                
-                if (isLast && m.attachments && m.attachments.length > 0) {
-                    let contentParts = [{ type: "text", text: m.content || "Analyze this attached image." }];
-                    m.attachments.forEach(att => {
-                        if (att.type.startsWith('image/')) {
-                            contentParts.push({
-                                type: "image_url",
-                                image_url: { url: att.data }
-                            });
-                        } else {
-                            contentParts.push({
-                                type: "text",
-                                text: `[Attached File: ${att.name}]\n${att.data}`
-                            });
-                        }
-                    });
-                    return { role, content: contentParts };
-                } else {
-                    return { role, content: m.content || "" };
-                }
-            });
-        }
-
-        async function fetchWithTimeout(url, options = {}, timeoutMs = 60000, signal = null) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-            
-            if (signal) {
-                signal.addEventListener('abort', () => {
-                    controller.abort();
-                });
-            }
-
-            try {
-                const response = await fetch(url, {
-                    ...options,
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-                return response;
-            } catch (error) {
-                clearTimeout(timeoutId);
-                throw error;
-            }
-        }
-
-        async function sendMessage() {
-            if (!els.messageInput || isGenerating) return;
-            const content = els.messageInput.value.trim();
-            if (!content && currentAttachments.length === 0) return;
-
-            let chat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (!chat) {
-                startNewChat(false);
-                chat = appState.chats[0];
-            }
-
-            if (els.emptyState) els.emptyState.classList.add('hidden');
-            els.messageInput.value = '';
-            els.messageInput.style.height = '';
-            
+            // Text / Multimodal Generation
             isGenerating = true;
             if (els.sendBtn) els.sendBtn.classList.add('hidden');
             if (els.stopBtn) els.stopBtn.classList.remove('hidden');
-            
-            activeAbortController = new AbortController();
-            
-            const messageAttachments = [...currentAttachments];
-            currentAttachments = [];
-            renderAttachmentPreviews();
-            
-            chat.messages.push({ role: 'user', content: content, attachments: messageAttachments });
-            chat.updatedAt = Date.now();
-            
-            if (chat.messages.length === 1) {
-                chat.title = (content || messageAttachments[0]?.name || 'Chat').substring(0, 30);
-            }
-            
-            saveChatsToStorage();
-            appendMessageUI('user', content, false, messageAttachments);
-            scrollToBottom();
 
-            const loaderId = appendLoadingUI(isImageMode);
+            const assistantInner = appendMessageUI('assistant', '', true);
+            const bodyDiv = assistantInner.querySelector('.markdown-body');
+
+            activeAbortController = new AbortController();
 
             try {
-                if (isImageMode) {
-                    const encodedPrompt = encodeURIComponent(content || "Creative wallpaper");
-                    const randomSeed = Math.floor(Math.random() * 1000000);
-                    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true&model=flux`;
+                let aiResponseText = '';
+                
+                // Determine model endpoint
+                let selectedModelToUse = appState.model;
+                if (selectedModelToUse === 'auto') {
+                    const randomIndex = Math.floor(Math.random() * AUTO_20_MODELS.length);
+                    selectedModelToUse = AUTO_20_MODELS[randomIndex];
+                }
 
-                    const loaderEl = document.getElementById(loaderId);
-                    if (loaderEl) loaderEl.remove();
-                    const aiResponse = `Here is your generated image:\n\n![Generated Image](${imageUrl})`;
-                    
-                    chat.messages.push({ role: 'assistant', content: aiResponse, isImage: true });
-                    saveChatsToStorage();
-                    await appendStreamingMessageUI(aiResponse, true);
-                } else {
-                    const payloadMessages = buildOpenAIMultimodalPayload(chat.messages);
-                    const hasImage = messageAttachments.some(a => a.type.startsWith('image/'));
+                if (selectedModelToUse === 'custom' && appState.customModel) {
+                    selectedModelToUse = appState.customModel;
+                }
 
-                    let modelsToTry = [];
-                    if (hasImage) {
-                        modelsToTry = [...VISION_CAPABLE_MODELS, ...AUTO_20_MODELS.filter(m => !VISION_CAPABLE_MODELS.includes(m))];
-                    } else if (appState.model === 'auto') {
-                        modelsToTry = AUTO_20_MODELS;
-                    } else {
-                        modelsToTry = [appState.model, ...AUTO_20_MODELS.filter(m => m !== appState.model)];
-                    }
+                // If user supplied custom API key, use direct OpenAI / Gemini style fetch if needed or Pollinations
+                let apiMessages = [
+                    { role: 'system', content: SYSTEM_PROMPT },
+                    ...chat.messages.map(m => ({ role: m.role, content: m.content }))
+                ];
 
-                    let aiResponse = null;
+                let endpoint = `https://text.pollinations.ai/openai`;
+                let headers = { 'Content-Type': 'application/json' };
+                
+                if (appState.model === 'custom' && appState.customApiKey) {
+                    headers['Authorization'] = `Bearer ${appState.customApiKey}`;
+                }
 
-                    for (const model of modelsToTry) {
-                        if (!isGenerating) break;
+                const payload = {
+                    model: selectedModelToUse === 'custom' ? 'openai' : selectedModelToUse,
+                    messages: apiMessages,
+                    jsonMode: false
+                };
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload),
+                    signal: activeAbortController.signal
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+
+                const data = await response.json();
+                aiResponseText = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "I'm here to help!";
+
+                chat.messages.push({ role: 'assistant', content: aiResponseText });
+                saveChatsToStorage();
+
+                bodyDiv.innerHTML = marked.parse(aiResponseText);
+                bodyDiv.querySelectorAll('pre').forEach(pre => {
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'code-copy-btn';
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.onclick = () => {
+                        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                        const textArea = document.createElement('textarea');
+                        textArea.value = code;
+                        document.body.appendChild(textArea);
+                        textArea.select();
                         try {
-                            const res = await fetchWithTimeout('https://text.pollinations.ai/', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    messages: [{ role: "system", content: SYSTEM_PROMPT }, ...payloadMessages],
-                                    model: model,
-                                    json: false
-                                })
-                            }, 60000, activeAbortController.signal);
+                            document.execCommand('copy');
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+                        } catch (err) {}
+                        document.body.removeChild(textArea);
+                    };
+                    pre.appendChild(copyBtn);
+                });
 
-                            if (res.ok) {
-                                const text = await res.text();
-                                if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE html>') && !text.includes('Error 422')) {
-                                    aiResponse = text.trim();
-                                    break;
-                                }
-                            }
-                        } catch (err) {
-                            console.warn(`Model ${model} failed, trying next...`, err);
-                        }
-                    }
-
-                    const loaderEl = document.getElementById(loaderId);
-                    if (loaderEl) loaderEl.remove();
-
-                    if (!aiResponse) {
-                        aiResponse = "I apologize, but all upstream model endpoints are currently busy. Please try sending your prompt again.";
-                    }
-
-                    chat.messages.push({ role: 'assistant', content: aiResponse });
-                    saveChatsToStorage();
-                    await appendStreamingMessageUI(aiResponse);
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    aiResponseText = '*Generation stopped by user.*';
+                } else {
+                    aiResponseText = '⚠️ Network connection or model routing timeout. Please try again.';
                 }
-            } catch (error) {
-                const loaderEl = document.getElementById(loaderId);
-                if (loaderEl) loaderEl.remove();
-                if (error.name !== 'AbortError') {
-                    const errMsg = "An error occurred while generating a response.";
-                    chat.messages.push({ role: 'assistant', content: errMsg });
-                    saveChatsToStorage();
-                    appendMessageUI('assistant', errMsg);
-                }
+                chat.messages.push({ role: 'assistant', content: aiResponseText });
+                saveChatsToStorage();
+                bodyDiv.innerHTML = marked.parse(aiResponseText);
             } finally {
                 isGenerating = false;
                 if (els.sendBtn) els.sendBtn.classList.remove('hidden');
                 if (els.stopBtn) els.stopBtn.classList.add('hidden');
                 activeAbortController = null;
+                scrollToBottom();
             }
         }
 
@@ -915,31 +919,35 @@
             if (els.modalTitle) els.modalTitle.textContent = title;
             if (els.modalMessage) els.modalMessage.textContent = message;
             
-            const confirmBtn = document.getElementById('modalConfirmBtn');
-            if (confirmBtn) {
-                const newBtn = confirmBtn.cloneNode(true);
-                confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-                
+            if (els.modalActions) {
+                els.modalActions.innerHTML = '';
                 if (isConfirm) {
-                    newBtn.textContent = 'Confirm';
-                    newBtn.onclick = () => {
-                        els.customModal.classList.add('hidden');
-                        if (onConfirm) onConfirm();
-                    };
-                } else {
-                    newBtn.textContent = 'OK';
-                    newBtn.onclick = () => els.customModal.classList.add('hidden');
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.type = 'button';
+                    cancelBtn.className = 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#282a2c] hover:bg-gray-200 dark:hover:bg-[#333538] rounded-xl transition cursor-pointer';
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.onclick = () => els.customModal.classList.add('hidden');
+                    els.modalActions.appendChild(cancelBtn);
                 }
+
+                const okBtn = document.createElement('button');
+                okBtn.type = 'button';
+                okBtn.className = 'px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer';
+                okBtn.textContent = 'OK';
+                okBtn.onclick = () => {
+                    els.customModal.classList.add('hidden');
+                    if (onConfirm) onConfirm();
+                };
+                els.modalActions.appendChild(okBtn);
             }
+
             els.customModal.classList.remove('hidden');
         }
 
-        window.onload = function() {
+        window.addEventListener('DOMContentLoaded', () => {
             cacheElements();
             applyTheme(appState.theme);
             updateActiveModelBadge();
-
-            if (els.modelSelect) els.modelSelect.value = appState.model;
 
             if (appState.chats.length === 0) {
                 startNewChat(false);
@@ -949,50 +957,50 @@
             renderChat(appState.currentChatId);
 
             // Event Listeners
+            if (els.newChatBtn) els.newChatBtn.onclick = () => startNewChat(true);
             if (els.sidebarToggleBtn) els.sidebarToggleBtn.onclick = toggleSidebar;
             if (els.overlay) els.overlay.onclick = toggleSidebar;
-            if (els.newChatBtn) els.newChatBtn.onclick = () => startNewChat(true);
-            if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
             
-            // Explore triggers
             if (els.headerExploreBtn) els.headerExploreBtn.onclick = toggleExploreBar;
             if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = toggleExploreBar;
             if (els.exploreModelsBtn) els.exploreModelsBtn.onclick = openSettings;
 
             if (els.settingsOpenBtn) els.settingsOpenBtn.onclick = openSettings;
             if (els.closeSettingsBtn) els.closeSettingsBtn.onclick = closeSettings;
-            if (els.saveSettingsBtn) {
-                els.saveSettingsBtn.onclick = () => {
-                    handleModelChange();
-                    closeSettings();
-                };
-            }
+            if (els.saveSettingsBtn) els.saveSettingsBtn.onclick = saveSettingsValues;
 
             if (els.themeLightBtn) els.themeLightBtn.onclick = () => setTheme('light');
             if (els.themeDarkBtn) els.themeDarkBtn.onclick = () => setTheme('dark');
+            if (els.modelSelect) els.modelSelect.onchange = handleModelChange;
+
+            if (els.imageModeBtn) els.imageModeBtn.onclick = toggleImageMode;
+            if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
 
             if (els.attachBtn && els.fileInput) {
                 els.attachBtn.onclick = () => els.fileInput.click();
                 els.fileInput.onchange = handleFileSelect;
             }
 
-            if (els.imageModeBtn) els.imageModeBtn.onclick = toggleImageMode;
-            if (els.sendBtn) els.sendBtn.onclick = sendMessage;
-            if (els.stopBtn) els.stopBtn.onclick = stopResponse;
+            if (els.sendBtn) els.sendBtn.onclick = handleSendMessage;
+            if (els.stopBtn) {
+                els.stopBtn.onclick = () => {
+                    if (activeAbortController) activeAbortController.abort();
+                };
+            }
 
             if (els.messageInput) {
-                els.messageInput.onkeydown = (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                };
                 els.messageInput.oninput = function() {
                     this.style.height = 'auto';
                     this.style.height = (this.scrollHeight) + 'px';
                 };
+                els.messageInput.onkeydown = function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                    }
+                };
             }
-        };
+        });
     </script>
 </body>
 </html>
