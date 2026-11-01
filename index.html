@@ -35,7 +35,7 @@
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
@@ -102,6 +102,13 @@
             </button>
         </div>
         
+        <!-- Explore Button in Sidebar -->
+        <div class="px-4 pb-2">
+            <button id="sidebarExploreBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
+                <i class="fa-solid fa-compass text-purple-400"></i> Explore
+            </button>
+        </div>
+
         <div class="flex-1 overflow-y-auto p-3">
             <div class="text-xs font-semibold text-gray-400 mb-2 px-2">Recent</div>
             <ul id="historyList" class="space-y-1"></ul>
@@ -132,10 +139,35 @@
                 </span>
             </div>
             
-            <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center cursor-pointer" title="Clear current chat">
-                <i class="fa-solid fa-trash-can text-lg"></i>
-            </button>
+            <div class="flex items-center gap-2">
+                <!-- Header Explore Button -->
+                <button id="headerExploreBtn" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] transition cursor-pointer" title="Explore Mei AI">
+                    <i class="fa-solid fa-compass text-purple-400"></i> Explore
+                </button>
+
+                <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center cursor-pointer" title="Clear current chat">
+                    <i class="fa-solid fa-trash-can text-lg"></i>
+                </button>
+            </div>
         </header>
+
+        <!-- Explore Mini Scroller Bar (Initially Hidden) -->
+        <div id="exploreMiniBar" class="hidden bg-white/95 dark:bg-[#18181a]/95 border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 z-20 transition-all duration-300 backdrop-blur-md">
+            <div class="max-w-4xl mx-auto flex items-center gap-3 overflow-x-auto no-scrollbar py-0.5">
+                <span class="text-xs font-semibold text-gray-400 flex-shrink-0 uppercase tracking-wider"><i class="fa-solid fa-compass mr-1 text-purple-400"></i> Explore:</span>
+                
+                <a href="about.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
+                    <i class="fa-solid fa-circle-info text-blue-400"></i> About Mei AI
+                </a>
+                
+                <button id="exploreModelsBtn" type="button" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50 cursor-pointer">
+                    <i class="fa-solid fa-brain text-purple-400"></i> Explore Models
+                </button>
+
+                <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 px-2">|</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">Keyless 20+ Model Router & Flux Generator</span>
+            </div>
+        </div>
 
         <!-- Scrollable Messages Area -->
         <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36 relative">
@@ -187,7 +219,7 @@
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4">
             <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Settings</h3>
+                <h3 class="text-lg font-semibold">Settings & Models</h3>
                 <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
@@ -316,14 +348,16 @@
                 settingsOpenBtn: document.getElementById('settingsOpenBtn'),
                 clearChatBtn: document.getElementById('clearChatBtn'),
                 sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
-                sidebarCloseBtn: document.getElementById('sidebarCloseBtn')
+                headerExploreBtn: document.getElementById('headerExploreBtn'),
+                sidebarExploreBtn: document.getElementById('sidebarExploreBtn'),
+                exploreMiniBar: document.getElementById('exploreMiniBar'),
+                exploreModelsBtn: document.getElementById('exploreModelsBtn')
             };
         }
 
         function toggleSidebar() {
             if (els.sidebar) {
                 els.sidebar.classList.toggle('open');
-                // For desktop view toggle as well or handle transform
                 if (window.innerWidth >= 1024) {
                     els.sidebar.classList.toggle('hidden');
                 }
@@ -331,18 +365,43 @@
             if (els.overlay && window.innerWidth < 1024) els.overlay.classList.toggle('hidden');
         }
 
+        function toggleExploreBar() {
+            if (els.exploreMiniBar) {
+                els.exploreMiniBar.classList.toggle('hidden');
+            }
+        }
+
         function openSettings() {
             if (els.settingsModal) els.settingsModal.classList.remove('hidden');
+            if (els.exploreMiniBar) els.exploreMiniBar.classList.add('hidden');
         }
 
         function closeSettings() {
             if (els.settingsModal) els.settingsModal.classList.add('hidden');
         }
 
+        function applyTheme(theme) {
+            const htmlEl = document.documentElement;
+            if (theme === 'dark') {
+                htmlEl.classList.add('dark');
+            } else {
+                htmlEl.classList.remove('dark');
+            }
+        }
+
         function setTheme(theme) {
             appState.theme = theme;
             localStorage.setItem('ai_theme', theme);
             applyTheme(theme);
+        }
+
+        function updateActiveModelBadge() {
+            if (!els.activeModelBadge) return;
+            if (appState.model === 'auto') {
+                els.activeModelBadge.textContent = "Auto (20 Models Router)";
+            } else {
+                els.activeModelBadge.textContent = `Model: ${appState.model}`;
+            }
         }
 
         function handleModelChange() {
@@ -380,6 +439,63 @@
             }
         }
 
+        function generateId() {
+            return 'chat_' + Math.random().toString(36).substring(2, 9);
+        }
+
+        function saveChatsToStorage() {
+            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+            renderHistorySidebar();
+        }
+
+        function renderHistorySidebar() {
+            if (!els.historyList) return;
+            els.historyList.innerHTML = '';
+            
+            if (appState.chats.length === 0) {
+                els.historyList.innerHTML = '<li class="text-xs text-gray-400 px-2 py-1">No recent chats</li>';
+                return;
+            }
+
+            appState.chats.forEach(chat => {
+                const li = document.createElement('li');
+                const isActive = chat.id === appState.currentChatId;
+                li.className = `group flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition ${
+                    isActive ? 'bg-gray-100 dark:bg-[#282a2c] text-gray-900 dark:text-white font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#202225]'
+                }`;
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'truncate flex-1';
+                titleSpan.textContent = chat.title || 'New Chat';
+                titleSpan.onclick = () => switchChat(chat.id);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 transition';
+                deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can text-xs"></i>';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteChat(chat.id);
+                };
+
+                li.appendChild(titleSpan);
+                li.appendChild(deleteBtn);
+                els.historyList.appendChild(li);
+            });
+        }
+
+        function deleteChat(chatId) {
+            appState.chats = appState.chats.filter(c => c.id !== chatId);
+            if (appState.currentChatId === chatId) {
+                if (appState.chats.length > 0) {
+                    appState.currentChatId = appState.chats[0].id;
+                } else {
+                    startNewChat(false);
+                }
+            }
+            saveChatsToStorage();
+            renderChat(appState.currentChatId);
+        }
+
         function startNewChat(render = true) {
             const newChat = { id: generateId(), title: 'New Chat', messages: [], updatedAt: Date.now() };
             appState.chats.unshift(newChat);
@@ -409,6 +525,34 @@
             });
         }
 
+        function renderChat(chatId) {
+            if (!els.chatContainer) return;
+            const chat = appState.chats.find(c => c.id === chatId);
+            
+            // Clear message container except empty state
+            els.chatContainer.innerHTML = '';
+            
+            if (!chat || chat.messages.length === 0) {
+                if (els.emptyState) {
+                    els.chatContainer.appendChild(els.emptyState);
+                    els.emptyState.classList.remove('hidden');
+                }
+            } else {
+                if (els.emptyState) els.emptyState.classList.add('hidden');
+                chat.messages.forEach(msg => {
+                    appendMessageUI(msg.role, msg.content, false, msg.attachments || []);
+                });
+            }
+            scrollToBottom();
+            renderHistorySidebar();
+        }
+
+        function scrollToBottom() {
+            if (els.chatContainer) {
+                els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
+            }
+        }
+
         function handleFileSelect(e) {
             const files = Array.from(e.target.files);
             files.forEach(file => {
@@ -431,10 +575,157 @@
             if (els.fileInput) els.fileInput.value = '';
         }
 
+        function renderAttachmentPreviews() {
+            if (!els.attachmentPreview) return;
+            if (currentAttachments.length === 0) {
+                els.attachmentPreview.classList.add('hidden');
+                els.attachmentPreview.innerHTML = '';
+                return;
+            }
+            els.attachmentPreview.classList.remove('hidden');
+            els.attachmentPreview.innerHTML = '';
+
+            currentAttachments.forEach((att, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 px-3 py-1 rounded-xl text-xs';
+                
+                if (att.type.startsWith('image/')) {
+                    chip.innerHTML = `<img src="${att.data}" class="w-6 h-6 object-cover rounded-md"> <span class="truncate max-w-[120px]">${att.name}</span> <button type="button" onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>`;
+                } else {
+                    chip.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> <span class="truncate max-w-[120px]">${att.name}</span> <button type="button" onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>`;
+                }
+                els.attachmentPreview.appendChild(chip);
+            });
+        }
+
         window.removeAttachment = function(index) {
             currentAttachments.splice(index, 1);
             renderAttachmentPreviews();
         };
+
+        function appendMessageUI(role, content, isStreaming = false, attachments = []) {
+            if (!els.chatContainer) return;
+            
+            const isUser = role === 'user';
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-4 max-w-4xl mx-auto my-6 px-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = `flex flex-col rounded-2xl p-4 text-sm leading-relaxed max-w-[85%] ${
+                isUser ? 'bg-gemini-userBubble text-gray-100 rounded-br-none' : 'bg-transparent text-gray-200 w-full'
+            }`;
+
+            if (attachments.length > 0) {
+                const attGrid = document.createElement('div');
+                attGrid.className = 'flex flex-wrap gap-2 mb-3';
+                attachments.forEach(att => {
+                    if (att.type.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = att.data;
+                        img.className = 'max-h-48 rounded-xl border border-gray-700 object-cover';
+                        attGrid.appendChild(img);
+                    } else {
+                        const fileBadge = document.createElement('div');
+                        fileBadge.className = 'bg-gray-800 border border-gray-700 p-2 rounded-xl text-xs flex items-center gap-2';
+                        fileBadge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> <span>${att.name}</span>`;
+                        attGrid.appendChild(fileBadge);
+                    }
+                });
+                bubble.appendChild(attGrid);
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'markdown-body';
+            
+            if (isUser) {
+                contentDiv.textContent = content;
+            } else {
+                contentDiv.innerHTML = marked.parse(content || '');
+                enhanceCodeBlocks(contentDiv);
+            }
+
+            bubble.appendChild(contentDiv);
+            wrapper.appendChild(bubble);
+            els.chatContainer.appendChild(wrapper);
+            scrollToBottom();
+            return contentDiv;
+        }
+
+        function appendLoadingUI(isImageGen = false) {
+            const loaderId = 'loader-' + Date.now();
+            const wrapper = document.createElement('div');
+            wrapper.id = loaderId;
+            wrapper.className = 'flex gap-4 max-w-4xl mx-auto my-6 px-4 justify-start';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'flex items-center gap-3 bg-transparent text-gray-400 p-4 text-sm';
+            bubble.innerHTML = `
+                <div class="w-3 h-3 rounded-full bg-blue-500 animate-ping"></div>
+                <span>${isImageGen ? 'Mei is painting your image with Flux...' : 'Mei is thinking...'}</span>
+            `;
+            wrapper.appendChild(bubble);
+            els.chatContainer.appendChild(wrapper);
+            scrollToBottom();
+            return loaderId;
+        }
+
+        async function appendStreamingMessageUI(fullText, isImage = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex gap-4 max-w-4xl mx-auto my-6 px-4 justify-start';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'flex flex-col rounded-2xl p-4 text-sm leading-relaxed text-gray-200 w-full';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'markdown-body';
+            bubble.appendChild(contentDiv);
+            wrapper.appendChild(bubble);
+            els.chatContainer.appendChild(wrapper);
+
+            if (isImage) {
+                contentDiv.innerHTML = marked.parse(fullText);
+                scrollToBottom();
+                return;
+            }
+
+            let currentText = '';
+            for (let i = 0; i < fullText.length; i++) {
+                currentText += fullText[i];
+                contentDiv.innerHTML = marked.parse(currentText);
+                if (i % 5 === 0) scrollToBottom();
+                await new Promise(r => setTimeout(r, 8));
+            }
+            enhanceCodeBlocks(contentDiv);
+            scrollToBottom();
+        }
+
+        function enhanceCodeBlocks(container) {
+            const preTags = container.querySelectorAll('pre');
+            preTags.forEach(pre => {
+                if (pre.querySelector('.code-copy-btn')) return;
+                const code = pre.querySelector('code');
+                const textToCopy = code ? code.innerText : pre.innerText;
+
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'code-copy-btn';
+                copyBtn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i> Copy';
+                copyBtn.onclick = () => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
+                        setTimeout(() => { copyBtn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i> Copy'; }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy', err);
+                    }
+                    document.body.removeChild(textArea);
+                };
+                pre.appendChild(copyBtn);
+            });
+        }
 
         function stopResponse() {
             if (activeAbortController) {
@@ -587,366 +878,121 @@
                                 }
                             }
                         } catch (err) {
-                            if (activeAbortController && activeAbortController.signal.aborted) {
-                                break;
-                            }
-                            console.warn(`Model ${model} timed out or failed. Falling back...`);
+                            console.warn(`Model ${model} failed, trying next...`, err);
                         }
                     }
 
                     const loaderEl = document.getElementById(loaderId);
                     if (loaderEl) loaderEl.remove();
 
-                    if (!isGenerating) return;
-
-                    if (!aiResponse || aiResponse.trim().length === 0) {
-                        aiResponse = "I'm having trouble reaching the server, try again later";
+                    if (!aiResponse) {
+                        aiResponse = "I apologize, but all upstream model endpoints are currently busy. Please try sending your prompt again.";
                     }
 
                     chat.messages.push({ role: 'assistant', content: aiResponse });
                     saveChatsToStorage();
-                    await appendStreamingMessageUI(aiResponse, false);
+                    await appendStreamingMessageUI(aiResponse);
                 }
             } catch (error) {
                 const loaderEl = document.getElementById(loaderId);
                 if (loaderEl) loaderEl.remove();
-                if (isGenerating) {
-                    const errorMsg = "I'm having trouble reaching the server, try again later";
-                    chat.messages.push({ role: 'assistant', content: errorMsg });
+                if (error.name !== 'AbortError') {
+                    const errMsg = "An error occurred while generating a response.";
+                    chat.messages.push({ role: 'assistant', content: errMsg });
                     saveChatsToStorage();
-                    appendMessageUI('assistant', errorMsg);
+                    appendMessageUI('assistant', errMsg);
                 }
             } finally {
                 isGenerating = false;
-                activeAbortController = null;
                 if (els.sendBtn) els.sendBtn.classList.remove('hidden');
                 if (els.stopBtn) els.stopBtn.classList.add('hidden');
-                if (els.messageInput) els.messageInput.focus();
-                scrollToBottom();
+                activeAbortController = null;
             }
         }
 
         function showCustomAlert(title, message, isConfirm = false, onConfirm = null) {
             if (!els.customModal) return;
-            els.modalTitle.textContent = title;
-            els.modalMessage.textContent = message;
-            els.modalActions.innerHTML = '';
+            if (els.modalTitle) els.modalTitle.textContent = title;
+            if (els.modalMessage) els.modalMessage.textContent = message;
             
-            if (isConfirm) {
-                const cancelBtn = document.createElement('button');
-                cancelBtn.type = "button";
-                cancelBtn.className = "px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer";
-                cancelBtn.textContent = "Cancel";
-                cancelBtn.onclick = () => els.customModal.classList.add('hidden');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            if (confirmBtn) {
+                const newBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
                 
-                const confirmBtn = document.createElement('button');
-                confirmBtn.type = "button";
-                confirmBtn.className = "px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-xl transition cursor-pointer";
-                confirmBtn.textContent = "Confirm";
-                confirmBtn.onclick = () => {
-                    els.customModal.classList.add('hidden');
-                    if (onConfirm) onConfirm();
-                };
-                
-                els.modalActions.appendChild(cancelBtn);
-                els.modalActions.appendChild(confirmBtn);
-            } else {
-                const okBtn = document.createElement('button');
-                okBtn.type = "button";
-                okBtn.className = "px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer";
-                okBtn.textContent = "OK";
-                okBtn.onclick = () => els.customModal.classList.add('hidden');
-                els.modalActions.appendChild(okBtn);
+                if (isConfirm) {
+                    newBtn.textContent = 'Confirm';
+                    newBtn.onclick = () => {
+                        els.customModal.classList.add('hidden');
+                        if (onConfirm) onConfirm();
+                    };
+                } else {
+                    newBtn.textContent = 'OK';
+                    newBtn.onclick = () => els.customModal.classList.add('hidden');
+                }
             }
-            
             els.customModal.classList.remove('hidden');
         }
 
-        function init() {
+        window.onload = function() {
             cacheElements();
             applyTheme(appState.theme);
-            initModelSettings();
-            attachEventListeners();
+            updateActiveModelBadge();
 
-            if (!Array.isArray(appState.chats) || appState.chats.length === 0) {
-                appState.chats = [];
+            if (els.modelSelect) els.modelSelect.value = appState.model;
+
+            if (appState.chats.length === 0) {
                 startNewChat(false);
             } else {
                 appState.currentChatId = appState.chats[0].id;
-                renderHistory();
-                renderChat(appState.currentChatId);
             }
-        }
+            renderChat(appState.currentChatId);
 
-        function attachEventListeners() {
+            // Event Listeners
+            if (els.sidebarToggleBtn) els.sidebarToggleBtn.onclick = toggleSidebar;
+            if (els.overlay) els.overlay.onclick = toggleSidebar;
+            if (els.newChatBtn) els.newChatBtn.onclick = () => startNewChat(true);
+            if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
+            
+            // Explore triggers
+            if (els.headerExploreBtn) els.headerExploreBtn.onclick = toggleExploreBar;
+            if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = toggleExploreBar;
+            if (els.exploreModelsBtn) els.exploreModelsBtn.onclick = openSettings;
+
+            if (els.settingsOpenBtn) els.settingsOpenBtn.onclick = openSettings;
+            if (els.closeSettingsBtn) els.closeSettingsBtn.onclick = closeSettings;
+            if (els.saveSettingsBtn) {
+                els.saveSettingsBtn.onclick = () => {
+                    handleModelChange();
+                    closeSettings();
+                };
+            }
+
+            if (els.themeLightBtn) els.themeLightBtn.onclick = () => setTheme('light');
+            if (els.themeDarkBtn) els.themeDarkBtn.onclick = () => setTheme('dark');
+
+            if (els.attachBtn && els.fileInput) {
+                els.attachBtn.onclick = () => els.fileInput.click();
+                els.fileInput.onchange = handleFileSelect;
+            }
+
+            if (els.imageModeBtn) els.imageModeBtn.onclick = toggleImageMode;
+            if (els.sendBtn) els.sendBtn.onclick = sendMessage;
+            if (els.stopBtn) els.stopBtn.onclick = stopResponse;
+
             if (els.messageInput) {
-                els.messageInput.addEventListener('input', function() {
-                    this.style.height = '';
-                    this.style.height = this.scrollHeight + 'px';
-                });
-                els.messageInput.addEventListener('keydown', function(e) {
+                els.messageInput.onkeydown = (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         sendMessage();
                     }
-                });
+                };
+                els.messageInput.oninput = function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                };
             }
-
-            if (els.sendBtn) els.sendBtn.addEventListener('click', sendMessage);
-            if (els.stopBtn) els.stopBtn.addEventListener('click', stopResponse);
-            if (els.imageModeBtn) els.imageModeBtn.addEventListener('click', toggleImageMode);
-            if (els.attachBtn) els.attachBtn.addEventListener('click', () => els.fileInput.click());
-            if (els.fileInput) els.fileInput.addEventListener('change', handleFileSelect);
-            
-            if (els.themeLightBtn) els.themeLightBtn.addEventListener('click', () => setTheme('light'));
-            if (els.themeDarkBtn) els.themeDarkBtn.addEventListener('click', () => setTheme('dark'));
-            if (els.modelSelect) els.modelSelect.addEventListener('change', handleModelChange);
-
-            if (els.closeSettingsBtn) els.closeSettingsBtn.addEventListener('click', closeSettings);
-            if (els.saveSettingsBtn) els.saveSettingsBtn.addEventListener('click', closeSettings);
-            if (els.newChatBtn) els.newChatBtn.addEventListener('click', () => startNewChat(true));
-            if (els.settingsOpenBtn) els.settingsOpenBtn.addEventListener('click', openSettings);
-            if (els.clearChatBtn) els.clearChatBtn.addEventListener('click', clearCurrentChat);
-            
-            if (els.sidebarToggleBtn) els.sidebarToggleBtn.addEventListener('click', toggleSidebar);
-            if (els.overlay) els.overlay.addEventListener('click', toggleSidebar);
-        }
-
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                if (els.themeDarkBtn) els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white dark:bg-[#1e1e20] shadow-sm text-blue-400 font-semibold cursor-pointer";
-                if (els.themeLightBtn) els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer";
-            } else {
-                document.documentElement.classList.remove('dark');
-                if (els.themeLightBtn) els.themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition bg-white shadow-sm text-yellow-600 font-semibold cursor-pointer";
-                if (els.themeDarkBtn) els.themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer";
-            }
-        }
-
-        function initModelSettings() {
-            if (els.modelSelect) els.modelSelect.value = appState.model;
-            updateActiveModelBadge();
-        }
-
-        function updateActiveModelBadge() {
-            if (!els.activeModelBadge) return;
-            if (appState.model === 'auto') {
-                els.activeModelBadge.textContent = 'Auto (20 Models Router)';
-            } else if (els.modelSelect && els.modelSelect.options && els.modelSelect.selectedIndex >= 0) {
-                const label = els.modelSelect.options[els.modelSelect.selectedIndex]?.text.split('(')[0] || appState.model;
-                els.activeModelBadge.textContent = label;
-            }
-        }
-
-        function scrollToBottom() { 
-            if (els.chatContainer) els.chatContainer.scrollTop = els.chatContainer.scrollHeight; 
-        }
-
-        function renderAttachmentPreviews() {
-            if (!els.attachmentPreview) return;
-            if (currentAttachments.length === 0) {
-                els.attachmentPreview.classList.add('hidden');
-                els.attachmentPreview.innerHTML = '';
-                return;
-            }
-            els.attachmentPreview.classList.remove('hidden');
-            els.attachmentPreview.innerHTML = currentAttachments.map((att, idx) => `
-                <div class="relative flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs">
-                    ${att.type.startsWith('image/') ? `<img src="${att.data}" class="w-8 h-8 object-cover rounded">` : `<i class="fa-solid fa-file-lines text-blue-500"></i>`}
-                    <span class="truncate max-w-[120px]">${escapeHTML(att.name)}</span>
-                    <button type="button" onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
-
-        function saveChatsToStorage() {
-            try {
-                localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
-                renderHistory();
-            } catch (e) {
-                showCustomAlert("Storage Limit", "Browser local storage limit reached.");
-            }
-        }
-
-        function renderHistory() {
-            if (!els.historyList) return;
-            els.historyList.innerHTML = appState.chats.map(chat => `
-                <li>
-                    <button type="button" onclick="switchChat('${chat.id}')" class="w-full text-left px-3 py-2 rounded-lg text-sm truncate transition cursor-pointer ${chat.id === appState.currentChatId ? 'bg-gray-100 dark:bg-[#282a2c] text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] hover:text-gray-900 dark:hover:text-gray-200'}">
-                        <i class="fa-regular fa-message mr-2 opacity-70"></i> ${escapeHTML(chat.title)}
-                    </button>
-                </li>
-            `).join('');
-        }
-
-        function renderChat(chatId) {
-            renderHistory();
-            const chat = appState.chats.find(c => c.id === chatId);
-            if (els.chatContainer) {
-                Array.from(els.chatContainer.children).forEach(child => {
-                    if (child.id !== 'emptyState') child.remove();
-                });
-            }
-
-            if (!chat || !Array.isArray(chat.messages) || chat.messages.length === 0) {
-                if (els.emptyState) els.emptyState.classList.remove('hidden');
-                return;
-            }
-
-            if (els.emptyState) els.emptyState.classList.add('hidden');
-            chat.messages.forEach(msg => appendMessageUI(msg.role, msg.content, msg.isImage, msg.attachments));
-            scrollToBottom();
-        }
-
-        function appendMessageUI(role, content, isImgResponse = false, attachments = []) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full animate-fade-in`;
-            
-            let attachmentsHTML = '';
-            if (Array.isArray(attachments) && attachments.length > 0) {
-                attachmentsHTML = `<div class="flex flex-wrap gap-2 mb-2">` + attachments.map(att => 
-                    att.type.startsWith('image/') 
-                        ? `<img src="${att.data}" class="max-w-xs max-h-48 rounded-lg border border-gray-300 dark:border-gray-700">`
-                        : `<div class="bg-gray-200 dark:bg-gray-800 p-2 rounded text-xs"><i class="fa-solid fa-file-lines mr-1"></i> ${escapeHTML(att.name)}</div>`
-                ).join('') + `</div>`;
-            }
-
-            const textContent = content || '';
-
-            if (role === 'user') {
-                msgDiv.innerHTML = `
-                    <div class="flex-1 flex justify-end">
-                        <div class="bg-gray-200 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 px-5 py-3 rounded-2xl rounded-tr-sm max-w-[85%] text-sm whitespace-pre-wrap">
-                            ${attachmentsHTML}
-                            ${escapeHTML(textContent)}
-                        </div>
-                    </div>
-                `;
-            } else {
-                let parsedContent = textContent;
-                if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
-                    try { parsedContent = marked.parse(textContent); } catch (e) { parsedContent = escapeHTML(textContent); }
-                } else {
-                    parsedContent = escapeHTML(textContent);
-                }
-
-                const iconColor = isImgResponse ? 'from-purple-600 to-pink-500' : 'from-blue-600 to-indigo-500';
-                const iconClass = isImgResponse ? 'fa-image' : 'fa-sparkles';
-                
-                msgDiv.innerHTML = `
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${iconColor} flex-shrink-0 flex items-center justify-center shadow-sm">
-                        <i class="fa-solid ${iconClass} text-white text-xs"></i>
-                    </div>
-                    <div class="flex-1 overflow-hidden">
-                        <div class="markdown-body text-gray-800 dark:text-gray-200 text-sm">${parsedContent}</div>
-                    </div>
-                `;
-
-                setTimeout(() => {
-                    const preElements = msgDiv.querySelectorAll('pre');
-                    preElements.forEach(pre => {
-                        if (!pre.querySelector('.code-copy-btn')) {
-                            const btn = document.createElement('button');
-                            btn.type = "button";
-                            btn.className = 'code-copy-btn';
-                            btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
-                            btn.onclick = () => {
-                                const codeEl = pre.querySelector('code');
-                                const textToCopy = codeEl ? codeEl.innerText : pre.innerText;
-                                navigator.clipboard.writeText(textToCopy).then(() => {
-                                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-                                    setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy'; }, 2000);
-                                });
-                            };
-                            pre.appendChild(btn);
-                        }
-                    });
-                }, 10);
-            }
-            if (els.chatContainer) els.chatContainer.appendChild(msgDiv);
-        }
-
-        async function appendStreamingMessageUI(fullText, isImgResponse = false) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full animate-fade-in`;
-            
-            const iconColor = isImgResponse ? 'from-purple-600 to-pink-500' : 'from-blue-600 to-indigo-500';
-            const iconClass = isImgResponse ? 'fa-image' : 'fa-sparkles';
-            
-            msgDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${iconColor} flex-shrink-0 flex items-center justify-center shadow-sm">
-                    <i class="fa-solid ${iconClass} text-white text-xs"></i>
-                </div>
-                <div class="flex-1 overflow-hidden">
-                    <div class="markdown-body text-gray-800 dark:text-gray-200 text-sm"></div>
-                </div>
-            `;
-            if (els.chatContainer) els.chatContainer.appendChild(msgDiv);
-            scrollToBottom();
-
-            const bodyEl = msgDiv.querySelector('.markdown-body');
-            
-            if (isImgResponse) {
-                if (bodyEl) bodyEl.innerHTML = marked.parse(fullText);
-                scrollToBottom();
-                return;
-            }
-
-            let currentText = "";
-            const words = fullText.split(" ");
-            for (let i = 0; i < words.length; i++) {
-                if (!isGenerating && activeAbortController === null) break;
-                currentText += (i === 0 ? "" : " ") + words[i];
-                if (bodyEl) bodyEl.innerHTML = marked.parse(currentText);
-                scrollToBottom();
-                await new Promise(r => setTimeout(r, 12));
-            }
-        }
-
-        function appendLoadingUI(isImg = false) {
-            const loaderId = 'loader-' + Date.now();
-            const msgDiv = document.createElement('div');
-            msgDiv.id = loaderId;
-            msgDiv.className = `flex gap-4 mb-6 max-w-4xl mx-auto w-full`;
-            
-            const iconColor = isImg ? 'from-purple-600 to-pink-500' : 'from-blue-600 to-indigo-500';
-            const iconClass = isImg ? 'fa-image' : 'fa-sparkles';
-
-            msgDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${iconColor} flex-shrink-0 flex items-center justify-center animate-pulse">
-                    <i class="fa-solid ${iconClass} text-white text-xs"></i>
-                </div>
-                <div class="flex-1 flex items-center gap-3">
-                    <div class="flex space-x-1.5">
-                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                        <div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                        <div class="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                    </div>
-                    <span class="text-xs text-gray-400 dark:text-gray-400 font-medium animate-pulse">Mei is thinking...</span>
-                </div>
-            `;
-            if (els.chatContainer) els.chatContainer.appendChild(msgDiv);
-            scrollToBottom();
-            return loaderId;
-        }
-
-        function escapeHTML(str) {
-            if (typeof str !== 'string') return '';
-            return str.replace(/[&<>'"]/g, 
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                }[tag])
-            );
-        }
-
-        window.addEventListener('DOMContentLoaded', init);
+        };
     </script>
 </body>
 </html>
