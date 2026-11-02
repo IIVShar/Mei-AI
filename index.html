@@ -67,29 +67,11 @@
         html:not(.dark) .markdown-body code { background: #f0f3f6; color: #d73a49; }
         html:not(.dark) .markdown-body p, html:not(.dark) .markdown-body ul, html:not(.dark) .markdown-body ol { color: #1f2937; }
         
-        .code-copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e6edf3;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .code-copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
-
         #sidebar { transition: transform 0.3s ease; }
         @media (max-width: 768px) {
             #sidebar { transform: translateX(-100%); position: fixed; z-index: 40; height: 100%; top: 0; left: 0; }
             #sidebar.open { transform: translateX(0); }
         }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
     </style>
 </head>
 <body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
@@ -109,6 +91,9 @@
         <div class="px-4 pb-2 space-y-1">
             <button id="sidebarExploreBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
                 <i class="fa-solid fa-compass text-purple-400"></i> Explore Menu
+            </button>
+            <button id="imageGenOpenBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Pollinations Image AI
             </button>
             <a href="wbots.html" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
                 <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots
@@ -151,6 +136,9 @@
             </div>
             
             <div class="flex items-center gap-2">
+                <button id="headerImageGenBtn" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-pink-700 dark:text-pink-300 bg-pink-100 hover:bg-pink-200 dark:bg-pink-950/60 dark:hover:bg-pink-900/80 border border-pink-200 dark:border-pink-800/50 transition cursor-pointer" title="Generate Images">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Image AI
+                </button>
                 <button id="headerExploreBtn" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] transition cursor-pointer" title="Explore Tools">
                     <i class="fa-solid fa-compass text-purple-400"></i> Explore
                 </button>
@@ -164,6 +152,9 @@
         <div id="exploreMiniBar" class="hidden bg-white/95 dark:bg-[#18181a]/95 border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 z-20 transition-all duration-300 backdrop-blur-md">
             <div class="max-w-4xl mx-auto flex items-center gap-3 overflow-x-auto py-0.5">
                 <span class="text-xs font-semibold text-gray-400 flex-shrink-0 uppercase tracking-wider"><i class="fa-solid fa-compass mr-1 text-purple-400"></i> Quick Navigation:</span>
+                <button id="miniBarImageGenBtn" type="button" class="flex items-center gap-2 px-3.5 py-1.5 bg-pink-50 hover:bg-pink-100 dark:bg-pink-950/40 dark:hover:bg-pink-900/60 text-pink-800 dark:text-pink-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-pink-200 dark:border-pink-800/50 cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Pollinations Image Generator
+                </button>
                 <a href="wbots.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
                     <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots Explorer
                 </a>
@@ -181,7 +172,10 @@
                     <div class="relative w-5 h-14 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
                 </div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Equipped with custom Google Gemini, OpenRouter, open-source fallback models, and auto-rotator execution.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Equipped with Gemini, OpenRouter, and Pollinations AI dynamic image generation.</p>
+                <button id="emptyStateImgBtn" type="button" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-lg transition transform hover:scale-105 cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Open Image Generator Studio
+                </button>
             </div>
         </div>
 
@@ -192,16 +186,14 @@
                 <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
                 <div class="flex items-end">
-                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json">
-                    
-                    <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach Image or File">
-                        <i class="fa-solid fa-plus"></i>
+                    <button id="imageModalBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate AI Image">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
                     </button>
 
                     <textarea 
                         id="messageInput" 
                         rows="1" 
-                        placeholder="Message Mei..."
+                        placeholder="Message Mei or type /image prompt..."
                         class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400"></textarea>
 
                     <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
@@ -209,9 +201,68 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Mei AI streaming suite with Google Gemini, OpenRouter & Bibbybit pulse branding.</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Use <code>/image &lt;prompt&gt;</code> directly in chat to create AI images instantly!</p>
         </div>
     </main>
+
+    <!-- Pollinations Image Generation Modal Studio -->
+    <div id="imageGenModal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-xl rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4 flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-lg"></i>
+                    <h3 class="text-lg font-semibold">Pollinations AI Image Studio</h3>
+                </div>
+                <button id="closeImageGenBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                <div>
+                    <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">Image Description (Prompt)</label>
+                    <textarea id="imgPromptInput" rows="3" placeholder="A futuristic vibrant cyberpunk street bathed in neon rain..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-pink-500 dark:focus:border-pink-400 resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Model Engine</label>
+                        <select id="imgModelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:border-pink-500 cursor-pointer">
+                            <option value="flux">Flux (High Detail Default)</option>
+                            <option value="turbo">Turbo (Fast Speed)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Aspect Ratio</label>
+                        <select id="imgRatioSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:border-pink-500 cursor-pointer">
+                            <option value="1024x1024">Square (1024x1024)</option>
+                            <option value="1280x720">Landscape (1280x720)</option>
+                            <option value="720x1280">Portrait (720x1280)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Preview Area -->
+                <div id="imgPreviewWrapper" class="hidden min-h-[220px] rounded-xl border border-gray-200 dark:border-gray-700/80 bg-gray-900/40 flex items-center justify-center relative overflow-hidden p-2">
+                    <img id="imgPreview" class="max-h-[320px] rounded-lg object-contain shadow-lg hidden">
+                    <div id="imgSpinner" class="hidden flex flex-col items-center gap-3 text-pink-400 py-8">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
+                        <span class="text-xs font-medium">Synthesizing image with Pollinations AI...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-between items-center">
+                <button id="sendImgToChatBtn" type="button" class="hidden text-xs font-medium text-pink-600 dark:text-pink-400 hover:underline cursor-pointer">
+                    <i class="fa-solid fa-share mr-1"></i> Post to Chat
+                </button>
+                <div class="flex gap-2 ml-auto">
+                    <button id="generateImgBtn" type="button" class="px-5 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition cursor-pointer flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Image
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
@@ -246,7 +297,6 @@
                         <option value="qwen-coder">Qwen 2.5 Coder 32B</option>
                         <option value="llama">Llama 3.3 70B Instruct</option>
                         <option value="deepseek">DeepSeek V3 / R1</option>
-                        <option value="mistral">Mistral Large 2</option>
                     </select>
                 </div>
 
@@ -279,7 +329,6 @@
     <script>
         const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity.";
 
-        // Multi-channel API endpoints and model fallbacks
         const API_CHANNELS = [
             { name: 'Pollinations OpenAI Gateway', url: 'https://text.pollinations.ai/openai' },
             { name: 'Pollinations Direct Gateway', url: 'https://text.pollinations.ai/' },
@@ -302,6 +351,7 @@
 
         let els = {};
         let isGenerating = false;
+        let activeGeneratedImgUrl = '';
 
         function cacheElements() {
             els = {
@@ -328,7 +378,24 @@
                 sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
                 headerExploreBtn: document.getElementById('headerExploreBtn'),
                 sidebarExploreBtn: document.getElementById('sidebarExploreBtn'),
-                exploreMiniBar: document.getElementById('exploreMiniBar')
+                exploreMiniBar: document.getElementById('exploreMiniBar'),
+                
+                // Image Gen elements
+                imageGenModal: document.getElementById('imageGenModal'),
+                closeImageGenBtn: document.getElementById('closeImageGenBtn'),
+                imageGenOpenBtn: document.getElementById('imageGenOpenBtn'),
+                headerImageGenBtn: document.getElementById('headerImageGenBtn'),
+                miniBarImageGenBtn: document.getElementById('miniBarImageGenBtn'),
+                imageModalBtn: document.getElementById('imageModalBtn'),
+                emptyStateImgBtn: document.getElementById('emptyStateImgBtn'),
+                imgPromptInput: document.getElementById('imgPromptInput'),
+                imgModelSelect: document.getElementById('imgModelSelect'),
+                imgRatioSelect: document.getElementById('imgRatioSelect'),
+                generateImgBtn: document.getElementById('generateImgBtn'),
+                imgPreviewWrapper: document.getElementById('imgPreviewWrapper'),
+                imgPreview: document.getElementById('imgPreview'),
+                imgSpinner: document.getElementById('imgSpinner'),
+                sendImgToChatBtn: document.getElementById('sendImgToChatBtn')
             };
         }
 
@@ -351,6 +418,64 @@
 
         function closeSettings() {
             if (els.settingsModal) els.settingsModal.classList.add('hidden');
+        }
+
+        function openImageGenModal(prefillPrompt = '') {
+            if (els.imageGenModal) els.imageGenModal.classList.remove('hidden');
+            if (prefillPrompt && els.imgPromptInput) els.imgPromptInput.value = prefillPrompt;
+        }
+
+        function closeImageGenModal() {
+            if (els.imageGenModal) els.imageGenModal.classList.add('hidden');
+        }
+
+        function buildPollinationsImageUrl(prompt, model, dimensions) {
+            const [width, height] = dimensions.split('x');
+            const encodedPrompt = encodeURIComponent(prompt);
+            const seed = Math.floor(Math.random() * 1000000);
+            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=${model}&seed=${seed}&nologo=true`;
+        }
+
+        async function triggerImageGeneration() {
+            const prompt = els.imgPromptInput.value.trim();
+            if (!prompt) return;
+
+            const model = els.imgModelSelect.value;
+            const ratio = els.imgRatioSelect.value;
+
+            els.imgPreviewWrapper.classList.remove('hidden');
+            els.imgPreview.classList.add('hidden');
+            els.imgSpinner.classList.remove('hidden');
+            els.sendImgToChatBtn.classList.add('hidden');
+
+            const imageUrl = buildPollinationsImageUrl(prompt, model, ratio);
+
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                activeGeneratedImgUrl = imageUrl;
+                els.imgPreview.src = imageUrl;
+                els.imgSpinner.classList.add('hidden');
+                els.imgPreview.classList.remove('hidden');
+                els.sendImgToChatBtn.classList.remove('hidden');
+            };
+            tempImg.onerror = () => {
+                els.imgSpinner.classList.add('hidden');
+                alert("Failed to load image from Pollinations AI. Please try again.");
+            };
+            tempImg.src = imageUrl;
+        }
+
+        function postGeneratedImageToChat() {
+            if (!activeGeneratedImgUrl) return;
+            const markdownImg = `![Generated Image](${activeGeneratedImgUrl})`;
+            
+            if (!appState.currentChatId) createNewChat();
+            const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
+
+            currentChat.messages.push({ role: 'assistant', content: markdownImg });
+            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+            renderMessages();
+            closeImageGenModal();
         }
 
         function applyTheme(theme) {
@@ -525,25 +650,18 @@
             return data.choices?.[0]?.message?.content || "No content returned from OpenRouter model.";
         }
 
-        // Resilient fetch loop for auto-rotator
+        // Multi-channel fallback rotator
         async function fetchUntilValidAnswer(messages, selectedModel, onThoughtStep) {
-            // Direct API Routing for Gemini
             if (selectedModel.startsWith('gemini')) {
-                if (!appState.geminiApiKey) {
-                    throw new Error("Google Gemini API Key is missing. Please set it in Settings.");
-                }
+                if (!appState.geminiApiKey) throw new Error("Google Gemini API Key missing in Settings.");
                 return await fetchGeminiApi(messages, selectedModel, appState.geminiApiKey, onThoughtStep);
             }
 
-            // Direct API Routing for OpenRouter
             if (selectedModel.startsWith('openrouter')) {
-                if (!appState.openrouterApiKey) {
-                    throw new Error("OpenRouter API Key is missing. Please set it in Settings.");
-                }
+                if (!appState.openrouterApiKey) throw new Error("OpenRouter API Key missing in Settings.");
                 return await fetchOpenRouterApi(messages, appState.openrouterApiKey, appState.openrouterModel, onThoughtStep);
             }
 
-            // Fallback Multi-Channel Rotator Logic
             const modelsToTry = selectedModel === 'auto' ? FALLBACK_MODELS : [selectedModel, ...FALLBACK_MODELS];
             let attempts = 0;
             const maxAttempts = 15;
@@ -560,20 +678,10 @@
                     const response = await fetch(endpoint.url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: model,
-                            messages: messages
-                        })
+                        body: JSON.stringify({ model: model, messages: messages })
                     });
 
-                    if (response.status === 429) {
-                        onThoughtStep(`Rate limit 429 hit on channel ${endpoint.name}. Auto-rotating...`);
-                        await new Promise(r => setTimeout(r, 800));
-                        continue;
-                    }
-
-                    if (!response.ok) {
-                        onThoughtStep(`Channel responded with status ${response.status}. Retrying alternate backend...`);
+                    if (response.status === 429 || !response.ok) {
                         await new Promise(r => setTimeout(r, 800));
                         continue;
                     }
@@ -588,41 +696,48 @@
                         content = raw;
                     }
 
-                    if (!content || content.includes('429 Too Many Requests') || content.includes('rate limit exceeded') || content.startsWith('{"error"')) {
-                        onThoughtStep(`API output contained error string. Cycling channel...`);
+                    if (!content || content.includes('429 Too Many Requests') || content.startsWith('{"error"')) {
                         await new Promise(r => setTimeout(r, 800));
                         continue;
                     }
 
-                    onThoughtStep(`Valid response received from ${model}. Finalizing answer...`);
                     return content;
                 } catch (err) {
-                    onThoughtStep(`Network hiccup on ${endpoint.name}. Trying next gateway...`);
                     await new Promise(r => setTimeout(r, 800));
                 }
             }
 
-            const lastMsg = messages[messages.length - 1].content;
-            onThoughtStep(`Executing final fallback channel query...`);
-            const fbRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(lastMsg)}?model=openai`);
-            if (fbRes.ok) {
-                return await fbRes.text();
-            }
-            throw new Error("Unable to fetch response. All channels exhausted.");
+            throw new Error("Unable to fetch response from backend channels.");
         }
 
         async function sendMessage() {
             const text = els.messageInput.value.trim();
             if (!text || isGenerating) return;
 
-            if (!appState.currentChatId) {
-                createNewChat();
+            // Handle inline /image commands
+            if (text.startsWith('/image ')) {
+                const imgPrompt = text.replace('/image ', '').trim();
+                els.messageInput.value = '';
+                const generatedUrl = buildPollinationsImageUrl(imgPrompt, 'flux', '1024x1024');
+                
+                if (!appState.currentChatId) createNewChat();
+                const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
+
+                currentChat.messages.push({ role: 'user', content: text });
+                appendMessageUI('user', text);
+
+                const aiBubble = appendMessageUI('assistant', 'Generating your image...');
+                const markdownImg = `![Generated Image](${generatedUrl})`;
+                currentChat.messages.push({ role: 'assistant', content: markdownImg });
+                localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+                aiBubble.innerHTML = marked.parse(markdownImg);
+                return;
             }
 
+            if (!appState.currentChatId) createNewChat();
+
             const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (currentChat.messages.length === 0) {
-                currentChat.title = text.slice(0, 30);
-            }
+            if (currentChat.messages.length === 0) currentChat.title = text.slice(0, 30);
 
             currentChat.messages.push({ role: 'user', content: text });
             appendMessageUI('user', text);
@@ -632,16 +747,16 @@
             isGenerating = true;
 
             const thinkingContainer = document.createElement('div');
-            thinkingContainer.className = 'mb-3 bg-gray-100 dark:bg-[#1e1e20] border border-purple-500/30 dark:border-purple-500/20 rounded-xl p-3 text-xs text-purple-600 dark:text-purple-300 transition-all';
+            thinkingContainer.className = 'mb-3 bg-gray-100 dark:bg-[#1e1e20] border border-purple-500/30 rounded-xl p-3 text-xs text-purple-600 dark:text-purple-300 transition-all';
             thinkingContainer.innerHTML = `
                 <details open class="cursor-pointer">
-                    <summary class="font-semibold flex items-center gap-2 outline-none select-none">
+                    <summary class="font-semibold flex items-center gap-2 select-none">
                         <i class="fa-solid fa-brain animate-pulse text-purple-500"></i>
                         <span>Thinking...</span>
                         <span id="thinkTimer" class="text-[10px] opacity-70 ml-auto font-mono">0.0s</span>
                     </summary>
-                    <div id="thinkLog" class="mt-2 pt-2 border-t border-purple-500/20 font-mono space-y-1 opacity-90 text-[11px] leading-relaxed">
-                        <p class="animate-pulse">> Deconstructing query & parsing context constraints...</p>
+                    <div id="thinkLog" class="mt-2 pt-2 border-t border-purple-500/20 font-mono space-y-1 opacity-90 text-[11px]">
+                        <p class="animate-pulse">> Processing constraints...</p>
                     </div>
                 </details>
             `;
@@ -663,22 +778,11 @@
             };
 
             try {
-                const messagesPayload = [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    ...currentChat.messages
-                ];
-
+                const messagesPayload = [{ role: 'system', content: SYSTEM_PROMPT }, ...currentChat.messages];
                 const resultText = await fetchUntilValidAnswer(messagesPayload, appState.model, addThoughtStep);
 
                 clearInterval(timerInterval);
-
-                const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
-                thinkingContainer.querySelector('summary').innerHTML = `
-                    <i class="fa-solid fa-check-circle text-emerald-500"></i>
-                    <span class="text-gray-600 dark:text-gray-300 font-medium">Thought for ${totalTime} seconds</span>
-                    <span class="text-[10px] opacity-70 ml-auto font-mono text-gray-400">Expand</span>
-                `;
-                thinkingContainer.querySelector('details').removeAttribute('open');
+                thinkingContainer.remove();
 
                 const answerContent = document.createElement('div');
                 aiBubble.appendChild(answerContent);
@@ -721,6 +825,16 @@
             if (els.newChatBtn) els.newChatBtn.onclick = createNewChat;
             if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
             if (els.sendBtn) els.sendBtn.onclick = sendMessage;
+
+            // Image modal triggers
+            if (els.imageModalBtn) els.imageModalBtn.onclick = () => openImageGenModal();
+            if (els.headerImageGenBtn) els.headerImageGenBtn.onclick = () => openImageGenModal();
+            if (els.miniBarImageGenBtn) els.miniBarImageGenBtn.onclick = () => openImageGenModal();
+            if (els.imageGenOpenBtn) els.imageGenOpenBtn.onclick = () => openImageGenModal();
+            if (els.emptyStateImgBtn) els.emptyStateImgBtn.onclick = () => openImageGenModal();
+            if (els.closeImageGenBtn) els.closeImageGenBtn.onclick = closeImageGenModal;
+            if (els.generateImgBtn) els.generateImgBtn.onclick = triggerImageGeneration;
+            if (els.sendImgToChatBtn) els.sendImgToChatBtn.onclick = postGeneratedImageToChat;
 
             if (els.themeLightBtn) els.themeLightBtn.onclick = () => applyTheme('light');
             if (els.themeDarkBtn) els.themeDarkBtn.onclick = () => applyTheme('dark');
