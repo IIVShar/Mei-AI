@@ -181,7 +181,7 @@
                     <div class="relative w-5 h-14 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
                 </div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Equipped with 20+ open-source models and auto 429 rotation backoffs for continuous conversation streaming.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Equipped with custom Google Gemini, OpenRouter, open-source fallback models, and auto-rotator execution.</p>
             </div>
         </div>
 
@@ -209,7 +209,7 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Mei AI streaming suite with Bibbybit pulse branding and multi-channel resilience.</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Mei AI streaming suite with Google Gemini, OpenRouter & Bibbybit pulse branding.</p>
         </div>
     </main>
 
@@ -217,7 +217,7 @@
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4">
             <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Settings & Models</h3>
+                <h3 class="text-lg font-semibold">Settings & API Configurations</h3>
                 <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
@@ -235,24 +235,42 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Model Selector (20+ Models)</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Model Provider Engine</label>
                     <select id="modelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
                         <option value="auto">Auto (All-Channels Multi-API Pool - 20+ Models)</option>
+                        <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Direct API)</option>
+                        <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Direct API)</option>
+                        <option value="openrouter-auto">OpenRouter (Auto / DeepSeek / Claude)</option>
                         <option value="openai">OpenAI GPT-4o Mini</option>
                         <option value="qwen">Qwen 2.5 72B Instruct</option>
                         <option value="qwen-coder">Qwen 2.5 Coder 32B</option>
-                        <option value="qwen-math">Qwen 2.5 Math</option>
                         <option value="llama">Llama 3.3 70B Instruct</option>
                         <option value="deepseek">DeepSeek V3 / R1</option>
                         <option value="mistral">Mistral Large 2</option>
-                        <option value="gemma">Gemma 2 27B Instruct</option>
-                        <option value="phi">Microsoft Phi-3.5</option>
                     </select>
+                </div>
+
+                <!-- Custom API Keys Section -->
+                <div class="space-y-4 pt-2 border-t border-gray-200 dark:border-gray-800">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                            Google Gemini API Key
+                        </label>
+                        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                            OpenRouter API Key & Model
+                        </label>
+                        <input type="password" id="openrouterApiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono mb-2">
+                        <input type="text" id="openrouterModelInput" placeholder="deepseek/deepseek-chat or anthropic/claude-3.5-sonnet" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
+                    </div>
                 </div>
             </div>
 
             <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end">
-                <button id="saveSettingsBtn" type="button" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">Done</button>
+                <button id="saveSettingsBtn" type="button" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">Save & Done</button>
             </div>
         </div>
     </div>
@@ -261,7 +279,7 @@
     <script>
         const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity.";
 
-        // Expanded multi-channel API endpoints and model fallbacks for robust 429 auto-retry
+        // Multi-channel API endpoints and model fallbacks
         const API_CHANNELS = [
             { name: 'Pollinations OpenAI Gateway', url: 'https://text.pollinations.ai/openai' },
             { name: 'Pollinations Direct Gateway', url: 'https://text.pollinations.ai/' },
@@ -276,7 +294,10 @@
             chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
             currentChatId: null,
             theme: localStorage.getItem('ai_theme') || 'dark',
-            model: localStorage.getItem('ai_model') || 'auto'
+            model: localStorage.getItem('ai_model') || 'auto',
+            geminiApiKey: localStorage.getItem('gemini_api_key') || '',
+            openrouterApiKey: localStorage.getItem('openrouter_api_key') || '',
+            openrouterModel: localStorage.getItem('openrouter_model') || 'deepseek/deepseek-chat'
         };
 
         let els = {};
@@ -293,6 +314,9 @@
                 sendBtn: document.getElementById('sendBtn'),
                 settingsModal: document.getElementById('settingsModal'),
                 modelSelect: document.getElementById('modelSelect'),
+                geminiApiKeyInput: document.getElementById('geminiApiKeyInput'),
+                openrouterApiKeyInput: document.getElementById('openrouterApiKeyInput'),
+                openrouterModelInput: document.getElementById('openrouterModelInput'),
                 activeModelBadge: document.getElementById('activeModelBadge'),
                 themeLightBtn: document.getElementById('themeLightBtn'),
                 themeDarkBtn: document.getElementById('themeDarkBtn'),
@@ -320,6 +344,9 @@
         function openSettings() {
             if (els.settingsModal) els.settingsModal.classList.remove('hidden');
             if (els.modelSelect) els.modelSelect.value = appState.model;
+            if (els.geminiApiKeyInput) els.geminiApiKeyInput.value = appState.geminiApiKey;
+            if (els.openrouterApiKeyInput) els.openrouterApiKeyInput.value = appState.openrouterApiKey;
+            if (els.openrouterModelInput) els.openrouterModelInput.value = appState.openrouterModel;
         }
 
         function closeSettings() {
@@ -441,8 +468,82 @@
             }
         }
 
-        // Resilient fetch loop: continues cycling channels & models until a valid non-429 answer is returned
+        // Custom Google Gemini API Handler
+        async function fetchGeminiApi(messages, modelName, apiKey, onThoughtStep) {
+            onThoughtStep(`Sending payload to Google Gemini API [${modelName}]...`);
+            const targetModel = modelName.includes('pro') ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
+
+            const contents = messages.filter(m => m.role !== 'system').map(m => ({
+                role: m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.content }]
+            }));
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                    contents: contents
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `Gemini API HTTP Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response text returned from Gemini API.";
+        }
+
+        // Custom OpenRouter API Handler
+        async function fetchOpenRouterApi(messages, apiKey, customModel, onThoughtStep) {
+            const targetModel = customModel || 'deepseek/deepseek-chat';
+            onThoughtStep(`Routing query through OpenRouter API [Model: ${targetModel}]...`);
+            
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'HTTP-Referer': window.location.href,
+                    'X-Title': 'Mei AI Interface',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: targetModel,
+                    messages: messages
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `OpenRouter API HTTP Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || "No content returned from OpenRouter model.";
+        }
+
+        // Resilient fetch loop for auto-rotator
         async function fetchUntilValidAnswer(messages, selectedModel, onThoughtStep) {
+            // Direct API Routing for Gemini
+            if (selectedModel.startsWith('gemini')) {
+                if (!appState.geminiApiKey) {
+                    throw new Error("Google Gemini API Key is missing. Please set it in Settings.");
+                }
+                return await fetchGeminiApi(messages, selectedModel, appState.geminiApiKey, onThoughtStep);
+            }
+
+            // Direct API Routing for OpenRouter
+            if (selectedModel.startsWith('openrouter')) {
+                if (!appState.openrouterApiKey) {
+                    throw new Error("OpenRouter API Key is missing. Please set it in Settings.");
+                }
+                return await fetchOpenRouterApi(messages, appState.openrouterApiKey, appState.openrouterModel, onThoughtStep);
+            }
+
+            // Fallback Multi-Channel Rotator Logic
             const modelsToTry = selectedModel === 'auto' ? FALLBACK_MODELS : [selectedModel, ...FALLBACK_MODELS];
             let attempts = 0;
             const maxAttempts = 15;
@@ -487,7 +588,6 @@
                         content = raw;
                     }
 
-                    // Check if the response itself indicates an unhandled error or 429 JSON string
                     if (!content || content.includes('429 Too Many Requests') || content.includes('rate limit exceeded') || content.startsWith('{"error"')) {
                         onThoughtStep(`API output contained error string. Cycling channel...`);
                         await new Promise(r => setTimeout(r, 800));
@@ -502,7 +602,6 @@
                 }
             }
 
-            // Fallback direct URL query if all POST attempts are exhausted
             const lastMsg = messages[messages.length - 1].content;
             onThoughtStep(`Executing final fallback channel query...`);
             const fbRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(lastMsg)}?model=openai`);
@@ -569,7 +668,6 @@
                     ...currentChat.messages
                 ];
 
-                // Keep retrying across all channels until a valid answer is generated
                 const resultText = await fetchUntilValidAnswer(messagesPayload, appState.model, addThoughtStep);
 
                 clearInterval(timerInterval);
@@ -592,9 +690,22 @@
             } catch (err) {
                 clearInterval(timerInterval);
                 thinkingContainer.remove();
-                aiBubble.textContent = "Error communicating with AI endpoint after multiple attempts. Please try again.";
+                aiBubble.textContent = `Error: ${err.message || 'Failed to fetch model response.'}`;
             } finally {
                 isGenerating = false;
+            }
+        }
+
+        function updateModelBadge() {
+            if (!els.activeModelBadge) return;
+            if (appState.model === 'auto') {
+                els.activeModelBadge.textContent = 'All-Channels Rotator (20+ Models)';
+            } else if (appState.model.startsWith('gemini')) {
+                els.activeModelBadge.textContent = `Google Gemini Direct (${appState.model})`;
+            } else if (appState.model.startsWith('openrouter')) {
+                els.activeModelBadge.textContent = `OpenRouter (${appState.openrouterModel || 'Auto'})`;
+            } else {
+                els.activeModelBadge.textContent = `Model: ${els.modelSelect?.options[els.modelSelect.selectedIndex]?.text || appState.model}`;
             }
         }
 
@@ -619,12 +730,20 @@
                     if (els.modelSelect) {
                         appState.model = els.modelSelect.value;
                         localStorage.setItem('ai_model', appState.model);
-                        if (els.activeModelBadge) {
-                            els.activeModelBadge.textContent = appState.model === 'auto' 
-                                ? 'All-Channels Rotator (20+ Models)' 
-                                : `Model: ${els.modelSelect.options[els.modelSelect.selectedIndex].text}`;
-                        }
                     }
+                    if (els.geminiApiKeyInput) {
+                        appState.geminiApiKey = els.geminiApiKeyInput.value.trim();
+                        localStorage.setItem('gemini_api_key', appState.geminiApiKey);
+                    }
+                    if (els.openrouterApiKeyInput) {
+                        appState.openrouterApiKey = els.openrouterApiKeyInput.value.trim();
+                        localStorage.setItem('openrouter_api_key', appState.openrouterApiKey);
+                    }
+                    if (els.openrouterModelInput) {
+                        appState.openrouterModel = els.openrouterModelInput.value.trim();
+                        localStorage.setItem('openrouter_model', appState.openrouterModel);
+                    }
+                    updateModelBadge();
                     closeSettings();
                 };
             }
@@ -639,6 +758,7 @@
             }
 
             applyTheme(appState.theme);
+            updateModelBadge();
 
             if (appState.chats.length === 0) {
                 createNewChat();
@@ -651,4 +771,3 @@
     </script>
 </body>
 </html>
-```
