@@ -186,7 +186,15 @@
                 <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
                 <div class="flex items-end">
-                    <button id="imageModalBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate AI Image">
+                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json">
+                    
+                    <!-- Plus (+) Button for File Uploads -->
+                    <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach File or Image">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                    <!-- Image AI Button Right Beside the + Button -->
+                    <button id="imageModalBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate AI Image Studio">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                     </button>
 
@@ -201,7 +209,7 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Use <code>/image &lt;prompt&gt;</code> directly in chat to create AI images instantly!</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image &lt;prompt&gt;</code> to make images!</p>
         </div>
     </main>
 
@@ -219,7 +227,7 @@
             <div class="p-6 space-y-4 overflow-y-auto flex-1">
                 <div>
                     <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">Image Description (Prompt)</label>
-                    <textarea id="imgPromptInput" rows="3" placeholder="A futuristic vibrant cyberpunk street bathed in neon rain..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-pink-500 dark:focus:border-pink-400 resize-none"></textarea>
+                    <textarea id="imgPromptInput" rows="3" placeholder="A vibrant sunset over snow-capped mountains..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-pink-500 dark:focus:border-pink-400 resize-none"></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -352,6 +360,7 @@
         let els = {};
         let isGenerating = false;
         let activeGeneratedImgUrl = '';
+        let attachedFiles = [];
 
         function cacheElements() {
             els = {
@@ -362,6 +371,9 @@
                 emptyState: document.getElementById('emptyState'),
                 messageInput: document.getElementById('messageInput'),
                 sendBtn: document.getElementById('sendBtn'),
+                attachBtn: document.getElementById('attachBtn'),
+                fileInput: document.getElementById('fileInput'),
+                attachmentPreview: document.getElementById('attachmentPreview'),
                 settingsModal: document.getElementById('settingsModal'),
                 modelSelect: document.getElementById('modelSelect'),
                 geminiApiKeyInput: document.getElementById('geminiApiKeyInput'),
@@ -428,6 +440,42 @@
         function closeImageGenModal() {
             if (els.imageGenModal) els.imageGenModal.classList.add('hidden');
         }
+
+        function handleFileUpload(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                attachedFiles.push(file);
+            });
+            renderAttachments();
+        }
+
+        function renderAttachments() {
+            if (!els.attachmentPreview) return;
+            els.attachmentPreview.innerHTML = '';
+            if (attachedFiles.length === 0) {
+                els.attachmentPreview.classList.add('hidden');
+                return;
+            }
+
+            els.attachmentPreview.classList.remove('hidden');
+            attachedFiles.forEach((file, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-[#282a2c] text-xs font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-700';
+                chip.innerHTML = `
+                    <i class="fa-solid ${file.type.startsWith('image/') ? 'fa-image text-pink-400' : 'fa-file-lines text-blue-400'}"></i>
+                    <span class="max-w-[120px] truncate">${file.name}</span>
+                    <button type="button" class="text-gray-400 hover:text-red-500 ml-1 cursor-pointer" onclick="removeAttachment(${index})">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                els.attachmentPreview.appendChild(chip);
+            });
+        }
+
+        window.removeAttachment = function(index) {
+            attachedFiles.splice(index, 1);
+            renderAttachments();
+        };
 
         function buildPollinationsImageUrl(prompt, model, dimensions) {
             const [width, height] = dimensions.split('x');
@@ -711,8 +759,8 @@
         }
 
         async function sendMessage() {
-            const text = els.messageInput.value.trim();
-            if (!text || isGenerating) return;
+            let text = els.messageInput.value.trim();
+            if ((!text && attachedFiles.length === 0) || isGenerating) return;
 
             // Handle inline /image commands
             if (text.startsWith('/image ')) {
@@ -732,6 +780,13 @@
                 localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
                 aiBubble.innerHTML = marked.parse(markdownImg);
                 return;
+            }
+
+            if (attachedFiles.length > 0) {
+                const fileNames = attachedFiles.map(f => f.name).join(', ');
+                text = text ? `${text}\n\n[Attached Files: ${fileNames}]` : `[Attached Files: ${fileNames}]`;
+                attachedFiles = [];
+                renderAttachments();
             }
 
             if (!appState.currentChatId) createNewChat();
@@ -825,6 +880,10 @@
             if (els.newChatBtn) els.newChatBtn.onclick = createNewChat;
             if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
             if (els.sendBtn) els.sendBtn.onclick = sendMessage;
+
+            // File input triggers
+            if (els.attachBtn) els.attachBtn.onclick = () => els.fileInput && els.fileInput.click();
+            if (els.fileInput) els.fileInput.onchange = handleFileUpload;
 
             // Image modal triggers
             if (els.imageModalBtn) els.imageModalBtn.onclick = () => openImageGenModal();
