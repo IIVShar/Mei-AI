@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -476,8 +477,18 @@
                 ];
 
                 const fullResponse = await sendMultiApiRequest(apiMessages, 'openai');
-                bubble.innerHTML = marked.parse(fullResponse);
-                chatSessions[activeWbot.id][assistantMsgIdx].content = fullResponse;
+                
+                // Parse JSON if returned in OpenAI format, or use raw text
+                let cleanText = fullResponse;
+                try {
+                    const parsed = JSON.parse(fullResponse);
+                    cleanText = parsed.choices?.[0]?.message?.content || (typeof parsed === 'string' ? parsed : fullResponse);
+                } catch (e) {
+                    cleanText = fullResponse;
+                }
+
+                bubble.innerHTML = marked.parse(cleanText);
+                chatSessions[activeWbot.id][assistantMsgIdx].content = cleanText;
                 saveSessions();
                 scrollToBottom();
             } catch (err) {
@@ -554,3 +565,4 @@
     </script>
 </body>
 </html>
+```
