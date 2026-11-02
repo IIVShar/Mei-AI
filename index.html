@@ -262,10 +262,15 @@
     <script>
         const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity.";
 
+        // Expanded multi-channel API endpoints and model fallbacks for robust 429 auto-retry
         const API_CHANNELS = [
             { name: 'Pollinations OpenAI Gateway', url: 'https://text.pollinations.ai/openai' },
-            { name: 'Pollinations Direct Gateway', url: 'https://text.pollinations.ai/' }
+            { name: 'Pollinations Direct Gateway', url: 'https://text.pollinations.ai/' },
+            { name: 'Pollinations Direct Secondary', url: 'https://text.pollinations.ai/' },
+            { name: 'Pollinations OpenAI Backup', url: 'https://text.pollinations.ai/openai' }
         ];
+
+        const FALLBACK_MODELS = ['openai', 'qwen', 'llama', 'deepseek', 'mistral', 'gemma'];
         let currentChannelIndex = 0;
 
         let appState = {
@@ -327,8 +332,12 @@
             localStorage.setItem('ai_theme', theme);
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
+                if (els.themeDarkBtn) els.themeDarkBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white shadow transition cursor-pointer';
+                if (els.themeLightBtn) els.themeLightBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333538] transition cursor-pointer';
             } else {
                 document.documentElement.classList.remove('dark');
+                if (els.themeLightBtn) els.themeLightBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg bg-white text-gray-800 shadow transition cursor-pointer';
+                if (els.themeDarkBtn) els.themeDarkBtn.className = 'flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333538] transition cursor-pointer';
             }
         }
 
@@ -337,5 +346,310 @@
             els.historyList.innerHTML = '';
             appState.chats.forEach(chat => {
                 const li = document.createElement('li');
-                li.className = `px-3 py-2 text-sm rounded-lg cursor-pointer truncate ${chat.id === appState.currentChatId ? 'bg-gray-200 dark:bg-[#282a2c] font-medium' : 'hover:bg-gray-100 dark:hover:bg-[#282a2c]/50 text
+                li.className = `px-3 py-2 text-sm rounded-lg cursor-pointer truncate ${chat.id === appState.currentChatId ? 'bg-gray-200 dark:bg-[#282a2c] font-medium text-blue-600 dark:text-blue-400' : 'hover:bg-gray-100 dark:hover:bg-[#282a2c]/50 text-gray-700 dark:text-gray-300'}`;
+                li.textContent = chat.title || 'New Chat';
+                li.onclick = () => loadChat(chat.id);
+                els.historyList.appendChild(li);
+            });
+        }
+
+        function createNewChat() {
+            const newChat = {
+                id: Date.now().toString(),
+                title: 'New Chat',
+                messages: []
+            };
+            appState.chats.unshift(newChat);
+            appState.currentChatId = newChat.id;
+            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+            renderHistory();
+            renderMessages();
+        }
+
+        function clearCurrentChat() {
+            if (!appState.currentChatId) return;
+            appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
+            appState.currentChatId = appState.chats.length > 0 ? appState.chats[0].id : null;
+            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+            if (!appState.currentChatId) {
+                createNewChat();
+            } else {
+                renderHistory();
+                renderMessages();
+            }
+        }
+
+        function loadChat(id) {
+            appState.currentChatId = id;
+            renderHistory();
+            renderMessages();
+        }
+
+        function renderMessages() {
+            if (!els.chatContainer) return;
+            els.chatContainer.innerHTML = '';
+            const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
+
+            if (!currentChat || currentChat.messages.length === 0) {
+                if (els.emptyState) els.chatContainer.appendChild(els.emptyState);
+                return;
+            }
+
+            if (els.emptyState && els.emptyState.parentNode) {
+                els.emptyState.parentNode.removeChild(els.emptyState);
+            }
+
+            currentChat.messages.forEach(msg => {
+                appendMessageUI(msg.role, msg.content);
+            });
+            els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
+        }
+
+        function appendMessageUI(role, content) {
+            if (els.emptyState && els.emptyState.parentNode) {
+                els.emptyState.parentNode.removeChild(els.emptyState);
+            }
+
+            const isUser = role === 'user';
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-4 max-w-4xl mx-auto w-full my-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = isUser 
+                ? 'bg-blue-600 text-white px-4 py-3 rounded-2xl text-sm max-w-[80%]' 
+                : 'text-gray-800 dark:text-gray-200 text-sm max-w-[80%] leading-relaxed markdown-body w-full';
+
+            if (isUser) {
+                bubble.textContent = content;
+            } else {
+                bubble.innerHTML = marked.parse(content || '');
+            }
+
+            wrapper.appendChild(bubble);
+            els.chatContainer.appendChild(wrapper);
+            els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
+            return bubble;
+        }
+
+        async function typeWriterStream(element, fullText) {
+            element.innerHTML = '';
+            const words = fullText.split(' ');
+            let currentText = '';
+            for (let i = 0; i < words.length; i++) {
+                currentText += (i === 0 ? '' : ' ') + words[i];
+                element.innerHTML = marked.parse(currentText);
+                await new Promise(r => setTimeout(r, 18));
+            }
+        }
+
+        // Resilient fetch loop: continues cycling channels & models until a valid non-429 answer is returned
+        async function fetchUntilValidAnswer(messages, selectedModel, onThoughtStep) {
+            const modelsToTry = selectedModel === 'auto' ? FALLBACK_MODELS : [selectedModel, ...FALLBACK_MODELS];
+            let attempts = 0;
+            const maxAttempts = 15;
+
+            while (attempts < maxAttempts) {
+                attempts++;
+                const model = modelsToTry[(attempts - 1) % modelsToTry.length];
+                const endpoint = API_CHANNELS[currentChannelIndex];
+                currentChannelIndex = (currentChannelIndex + 1) % API_CHANNELS.length;
+
+                onThoughtStep(`Attempt ${attempts}: Querying ${endpoint.name} [Model: ${model}]...`);
+
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: model,
+                            messages: messages
+                        })
+                    });
+
+                    if (response.status === 429) {
+                        onThoughtStep(`Rate limit 429 hit on channel ${endpoint.name}. Auto-rotating...`);
+                        await new Promise(r => setTimeout(r, 800));
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        onThoughtStep(`Channel responded with status ${response.status}. Retrying alternate backend...`);
+                        await new Promise(r => setTimeout(r, 800));
+                        continue;
+                    }
+
+                    const raw = await response.text();
+                    let content = '';
+
+                    try {
+                        const parsed = JSON.parse(raw);
+                        content = parsed.choices?.[0]?.message?.content || (typeof parsed === 'string' ? parsed : '');
+                    } catch {
+                        content = raw;
+                    }
+
+                    // Check if the response itself indicates an unhandled error or 429 JSON string
+                    if (!content || content.includes('429 Too Many Requests') || content.includes('rate limit exceeded') || content.startsWith('{"error"')) {
+                        onThoughtStep(`API output contained error string. Cycling channel...`);
+                        await new Promise(r => setTimeout(r, 800));
+                        continue;
+                    }
+
+                    onThoughtStep(`Valid response received from ${model}. Finalizing answer...`);
+                    return content;
+                } catch (err) {
+                    onThoughtStep(`Network hiccup on ${endpoint.name}. Trying next gateway...`);
+                    await new Promise(r => setTimeout(r, 800));
+                }
+            }
+
+            // Fallback direct URL query if all POST attempts are exhausted
+            const lastMsg = messages[messages.length - 1].content;
+            onThoughtStep(`Executing final fallback channel query...`);
+            const fbRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(lastMsg)}?model=openai`);
+            if (fbRes.ok) {
+                return await fbRes.text();
+            }
+            throw new Error("Unable to fetch response. All channels exhausted.");
+        }
+
+        async function sendMessage() {
+            const text = els.messageInput.value.trim();
+            if (!text || isGenerating) return;
+
+            if (!appState.currentChatId) {
+                createNewChat();
+            }
+
+            const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
+            if (currentChat.messages.length === 0) {
+                currentChat.title = text.slice(0, 30);
+            }
+
+            currentChat.messages.push({ role: 'user', content: text });
+            appendMessageUI('user', text);
+            els.messageInput.value = '';
+
+            const aiBubble = appendMessageUI('assistant', '');
+            isGenerating = true;
+
+            const thinkingContainer = document.createElement('div');
+            thinkingContainer.className = 'mb-3 bg-gray-100 dark:bg-[#1e1e20] border border-purple-500/30 dark:border-purple-500/20 rounded-xl p-3 text-xs text-purple-600 dark:text-purple-300 transition-all';
+            thinkingContainer.innerHTML = `
+                <details open class="cursor-pointer">
+                    <summary class="font-semibold flex items-center gap-2 outline-none select-none">
+                        <i class="fa-solid fa-brain animate-pulse text-purple-500"></i>
+                        <span>Thinking...</span>
+                        <span id="thinkTimer" class="text-[10px] opacity-70 ml-auto font-mono">0.0s</span>
+                    </summary>
+                    <div id="thinkLog" class="mt-2 pt-2 border-t border-purple-500/20 font-mono space-y-1 opacity-90 text-[11px] leading-relaxed">
+                        <p class="animate-pulse">> Deconstructing query & parsing context constraints...</p>
+                    </div>
+                </details>
+            `;
+            aiBubble.appendChild(thinkingContainer);
+
+            const thinkLog = thinkingContainer.querySelector('#thinkLog');
+            const thinkTimer = thinkingContainer.querySelector('#thinkTimer');
+            const startTime = Date.now();
+            const timerInterval = setInterval(() => {
+                if (thinkTimer) thinkTimer.textContent = `${((Date.now() - startTime) / 1000).toFixed(1)}s`;
+            }, 100);
+
+            const addThoughtStep = (msg) => {
+                if (!thinkLog) return;
+                const p = document.createElement('p');
+                p.textContent = `> ${msg}`;
+                thinkLog.appendChild(p);
+                els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
+            };
+
+            try {
+                const messagesPayload = [
+                    { role: 'system', content: SYSTEM_PROMPT },
+                    ...currentChat.messages
+                ];
+
+                // Keep retrying across all channels until a valid answer is generated
+                const resultText = await fetchUntilValidAnswer(messagesPayload, appState.model, addThoughtStep);
+
+                clearInterval(timerInterval);
+
+                const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                thinkingContainer.querySelector('summary').innerHTML = `
+                    <i class="fa-solid fa-check-circle text-emerald-500"></i>
+                    <span class="text-gray-600 dark:text-gray-300 font-medium">Thought for ${totalTime} seconds</span>
+                    <span class="text-[10px] opacity-70 ml-auto font-mono text-gray-400">Expand</span>
+                `;
+                thinkingContainer.querySelector('details').removeAttribute('open');
+
+                const answerContent = document.createElement('div');
+                aiBubble.appendChild(answerContent);
+
+                currentChat.messages.push({ role: 'assistant', content: resultText });
+                localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
+                await typeWriterStream(answerContent, resultText);
+                renderHistory();
+            } catch (err) {
+                clearInterval(timerInterval);
+                thinkingContainer.remove();
+                aiBubble.textContent = "Error communicating with AI endpoint after multiple attempts. Please try again.";
+            } finally {
+                isGenerating = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            cacheElements();
+
+            if (els.sidebarToggleBtn) els.sidebarToggleBtn.onclick = toggleSidebar;
+            if (els.overlay) els.overlay.onclick = toggleSidebar;
+            if (els.headerExploreBtn) els.headerExploreBtn.onclick = toggleExploreBar;
+            if (els.sidebarExploreBtn) els.sidebarExploreBtn.onclick = toggleExploreBar;
+            if (els.settingsOpenBtn) els.settingsOpenBtn.onclick = openSettings;
+            if (els.closeSettingsBtn) els.closeSettingsBtn.onclick = closeSettings;
+            if (els.newChatBtn) els.newChatBtn.onclick = createNewChat;
+            if (els.clearChatBtn) els.clearChatBtn.onclick = clearCurrentChat;
+            if (els.sendBtn) els.sendBtn.onclick = sendMessage;
+
+            if (els.themeLightBtn) els.themeLightBtn.onclick = () => applyTheme('light');
+            if (els.themeDarkBtn) els.themeDarkBtn.onclick = () => applyTheme('dark');
+
+            if (els.saveSettingsBtn) {
+                els.saveSettingsBtn.onclick = () => {
+                    if (els.modelSelect) {
+                        appState.model = els.modelSelect.value;
+                        localStorage.setItem('ai_model', appState.model);
+                        if (els.activeModelBadge) {
+                            els.activeModelBadge.textContent = appState.model === 'auto' 
+                                ? 'All-Channels Rotator (20+ Models)' 
+                                : `Model: ${els.modelSelect.options[els.modelSelect.selectedIndex].text}`;
+                        }
+                    }
+                    closeSettings();
+                };
+            }
+
+            if (els.messageInput) {
+                els.messageInput.onkeydown = (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                };
+            }
+
+            applyTheme(appState.theme);
+
+            if (appState.chats.length === 0) {
+                createNewChat();
+            } else {
+                appState.currentChatId = appState.chats[0].id;
+                renderHistory();
+                renderMessages();
+            }
+        });
+    </script>
+</body>
+</html>
 ```
