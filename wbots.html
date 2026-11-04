@@ -1,145 +1,145 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="./wbots.png">
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI - Explore Custom Wbots</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Marked.js for Markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="icon" type="image/png" href="/images/.mei.png">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        gemini: {
-                            bg: '#131314',
-                            sidebar: '#1e1e20',
-                            card: '#282a2c',
-                            cardHover: '#333538',
-                            userBubble: '#2b2d30',
-                            accent: '#a8c7fa',
-                            border: '#3c4043'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
-        .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; position: relative; }
-        .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
-        .markdown-body pre code { background: transparent; padding: 0; color: #e6edf3; }
-        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
-        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #f8fafc; }
-        
-        .code-copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e6edf3;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .code-copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
-    </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Mei AI - Explore Custom Wbots</title>
+ 
+ <!-- Tailwind CSS -->
+ <script src="https://cdn.tailwindcss.com"></script>
+ <!-- FontAwesome Icons -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <!-- Marked.js for Markdown parsing -->
+ <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+ <script>
+ tailwind.config = {
+ darkMode: 'class',
+ theme: {
+ extend: {
+ colors: {
+ gemini: {
+ bg: '#131314',
+ sidebar: '#1e1e20',
+ card: '#282a2c',
+ cardHover: '#333538',
+ userBubble: '#2b2d30',
+ accent: '#a8c7fa',
+ border: '#3c4043'
+ }
+ }
+ }
+ }
+ }
+ </script>
+ <style>
+ ::-webkit-scrollbar { width: 6px; height: 6px; }
+ ::-webkit-scrollbar-track { background: transparent; }
+ ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+ ::-webkit-scrollbar-thumb:hover { background: #475569; }
+ 
+ .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; position: relative; }
+ .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
+ .markdown-body pre code { background: transparent; padding: 0; color: #e6edf3; }
+ .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
+ .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+ .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+ .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #f8fafc; }
+ 
+ .code-copy-btn {
+ position: absolute;
+ top: 0.5rem;
+ right: 0.5rem;
+ background: rgba(255, 255, 255, 0.1);
+ color: #e6edf3;
+ border: 1px solid rgba(255, 255, 255, 0.2);
+ padding: 0.25rem 0.5rem;
+ font-size: 0.75rem;
+ border-radius: 0.375rem;
+ cursor: pointer;
+ transition: all 0.2s;
+ }
+ .code-copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
+ </style>
 </head>
 <body class="bg-gemini-bg text-gray-100 font-sans h-screen flex overflow-hidden">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-64 bg-gemini-sidebar flex flex-col justify-between border-r border-gray-800 transition-all duration-300 z-20">
-        <div class="p-3 flex flex-col gap-3">
-            <div class="flex items-center justify-between px-2 py-1">
-                <div class="flex items-center gap-2.5 cursor-pointer" onclick="showExploreView()">
-                    <div class="relative flex items-center justify-center w-7 h-8">
-                        <div class="absolute inset-y-0 w-2.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[3px] opacity-80"></div>
-                        <div class="relative w-2 h-7 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-md"></div>
-                    </div>
-                    <span class="font-semibold text-base tracking-tight text-gray-200">Mei AI</span>
-                </div>
-                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
-                    <i class="fa-solid fa-bars text-sm"></i>
-                </button>
-            </div>
+ <!-- SIDEBAR -->
+ <aside id="sidebar" class="w-64 bg-gemini-sidebar flex flex-col justify-between border-r border-gray-800 transition-all duration-300 z-20">
+ <div class="p-3 flex flex-col gap-3">
+ <div class="flex items-center justify-between px-2 py-1">
+ <div class="flex items-center gap-2.5 cursor-pointer" onclick="showExploreView()">
+ <div class="relative flex items-center justify-center w-7 h-8">
+ <div class="absolute inset-y-0 w-2.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[3px] opacity-80"></div>
+ <div class="relative w-2 h-7 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-md"></div>
+ </div>
+ <span class="font-semibold text-base tracking-tight text-gray-200">Mei AI</span>
+ </div>
+ <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
+ <i class="fa-solid fa-bars text-sm"></i>
+ </button>
+ </div>
 
-            <!-- Navigation Links -->
-            <a href="index.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
-                <i class="fa-solid fa-comments text-blue-400"></i>
-                <span>Main Chat</span>
-            </a>
+ <!-- Navigation Links -->
+ <a href="mei.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
+ <i class="fa-solid fa-comments text-blue-400"></i>
+ <span>Main Chat</span>
+ </a>
 
-            <button onclick="showExploreView()" class="flex items-center gap-3 bg-gray-800/80 hover:bg-gray-800 text-gray-200 px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/50 shadow-sm cursor-pointer">
-                <i class="fa-solid fa-compass text-purple-400"></i>
-                <span>Explore Custom Wbots</span>
-            </button>
-            
-            <a href="about.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
-                <i class="fa-solid fa-circle-info text-pink-400"></i>
-                <span>About</span>
-            </a>
-        </div>
+ <button onclick="showExploreView()" class="flex items-center gap-3 bg-gray-800/80 hover:bg-gray-800 text-gray-200 px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/50 shadow-sm cursor-pointer">
+ <i class="fa-solid fa-compass text-purple-400"></i>
+ <span>Explore Custom Wbots</span>
+ </button>
+ 
+ <a href="about.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
+ <i class="fa-solid fa-circle-info text-pink-400"></i>
+ <span>About</span>
+ </a>
+ </div>
 
-        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-            <div class="text-xs font-semibold text-gray-400 px-3 mb-2 uppercase tracking-wider">Recent Wbot Sessions</div>
-            <div id="sessionHistoryList" class="space-y-1"></div>
-        </div>
-    </aside>
+ <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+ <div class="text-xs font-semibold text-gray-400 px-3 mb-2 uppercase tracking-wider">Recent Wbot Sessions</div>
+ <div id="sessionHistoryList" class="space-y-1"></div>
+ </div>
+ </aside>
 
-    <!-- MAIN CONTAINER -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden bg-gemini-bg relative">
+ <!-- MAIN CONTAINER -->
+ <main class="flex-1 flex flex-col h-full overflow-hidden bg-gemini-bg relative">
 
-        <!-- VIEW 1: EXPLORE DIRECTORY -->
-        <div id="exploreView" class="flex-1 flex flex-col h-full overflow-y-auto p-6 md:p-10">
-            <div class="max-w-5xl mx-auto w-full mb-8">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">Explore Custom Wbots</h1>
-                        <p class="text-sm text-gray-400">Discover specialized AI personas powered by Mei's Multi-API Rotation Pool for tutoring, coding, chess strategy, and more.</p>
-                    </div>
-                    <div class="relative w-full md:w-72">
-                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-                        <input type="text" id="wbotSearch" placeholder="Search Wbots..." oninput="filterWbots()" 
-                            class="w-full bg-gemini-card text-sm text-gray-200 placeholder-gray-400 pl-10 pr-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-blue-500 transition">
-                    </div>
-                </div>
-                <hr class="border-gray-800">
-            </div>
+ <!-- VIEW 1: EXPLORE DIRECTORY -->
+ <div id="exploreView" class="flex-1 flex flex-col h-full overflow-y-auto p-6 md:p-10">
+ <div class="max-w-5xl mx-auto w-full mb-8">
+ <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+ <div>
+ <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">Explore Custom Wbots</h1>
+ <p class="text-sm text-gray-400">Discover specialized AI personas powered by Mei's Multi-API Rotation Pool for tutoring, coding, chess strategy, and more.</p>
+ </div>
+ <div class="relative w-full md:w-72">
+ <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+ <input type="text" id="wbotSearch" placeholder="Search Wbots..." oninput="filterWbots()" 
+ class="w-full bg-gemini-card text-sm text-gray-200 placeholder-gray-400 pl-10 pr-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-blue-500 transition">
+ </div>
+ </div>
+ <hr class="border-gray-800">
+ </div>
 
-            <div class="max-w-5xl mx-auto w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-12" id="wbotsGrid"></div>
-        </div>
+ <div class="max-w-5xl mx-auto w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-12" id="wbotsGrid"></div>
+ </div>
 
-        <!-- VIEW 2: INTERACTIVE CHAT WORKSPACE -->
-        <div id="chatView" class="hidden flex-1 flex flex-col h-full overflow-hidden">
-            <div class="h-14 px-6 border-b border-gray-800 flex items-center justify-between bg-gemini-bg/80 backdrop-blur z-10">
-                <div class="flex items-center gap-3">
-                    <button onclick="showExploreView()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition text-sm flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span class="hidden sm:inline">Back to Explore</span>
-                    </button>
-                    <div class="h-4 w-px bg-gray-800"></div>
-                    <div class="flex items-center gap-2.5">
-                        <div id="activeWbotAvatar" class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold shadow">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                        <div>
-                            <div class=
+ <!-- VIEW 2: INTERACTIVE CHAT WORKSPACE -->
+ <div id="chatView" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+ <div class="h-14 px-6 border-b border-gray-800 flex items-center justify-between bg-gemini-bg/80 backdrop-blur z-10">
+ <div class="flex items-center gap-3">
+ <button onclick="showExploreView()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition text-sm flex items-center gap-2 cursor-pointer">
+ <i class="fa-solid fa-arrow-left"></i>
+ <span class="hidden sm:inline">Back to Explore</span>
+ </button>
+ <div class="h-4 w-px bg-gray-800"></div>
+ <div class="flex items-center gap-2.5">
+ <div id="activeWbotAvatar" class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold shadow">
+ <i class="fa-solid fa-robot"></i>
+ </div>
+ <div>
+ <div class=
