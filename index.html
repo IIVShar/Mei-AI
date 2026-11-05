@@ -342,7 +342,7 @@
         </div>
     </div>
 
-    <!-- Application JavaScript -->
+    <!-- Application JavaScript with Safe Null Checks -->
     <script>
         const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity.";
 
@@ -463,7 +463,7 @@
         }
 
         function handleFileUpload(e) {
-            const files = Array.from(e.target.files);
+            const files = Array.from(e.target.files || []);
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
@@ -475,7 +475,7 @@
                     });
                     renderAttachments();
                 };
-                if (file.type.startsWith('image/')) {
+                if (file.type && file.type.startsWith('image/')) {
                     reader.readAsDataURL(file);
                 } else {
                     reader.readAsText(file);
@@ -493,46 +493,4 @@
             els.attachmentPreview.classList.remove('hidden');
             attachedFiles.forEach((file, index) => {
                 const badge = document.createElement('div');
-                badge.className = "flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs z-10";
-                badge.innerHTML = `
-                    <i class="fa-solid ${file.type.startsWith('image/') ? 'fa-image text-pink-400' : 'fa-file-lines text-blue-400'}"></i>
-                    <span class="truncate max-w-[120px]">${file.name}</span>
-                    <button type="button" class="text-gray-400 hover:text-red-500 cursor-pointer" onclick="removeAttachment(${index})">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                `;
-                els.attachmentPreview.appendChild(badge);
-            });
-        }
-
-        function removeAttachment(index) {
-            attachedFiles.splice(index, 1);
-            renderAttachments();
-        }
-
-        function applyTheme(theme) {
-            appState.theme = theme;
-            localStorage.setItem('ai_theme', theme);
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        }
-
-        function createNewChat(e) {
-            if (e) e.stopPropagation();
-            const newChat = {
-                id: 'chat_' + Date.now(),
-                title: 'New Conversation',
-                messages: []
-            };
-            appState.chats.unshift(newChat);
-            appState.currentChatId = newChat.id;
-            saveChats();
-            renderChatHistory();
-            renderCurrentChat();
-        }
-
-        function saveChats() {
-            localStorage.setItem('ai_chats',
+                badge.className = "flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c
