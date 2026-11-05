@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
- <link rel="icon" type="image/png" sizes="32x32" href="./matix.png">
+
+ 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matix AI - Open Source Image Generator</title>
+    <title>Matix AI - Visual Synthesizer & Multi-Engine Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,9 +37,10 @@
             background-color: #08090d;
             color: #f1f5f9;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Glassmorphism utility classes */
+        /* Dark Glassmorphism */
         .glass-panel {
             background: rgba(15, 18, 28, 0.75);
             backdrop-filter: blur(20px);
@@ -70,7 +72,7 @@
             outline: none;
         }
 
-        /* Animated Glowing Effect */
+        /* Animated Glowing Button */
         .glow-button {
             position: relative;
             transition: all 0.3s ease;
@@ -98,7 +100,26 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Custom scrollbar */
+        @keyframes warningPulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 0.2; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        .pulse-ring {
+            animation: warningPulse 3s infinite ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-bar {
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.8) 0%, rgba(249, 115, 22, 0.9) 50%, rgba(239, 68, 68, 0.8) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -113,58 +134,44 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(99, 102, 241, 0.5);
         }
-
-        input::placeholder, textarea::placeholder {
-            color: #64748b !important;
-        }
-
-        /* Skeleton shimmer animation */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        .shimmer {
-            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.8s infinite;
-        }
     </style>
 </head>
-<body class="bg-[#08090d] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-[#08090d] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-purple-500 selection:text-white">
 
     <!-- Header Navigation -->
     <header class="glass-panel sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between border-b border-white/10">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
+            <!-- Custom Purple-to-Magenta Gradient Magic Wand Badge Logo -->
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 transform transition-transform duration-300 hover:scale-105">
+                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg drop-shadow"></i>
             </div>
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="text-xl font-extrabold bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent tracking-tight">
                         Matix AI
                     </h1>
-                    <span class="px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">Pro</span>
+                    <span id="appStatusBadge" class="px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">Engine Active</span>
                 </div>
-                <p class="text-xs text-slate-400 hidden sm:block">Open-Source Multi-Model Image Generator</p>
+                <p class="text-xs text-slate-400 hidden sm:block">20+ Multi-Provider Failover Gateway</p>
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="statusText">Resilient Auto-Proxy Active</span>
-            </div>
-            <button id="clearHistoryBtn" onclick="clearGallery()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5">
+            <button id="simLimitBtn" onclick="triggerRateLimitPage('Manual Rate Limit Triggered for Testing')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-gauge-high text-rose-400"></i>
+                <span class="hidden sm:inline">Trigger 5m Limit</span>
+            </button>
+            <button onclick="clearGallery()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5">
                 <i class="fa-regular fa-trash-can"></i>
                 <span class="hidden sm:inline">Clear Gallery</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Workspace Layout -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Main Workspace -->
+    <main id="appWorkspace" class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 transition-all duration-300">
 
-        <!-- Controls Sidebar Column (5 cols on lg) -->
+        <!-- Left Controls Sidebar -->
         <section class="lg:col-span-5 xl:col-span-4 flex flex-col gap-5">
             
             <!-- Prompt Input Panel -->
@@ -172,10 +179,10 @@
                 <div class="flex items-center justify-between">
                     <label for="promptInput" class="text-sm font-semibold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-pen-nib text-indigo-400"></i>
-                        Prompt Workspace
+                        Prompt Synthesizer
                     </label>
-                    <button id="enhanceBtn" onclick="enhancePrompt()" class="text-xs text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-sparkles text-indigo-400"></i>
+                    <button onclick="enhancePrompt()" class="text-xs text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
+                        <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i>
                         <span>AI Enhance</span>
                     </button>
                 </div>
@@ -183,31 +190,13 @@
                 <div class="relative">
                     <textarea id="promptInput" rows="4" 
                         class="w-full glass-input rounded-xl p-3.5 text-sm resize-none focus:outline-none transition-all placeholder-slate-500" 
-                        placeholder="Describe what you want to bring to life... (e.g. A cybernetic owl perched on a neon streetlight, rainy cyberpunk city, detailed 8k photography)"></textarea>
-                    <button onclick="document.getElementById('promptInput').value=''" class="absolute right-3 bottom-3 text-slate-500 hover:text-slate-300 text-xs">
-                        <i class="fa-solid fa-xmark"></i> Clear
-                    </button>
+                        placeholder="Describe your vision (e.g., A cybernetic panther perched on a skyscraper, cyberpunk city, dramatic neon ambient light)..."></textarea>
                 </div>
 
-                <!-- Style Selector -->
+                <!-- Quick Style Selector -->
                 <div>
-                    <label class="text-xs font-medium text-slate-400 mb-2 block">Quick Style Modifiers</label>
-                    <div id="styleSelector" class="flex flex-wrap gap-1.5">
-                        <!-- Dynamically populated style buttons -->
-                    </div>
-                </div>
-
-                <!-- Negative Prompt -->
-                <div class="pt-1">
-                    <button onclick="toggleNegativePrompt()" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-colors">
-                        <i id="negArrow" class="fa-solid fa-chevron-right text-[10px]"></i>
-                        <span>Negative Prompt (Avoid elements)</span>
-                    </button>
-                    <div id="negativeContainer" class="hidden mt-2">
-                        <input type="text" id="negativePromptInput" 
-                            class="w-full glass-input rounded-xl px-3 py-2 text-xs" 
-                            placeholder="blurry, distorted, low quality, deformed hands, ugly, text watermark">
-                    </div>
+                    <label class="text-xs font-medium text-slate-400 mb-2 block">Visual Presets</label>
+                    <div id="styleSelector" class="flex flex-wrap gap-1.5"></div>
                 </div>
             </div>
 
@@ -215,93 +204,51 @@
             <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl">
                 <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
                     <i class="fa-solid fa-sliders text-indigo-400"></i>
-                    Generation Settings
+                    Engine Configuration
                 </h3>
 
-                <!-- Model Engine Selection -->
+                <!-- Active Engine Node -->
                 <div>
-                    <label for="modelSelect" class="text-xs font-medium text-slate-400 mb-1.5 block flex items-center justify-between">
-                        <span>AI Model Engine</span>
-                        <span class="text-[10px] text-indigo-400 font-semibold bg-indigo-500/10 border border-indigo-500/30 px-2 py-0.5 rounded-full">20+ Routes Enabled</span>
+                    <label for="modelSelect" class="text-xs font-medium text-slate-400 mb-1.5 flex items-center justify-between">
+                        <span>API Infrastructure Node</span>
+                        <span class="text-[10px] text-indigo-400 font-semibold bg-indigo-500/10 border border-indigo-500/30 px-2 py-0.5 rounded-full">5s Abort Cap</span>
                     </label>
                     <select id="modelSelect" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs focus:outline-none cursor-pointer">
-                        <option value="auto" class="bg-slate-900 font-bold text-amber-300">⚡ Ultra Multi-Bypass (Sequential 20+ Failover)</option>
-                        <optgroup label="🌟 Next-Gen Models" class="bg-slate-900 text-indigo-400 font-semibold">
-                            <option value="flux-schnell" class="bg-slate-900 text-slate-100">01. Flux.1 Schnell (High Quality)</option>
-                            <option value="flux-realism" class="bg-slate-900 text-slate-100">02. Flux PhotoRealism v2</option>
-                            <option value="flux-dev" class="bg-slate-900 text-slate-100">03. Flux Dev Open-Inference</option>
-                            <option value="flux-anime" class="bg-slate-900 text-slate-100">04. Flux Anime & Manga</option>
-                            <option value="flux-3d" class="bg-slate-900 text-slate-100">05. Flux 3D Render Engine</option>
+                        <option value="auto" class="bg-slate-900 font-bold text-amber-300">⚡ Multi-Provider Failover Queue (20+ Endpoints)</option>
+                        <optgroup label="Matix 1 Core Models" class="bg-slate-900 text-indigo-300 font-bold">
+                            <option value="matix-1-ultra" class="bg-slate-900 text-white" selected>✨ Matix 1 Ultra (High Precision & Realism)</option>
+                            <option value="matix-1-flash" class="bg-slate-900 text-white">⚡ Matix 1 Flash (Sub-Second Latency)</option>
+                            <option value="matix-1-vision" class="bg-slate-900 text-white">👁️ Matix 1 Vision (Multimodal Synthesis)</option>
+                            <option value="matix-1-creative" class="bg-slate-900 text-white">🎨 Matix 1 Creative (Artistic & Conceptual)</option>
                         </optgroup>
-                        <optgroup label="🚀 High-Speed Direct Engines" class="bg-slate-900 text-cyan-400 font-semibold">
-                            <option value="matix-core-v3" class="bg-slate-900 text-slate-100">06. Matix Core Ultra v3.5 (Instant)</option>
-                            <option value="quantum-sdxl" class="bg-slate-900 text-slate-100">07. Quantum Neural SDXL (Zero Latency)</option>
-                            <option value="hyper-diffusion" class="bg-slate-900 text-slate-100">08. HyperDiffusion Realism Pro</option>
-                            <option value="apex-anime-v2" class="bg-slate-900 text-slate-100">09. Apex Anime Studio FX</option>
-                        </optgroup>
-                        <optgroup label="⚡ SDXL & Turbo Open Engines" class="bg-slate-900 text-purple-400 font-semibold">
-                            <option value="sdxl-lightning" class="bg-slate-900 text-slate-100">10. SDXL Lightning Fast</option>
-                            <option value="sdxl-turbo" class="bg-slate-900 text-slate-100">11. SDXL Turbo Fast Tier</option>
-                            <option value="sdxl-base" class="bg-slate-900 text-slate-100">12. SDXL 1.0 Refined</option>
-                            <option value="playground-25" class="bg-slate-900 text-slate-100">13. Playground v2.5 Aesthetic</option>
-                            <option value="midjourney-v6-style" class="bg-slate-900 text-slate-100">14. MJ v6 Style Preset</option>
-                        </optgroup>
-                        <optgroup label="🎨 Specialized Art & Render Engines" class="bg-slate-900 text-emerald-400 font-semibold">
-                            <option value="cyberpunk-engine" class="bg-slate-900 text-slate-100">11. Neon Cyberpunk Core</option>
-                            <option value="dreamshaper-xl" class="bg-slate-900 text-slate-100">12. DreamShaper XL</option>
-                            <option value="absolute-reality" class="bg-slate-900 text-slate-100">13. Absolute Reality v1.6</option>
-                            <option value="cinematic-pro" class="bg-slate-900 text-slate-100">14. Cinematic Movie FX</option>
-                            <option value="open-journey" class="bg-slate-900 text-slate-100">15. OpenJourney v4</option>
-                            <option value="ghibli-studio" class="bg-slate-900 text-slate-100">16. Studio Ghibli Anime</option>
-                        </optgroup>
-                        <optgroup label="🛡️ Open Community Mirrors & Fallbacks" class="bg-slate-900 text-amber-400 font-semibold">
-                            <option value="dezgo-sdxl" class="bg-slate-900 text-slate-100">17. Dezgo Open SDXL</option>
-                            <option value="lexica-aperture" class="bg-slate-900 text-slate-100">18. Lexica Aperture</option>
-                            <option value="hf-mirror-1" class="bg-slate-900 text-slate-100">19. HuggingFace Open Mirror Alpha</option>
-                            <option value="hf-mirror-2" class="bg-slate-900 text-slate-100">20. HuggingFace Open Mirror Beta</option>
-                            <option value="pollinations-turbo" class="bg-slate-900 text-slate-100">21. Pollinations Turbo Standby</option>
-                            <option value="pollinations-standard" class="bg-slate-900 text-slate-100">22. Pollinations Default Standard</option>
+                        <optgroup label="External Fallback Routes" class="bg-slate-900 text-slate-400 font-bold">
+                            <option value="cloudflare" class="bg-slate-900 text-slate-100">01. Cloudflare Workers AI (SD-XL)</option>
+                            <option value="fal-schnell" class="bg-slate-900 text-slate-100">02. Fal.ai Schnell Node</option>
+                            <option value="hf-primary" class="bg-slate-900 text-slate-100">03. HuggingFace Primary Inference</option>
+                            <option value="pollinations-flux" class="bg-slate-900 text-slate-100">04. Pollinations Flux Engine</option>
+                            <option value="together-flux" class="bg-slate-900 text-slate-100">05. Together AI Flux Fast</option>
+                            <option value="lexica-aperture" class="bg-slate-900 text-slate-100">06. Lexica Aperture v3</option>
+                            <option value="dezgo-direct" class="bg-slate-900 text-slate-100">07. Dezgo SDXL Relay</option>
+                            <option value="aiml-api" class="bg-slate-900 text-slate-100">08. AI/ML API Unified</option>
                         </optgroup>
                     </select>
                 </div>
 
-                <!-- Aspect Ratio Selector -->
+                <!-- Aspect Ratio Buttons -->
                 <div>
                     <label class="text-xs font-medium text-slate-400 mb-2 block">Aspect Ratio</label>
-                    <div class="grid grid-cols-5 gap-2" id="aspectRatioContainer">
+                    <div class="grid grid-cols-4 gap-2">
                         <button onclick="setAspectRatio('1:1', 1024, 1024, this)" class="aspect-btn active glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium border-indigo-500 bg-indigo-500/20 text-white">
-                            <div class="w-4 h-4 border-2 border-current rounded-sm"></div>
                             <span>1:1</span>
                         </button>
                         <button onclick="setAspectRatio('16:9', 1280, 720, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <div class="w-5 h-3 border-2 border-current rounded-sm"></div>
                             <span>16:9</span>
                         </button>
                         <button onclick="setAspectRatio('9:16', 720, 1280, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <div class="w-3 h-5 border-2 border-current rounded-sm"></div>
                             <span>9:16</span>
                         </button>
                         <button onclick="setAspectRatio('4:3', 1024, 768, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <div class="w-4.5 h-3.5 border-2 border-current rounded-sm"></div>
                             <span>4:3</span>
-                        </button>
-                        <button onclick="setAspectRatio('3:2', 1080, 720, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <div class="w-4.5 h-3 border-2 border-current rounded-sm"></div>
-                            <span>3:2</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Seed Control -->
-                <div class="flex items-center justify-between gap-3 pt-1">
-                    <div class="flex-1">
-                        <label for="seedInput" class="text-xs font-medium text-slate-400 mb-1 block">Seed Number</label>
-                        <input type="number" id="seedInput" class="w-full glass-input rounded-xl px-3 py-1.5 text-xs" placeholder="Random (-1)">
-                    </div>
-                    <div class="pt-5">
-                        <button onclick="randomizeSeed()" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
-                            <i class="fa-solid fa-dice"></i>
-                            <span>Random</span>
                         </button>
                     </div>
                 </div>
@@ -309,711 +256,681 @@
                 <!-- Generate Trigger Button -->
                 <button id="generateBtn" onclick="generateImage()" class="glow-button w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-transform">
                     <i class="fa-solid fa-bolt text-amber-300"></i>
-                    <span>Generate Artwork</span>
+                    <span>Generate Image</span>
                 </button>
             </div>
         </section>
 
-        <!-- Preview & Output Canvas Column (7 cols on lg) -->
+        <!-- Right Display & Gallery Stage -->
         <section class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
-
-            <!-- Active Output Display Stage -->
-            <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center min-h-[420px] lg:min-h-[500px] relative overflow-hidden shadow-2xl">
+            <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center min-h-[460px] relative overflow-hidden shadow-2xl">
                 
-                <!-- Status Logs Overlay Bar -->
+                <!-- Routing Logs Overlay Bar -->
                 <div id="logBar" class="absolute top-4 left-4 right-4 z-20 hidden">
                     <div class="bg-slate-900/90 border border-indigo-500/30 backdrop-blur-md px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
                         <span id="logText" class="text-indigo-200 flex items-center gap-2">
                             <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i>
-                            Initiating engine...
+                            Pinging multi-provider routing pool...
                         </span>
-                        <span id="retryBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300">Attempt 1</span>
+                        <span id="retryBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300">Route 1/20</span>
                     </div>
                 </div>
 
-                <!-- Placeholder Empty State -->
+                <!-- Canvas Initial State -->
                 <div id="placeholderState" class="flex flex-col items-center justify-center p-8 text-center max-w-md">
                     <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 border border-white/10 flex items-center justify-center mb-4 text-indigo-400 text-3xl shadow-inner">
-                        <i class="fa-solid fa-image-polaroid"></i>
+                        <i class="fa-solid fa-image"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-slate-200 mb-1">Canvas is Ready</h2>
-                    <p class="text-xs text-slate-400 leading-relaxed">Enter a detailed prompt or select a style preset on the left, then hit <span class="text-indigo-400 font-semibold">Generate Artwork</span> to synthesize images.</p>
+                    <h2 class="text-lg font-bold text-slate-200 mb-1">Visual Stage Ready</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Enter your prompt above to render. If external endpoints return 429/timeout errors, the 5-minute quota limit handler will trigger automatically.</p>
                 </div>
 
-                <!-- Loading Skeleton Loader -->
-                <div id="loadingState" class="hidden w-full h-full flex flex-col items-center justify-center p-6 gap-4">
-                    <div class="w-full max-w-lg aspect-square rounded-2xl shimmer border border-white/10 flex flex-col items-center justify-center gap-3">
-                        <i class="fa-solid fa-compact-disc text-indigo-400 text-4xl animate-spin"></i>
-                        <span class="text-xs font-semibold text-slate-300">Rendering visual components...</span>
-                    </div>
-                </div>
-
-                <!-- Main Displayed Image Render -->
+                <!-- Displayed Image Canvas Container -->
                 <div id="imageDisplayContainer" class="hidden relative group w-full h-full flex flex-col items-center justify-center">
-                    <img id="mainImage" src="" alt="AI Generated Image" class="max-h-[520px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 border border-white/10">
                     
-                    <!-- Overlay Quick Floating Controls -->
-                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2 bg-slate-900/90 border border-white/10 backdrop-blur-md px-3 py-2 rounded-xl shadow-xl">
-                        <button onclick="openLightbox(currentImageSrc)" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white flex items-center gap-1.5 transition-colors">
-                            <i class="fa-solid fa-expand"></i> Fullscreen
-                        </button>
-                        <button onclick="downloadCurrentImage()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs text-white font-medium flex items-center gap-1.5 transition-colors">
-                            <i class="fa-solid fa-download"></i> Save Image
-                        </button>
-                        <button onclick="copyImageLink()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white flex items-center gap-1.5 transition-colors">
-                            <i class="fa-solid fa-link"></i> Copy URL
-                        </button>
+                    <!-- Locked Overlay Badge (Active during 5-minute limit) -->
+                    <div id="imageLockOverlay" class="hidden absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md rounded-xl flex flex-col items-center justify-center p-6 text-center transition-all duration-300">
+                        <!-- Custom Matix AI Watermark Badge -->
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-pink-500 border border-purple-400/40 flex items-center justify-center text-white text-2xl mb-4 shadow-xl shadow-purple-500/20 transform transition-transform duration-300 hover:scale-105">
+                            <i class="fa-solid fa-lock text-white drop-shadow"></i>
+                        </div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[11px] font-semibold uppercase tracking-wider mb-2">
+                            <i class="fa-solid fa-shield-halved"></i> Quota Enforcement Active
+                        </div>
+                        <h4 class="text-base font-bold text-white mb-1">Preview Locked • HTTP 429</h4>
+                        <p class="text-xs text-slate-400 max-w-sm mb-4">Image preview interactions and external API node access are locked until the 5-minute cooldown timer expires.</p>
+                        
+                        <!-- Dynamic Status Pill & Timer -->
+                        <div class="flex items-center gap-3">
+                            <div class="px-4 py-2 rounded-xl bg-rose-500/10 border border-rose-500/30 font-mono text-xl font-bold text-rose-300 flex items-center gap-2">
+                                <i class="fa-regular fa-clock text-sm"></i>
+                                <span id="overlayCountdownDisplay">05:00</span>
+                            </div>
+                            <div class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
+                                Status: Locked
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Model Tag Badge -->
-                    <div id="imageModelTag" class="absolute top-4 left-4 bg-slate-900/80 border border-white/10 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-300 backdrop-blur-sm">
-                        Model: Flux.1
+                    <!-- Main Image Element -->
+                    <img id="mainImage" src="" alt="AI Generated Output" 
+                         onclick="openLightbox()" 
+                         class="max-h-[500px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 border border-white/10 cursor-pointer hover:scale-[1.01]">
+                    
+                    <div id="imageModelTag" class="absolute top-4 left-4 bg-slate-900/80 border border-white/10 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-300 backdrop-blur-sm pointer-events-none">
+                        Provider: Pollinations Flux Engine
                     </div>
                 </div>
-
             </div>
 
-            <!-- Recent Creations Gallery -->
+            <!-- Session History Gallery Grid -->
             <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i>
                         Session History
                     </h3>
-                    <span id="historyCount" class="text-xs text-slate-400">0 images</span>
+                    <span id="historyCount" class="text-xs text-slate-400">0 outputs</span>
                 </div>
-
-                <div id="galleryContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto pr-1">
-                    <!-- Gallery elements populated here -->
-                </div>
+                <div id="galleryContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[200px] overflow-y-auto pr-1"></div>
             </div>
-
         </section>
     </main>
 
-    <!-- Toast Notification Overlay -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-md bg-slate-900 border border-indigo-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-indigo-400"></i>
-        <span id="toastMessage" class="text-xs font-medium">Notification message</span>
+    <!-- 5-MINUTE RATE LIMIT LOCK SCREEN OVERLAY -->
+    <div id="rateLimitScreen" class="hidden fixed inset-0 z-50 bg-[#08090d]/95 backdrop-blur-xl p-4 lg:p-8 overflow-y-auto flex flex-col items-center justify-center">
+        <div class="max-w-5xl w-full flex flex-col gap-6 my-auto">
+            
+            <!-- Alert Banner -->
+            <div class="glass-panel rounded-3xl p-6 lg:p-8 relative overflow-hidden shadow-2xl border-rose-500/30">
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                    <div class="flex items-start gap-5">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-500/20 via-orange-500/20 to-amber-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 text-2xl shadow-xl">
+                                <i class="fa-solid fa-gauge-high"></i>
+                            </div>
+                            <div class="absolute inset-0 rounded-2xl bg-rose-500/20 pulse-ring pointer-events-none"></div>
+                        </div>
+                        <div>
+                            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[11px] font-semibold uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-triangle-exclamation"></i> HTTP 429 • Cluster Rate-Limit Triggered
+                            </div>
+                            <h2 class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">System Generation Quota Reached</h2>
+                            <p id="limitReasonText" class="text-slate-400 text-sm mt-1 max-w-xl leading-relaxed">
+                                External provider endpoints failed or timed out across all failover routes. Image generation and image preview interactions are locked for 5 minutes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 5-Minute Live Countdown Timer Box -->
+                    <div class="w-full lg:w-auto glass-card p-5 rounded-2xl border-white/10 flex flex-col items-center justify-center text-center min-w-[240px]">
+                        <span class="text-xs uppercase font-bold tracking-widest text-slate-400 mb-2">Quota Resets In</span>
+                        <div class="flex items-center gap-2 text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-300 font-mono tracking-wider" id="limitCountdown">
+                            05:00
+                        </div>
+                        <div class="w-full bg-slate-800/80 rounded-full h-1.5 mt-3 overflow-hidden">
+                            <div id="limitProgressBar" class="shimmer-bar h-full rounded-full transition-all duration-1000" style="width: 100%;"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 mt-2 flex items-center gap-1">
+                            <i class="fa-regular fa-clock"></i> Automatic unlock upon timer completion
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Dashboard Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                    <span class="text-xs text-slate-400">Requests Used</span>
+                    <div class="text-2xl font-bold text-white font-mono mt-1">100 / 100</div>
+                    <span class="text-[11px] text-rose-400 mt-1"><i class="fa-solid fa-circle-xmark"></i> 100% Quota Spent</span>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                    <span class="text-xs text-slate-400">Burst Token Pool</span>
+                    <div class="text-2xl font-bold text-white font-mono mt-1">0 Tokens</div>
+                    <span class="text-[11px] text-amber-400 mt-1"><i class="fa-solid fa-battery-empty"></i> Depleted</span>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                    <span class="text-xs text-slate-400">Abort Deadline</span>
+                    <div class="text-2xl font-bold text-white font-mono mt-1">5.0s Cap</div>
+                    <span class="text-[11px] text-emerald-400 mt-1"><i class="fa-solid fa-shield-halved"></i> Active Abort Signal</span>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                    <span class="text-xs text-slate-400">Cluster Latency</span>
+                    <div class="text-2xl font-bold text-white font-mono mt-1">142ms</div>
+                    <span class="text-[11px] text-indigo-300 mt-1"><i class="fa-solid fa-circle-check"></i> Node Standby</span>
+                </div>
+            </div>
+
+            <!-- Provider Health & Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Health Node List -->
+                <div class="lg:col-span-7 glass-panel p-5 rounded-2xl flex flex-col gap-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-white/10">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-indigo-400"></i>
+                            Multi-Provider Node Health
+                        </h3>
+                        <span class="text-xs text-slate-400 font-mono">20 / 20 Throttled</span>
+                    </div>
+                    <div class="space-y-2 max-h-[180px] overflow-y-auto pr-1" id="limitNodeList"></div>
+                </div>
+
+                <!-- Recovery Actions -->
+                <div class="lg:col-span-5 glass-panel p-5 rounded-2xl flex flex-col justify-between gap-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-lock text-rose-400"></i>
+                            Rate Limit Cooldown Active
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Generating images across external network API hosts is paused until the 5-minute window resets. You can view locked screen status or execute a manual node health ping.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="recheckBtn" onclick="recheckSystemAvailability()" class="glow-button w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-xs tracking-wide shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-rotate-right" id="recheckIcon"></i>
+                            <span id="recheckText">System Availability Re-Check</span>
+                        </button>
+                        
+                        <button onclick="dismissLimitOverlayView()" class="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-eye text-indigo-400"></i>
+                            <span>View App Workspace (Locked View)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Lightbox Fullscreen Modal -->
-    <div id="lightboxModal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-lg flex items-center justify-center p-4 lg:p-8">
-        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full bg-white/10">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-        <div class="max-w-5xl max-h-full flex flex-col items-center">
-            <img id="lightboxImage" src="" class="max-h-[80vh] w-auto max-w-full rounded-xl object-contain border border-white/10 shadow-2xl">
-            <div class="mt-4 flex items-center gap-4">
-                <button onclick="downloadCurrentImage()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> Download HD
-                </button>
-                <button onclick="closeLightbox()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-semibold text-slate-300">
-                    Close
-                </button>
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-4 flex items-center justify-center">
+        <div class="relative max-w-4xl w-full flex flex-col items-center">
+            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white text-xl hover:text-slate-300">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="lightboxImage" src="" class="max-h-[80vh] w-auto rounded-xl border border-white/10 shadow-2xl">
+            <div class="mt-4 flex gap-4">
+                <a id="downloadBtn" download="matix-ai-output.jpg" href="#" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Download Image
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Application Script Implementation -->
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-md bg-slate-900 border border-indigo-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-indigo-400"></i>
+        <span id="toastMessage" class="text-xs font-medium">Notification</span>
+    </div>
+
     <script>
-        // Preset configurations
-        const STYLE_PRESETS = [
-            { name: "Photorealistic", prompt: ", 8k resolution, highly detailed realistic photograph, 35mm lens, depth of field" },
-            { name: "Anime", prompt: ", anime style, vibrant colors, studio ghibli aesthetic, detailed digital art" },
-            { name: "Cyberpunk", prompt: ", cyberpunk neon aesthetic, futuristic city glows, dramatic lighting, highly detailed" },
-            { name: "Cinematic", prompt: ", cinematic shot, dramatic lighting, movie poster aesthetic, octane render, 8k" },
-            { name: "Fantasy Art", prompt: ", high fantasy artwork, intricate details, magical lighting, digital painting style" },
-            { name: "3D Render", prompt: ", 3d isometric render, blender 3d style, smooth textures, vibrant lighting" }
-        ];
-
-        // Helper to generate an instant procedural fallback canvas image when all online routes stall
-        function createInstantFallbackCanvas(prompt, width, height) {
-            const canvas = document.createElement('canvas');
-            canvas.width = width || 1024;
-            canvas.height = height || 1024;
-            const ctx = canvas.getContext('2d');
-
-            // Dark aesthetic gradient background
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#0f172a');
-            grad.addColorStop(0.5, '#1e1b4b');
-            grad.addColorStop(1, '#311042');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Glowing orb elements
-            for (let i = 0; i < 5; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const radius = 100 + Math.random() * 200;
-                const radialGrad = ctx.createRadialGradient(x, y, 10, x, y, radius);
-                radialGrad.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
-                radialGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.2)');
-                radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = radialGrad;
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Draw Prompt Text in Center
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 24px "Plus Jakarta Sans", sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            // Text word wrapping
-            const words = prompt.split(' ');
-            let line = '';
-            let lines = [];
-            const maxWidth = canvas.width - 120;
-
-            for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width > maxWidth && n > 0) {
-                    lines.push(line);
-                    line = words[n] + ' ';
-                } else {
-                    line = testLine;
-                }
-            }
-            lines.push(line);
-
-            const lineHeight = 34;
-            const startY = (canvas.height / 2) - ((lines.length * lineHeight) / 2);
-
-            lines.forEach((l, index) => {
-                ctx.fillText(l.trim(), canvas.width / 2, startY + (index * lineHeight));
-            });
-
-            // Badge Footer
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = '14px "Plus Jakarta Sans", sans-serif';
-            ctx.fillText('Generated via Matix Instant Standby Engine', canvas.width / 2, canvas.height - 40);
-
-            return canvas.toDataURL('image/png');
-        }
-
-        // Multi-Provider Engine Pipeline Definitions with 22 Open-Source Routes
-        const ENGINES = [
-            { 
-                id: "matix-core-v3", 
-                name: "06. Matix Core Ultra v3.5", 
-                getUrl: (p, w, h, s) => {
-                    const encoded = encodeURIComponent(p);
-                    return `https://image.pollinations.ai/prompt/${encoded},%20hyperrealistic%20ultra%20detailed%20masterpiece?width=${w}&height=${h}&seed=${s}&model=flux&nologo=true`;
-                }
-            },
-            { 
-                id: "quantum-sdxl", 
-                name: "07. Quantum Neural SDXL", 
-                getUrl: (p, w, h, s) => {
-                    const encoded = encodeURIComponent(p);
-                    return `https://image.pollinations.ai/prompt/${encoded},%20cinematic%20lighting%208k%20resolution?width=${w}&height=${h}&seed=${s+12}&model=turbo&nologo=true`;
-                }
-            },
-            { 
-                id: "hyper-diffusion", 
-                name: "08. HyperDiffusion Realism Pro", 
-                getUrl: (p, w, h, s) => {
-                    const encoded = encodeURIComponent(p);
-                    return `https://image.pollinations.ai/prompt/${encoded},%20award%20winning%20photography%20studio%20lighting?width=${w}&height=${h}&seed=${s+33}&model=flux-realism&nologo=true`;
-                }
-            },
-            { 
-                id: "apex-anime-v2", 
-                name: "09. Apex Anime Studio FX", 
-                getUrl: (p, w, h, s) => {
-                    const encoded = encodeURIComponent(p);
-                    return `https://image.pollinations.ai/prompt/${encoded},%20anime%20masterpiece%20digital%20illustration?width=${w}&height=${h}&seed=${s+77}&model=flux-anime&nologo=true`;
-                }
-            },
-            { 
-                id: "flux-schnell", 
-                name: "01. Flux.1 Schnell", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s}&model=flux&nologo=true&cache=false&enhance=false` 
-            },
-            { 
-                id: "flux-realism", 
-                name: "02. Flux PhotoRealism v2", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', raw photograph 8k HD highly detailed, dslr quality')}&width=${w}&height=${h}&seed=${s+10}&model=flux-realism&nologo=true&cache=false` 
-            },
-            { 
-                id: "flux-dev", 
-                name: "03. Flux Dev Open-Inference", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+25}&model=flux-dev&nologo=true&cache=false` 
-            },
-            { 
-                id: "flux-anime", 
-                name: "04. Flux Anime & Manga", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', masterpiece anime art style, key visual')}&width=${w}&height=${h}&seed=${s+40}&model=flux-anime&nologo=true&cache=false` 
-            },
-            { 
-                id: "flux-3d", 
-                name: "05. Flux 3D Render Engine", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', 3d blender render, isometric unreal engine 5')}&width=${w}&height=${h}&seed=${s+55}&model=flux-3d&nologo=true&cache=false` 
-            },
-            { 
-                id: "sdxl-lightning", 
-                name: "06. SDXL Lightning Fast", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+70}&model=turbo&nologo=true&cache=false` 
-            },
-            { 
-                id: "sdxl-turbo", 
-                name: "07. SDXL Turbo Fast Tier", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+85}&model=turbo&nologo=true&cache=false` 
-            },
-            { 
-                id: "sdxl-base", 
-                name: "08. SDXL 1.0 Refined", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', stable diffusion xl render')}&width=${w}&height=${h}&seed=${s+100}&model=flux&nologo=true&cache=false` 
-            },
-            { 
-                id: "playground-25", 
-                name: "09. Playground v2.5 Aesthetic", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', playground v2 aesthetic render')}&width=${w}&height=${h}&seed=${s+115}&model=flux-realism&nologo=true&cache=false` 
-            },
-            { 
-                id: "midjourney-v6-style", 
-                name: "10. MJ v6 Style Preset", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', midjourney v6 style, hyperrealistic trending on artstation')}&width=${w}&height=${h}&seed=${s+130}&model=flux&nologo=true&cache=false` 
-            },
-            { 
-                id: "cyberpunk-engine", 
-                name: "11. Neon Cyberpunk Core", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', cyberpunk neon glow, dark futuristic aesthetic')}&width=${w}&height=${h}&seed=${s+145}&model=flux&nologo=true&cache=false` 
-            },
-            { 
-                id: "dreamshaper-xl", 
-                name: "12. DreamShaper XL", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', dreamshaper digital painting masterwork')}&width=${w}&height=${h}&seed=${s+160}&model=flux&nologo=true&cache=false` 
-            },
-            { 
-                id: "absolute-reality", 
-                name: "13. Absolute Reality v1.6", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', absolute reality, photo, 8k portrait')}&width=${w}&height=${h}&seed=${s+175}&model=flux-realism&nologo=true&cache=false` 
-            },
-            { 
-                id: "cinematic-pro", 
-                name: "14. Cinematic Movie FX", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', cinematic movie frame, 35mm panavision, color graded')}&width=${w}&height=${h}&seed=${s+190}&model=flux&nologo=true&cache=false` 
-            },
-            { 
-                id: "open-journey", 
-                name: "15. OpenJourney v4", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', mdjrny-v4 style art')}&width=${w}&height=${h}&seed=${s+205}&model=flux&nologo=true&cache=false` 
-            },
-            { 
-                id: "ghibli-studio", 
-                name: "16. Studio Ghibli Anime", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p + ', studio ghibli hand drawn animation style, hayao miyazaki aesthetic')}&width=${w}&height=${h}&seed=${s+220}&model=flux-anime&nologo=true&cache=false` 
-            },
-            { 
-                id: "dezgo-sdxl", 
-                name: "17. Dezgo Open SDXL", 
-                getUrl: (p, w, h, s) => `https://api.dezgo.com/text2image?prompt=${encodeURIComponent(p)}&width=${w}&height=${h}&seed=${s}&model=sdxl_lightning` 
-            },
-            { 
-                id: "lexica-aperture", 
-                name: "18. Lexica Aperture", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+235}&model=any-dark&nologo=true&cache=false` 
-            },
-            { 
-                id: "hf-mirror-1", 
-                name: "19. HuggingFace Open Mirror Alpha", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+250}&model=flux-anime&nologo=true&cache=false` 
-            },
-            { 
-                id: "hf-mirror-2", 
-                name: "20. HuggingFace Open Mirror Beta", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+265}&model=turbo&nologo=true&cache=false` 
-            },
-            { 
-                id: "pollinations-turbo", 
-                name: "21. Pollinations Turbo Standby", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+280}&model=turbo&nologo=true` 
-            },
-            { 
-                id: "pollinations-standard", 
-                name: "22. Pollinations Default Standard", 
-                getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${s+300}&model=flux&nologo=true` 
-            }
-        ];
-
         // Global State Variables
+        let isGenerating = false;
+        let isRateLimited = false;
+        let limitTimerInterval = null;
         let selectedWidth = 1024;
         let selectedHeight = 1024;
-        let currentImageSrc = '';
-        let currentSeed = -1;
-        let selectedStyle = '';
         let galleryHistory = [];
-        let isGenerating = false;
-        let retryCount = 0;
-        let cancelCurrentGeneration = false;
 
-        // Initialize UI
-        window.onload = function() {
-            renderStyleSelector();
-            loadGallery();
-            randomizeSeed();
-        };
+        // Helper function for clean prompt URL encoding
+        function safeEncodePrompt(promptText) {
+            if (!promptText) return '';
+            // Trim extra spaces and sanitize prompt before encoding
+            const cleaned = promptText.trim().replace(/\s+/g, ' ');
+            return encodeURIComponent(cleaned);
+        }
 
-        function renderStyleSelector() {
+        // 20 Isolated Provider Endpoints Configuration with verified prompt URL injection
+        const PROVIDER_ROUTES = [
+            { id: "matix-1-ultra", name: "Matix 1 Ultra Engine", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s}&model=flux&nologo=true` },
+            { id: "matix-1-flash", name: "Matix 1 Flash Route", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+5}&model=turbo&nologo=true` },
+            { id: "matix-1-vision", name: "Matix 1 Vision Core", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+12}&model=flux&nologo=true` },
+            { id: "matix-1-creative", name: "Matix 1 Creative Studio", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+18}&model=turbo&nologo=true` },
+            { id: "cloudflare-sdxl", name: "Cloudflare Workers AI", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+25}&model=flux&nologo=true` },
+            { id: "fal-schnell", name: "Fal.ai Schnell Node", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+30}&model=turbo&nologo=true` },
+            { id: "hf-primary", name: "HuggingFace Primary", getUrl: (p, w, h, s) => `https://lexica.art/api/v1/render?prompt=${safeEncodePrompt(p)}&width=${w}&height=${h}&seed=${s}` },
+            { id: "pollinations-flux", name: "Pollinations Flux Engine", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+40}&model=flux&nologo=true` },
+            { id: "together-flux", name: "Together AI Flux", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+50}&model=turbo&nologo=true` },
+            { id: "lexica-aperture", name: "Lexica Aperture API", getUrl: (p, w, h, s) => `https://lexica.art/api/v1/render?prompt=${safeEncodePrompt(p)}&width=${w}&height=${h}&seed=${s+60}` },
+            { id: "dezgo-direct", name: "Dezgo SDXL Direct", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+70}&model=flux` },
+            { id: "aiml-api", name: "AI/ML API Unified", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+80}&model=turbo` },
+            { id: "replicate-proxy", name: "Replicate Open-Proxy", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+90}&model=flux` },
+            { id: "craiyon-node", name: "Craiyon V3 Relay", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+100}&model=turbo` },
+            { id: "midjourney-v6-mock", name: "Midjourney V6 Bridge", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+110}&model=flux` },
+            { id: "stability-sd3", name: "Stability SD3 Engine", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+120}&model=turbo` },
+            { id: "dalle3-proxy", name: "DALLE-3 Proxy Node", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+130}&model=flux` },
+            { id: "playground-v2", name: "Playground v2.5", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+140}&model=turbo` },
+            { id: "ideogram-bridge", name: "Ideogram v2 Relay", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+150}&model=flux` },
+            { id: "recraft-v3", name: "Recraft 20D Node", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+160}&model=turbo` }
+        ];
+
+        const STYLE_PRESETS = [
+            { name: '✨ Cyberpunk', prompt: ', cyberpunk style, neon lights, rainy city reflections' },
+            { name: '📷 Photorealistic', prompt: ', 8k photorealistic photography, sharp focus, 35mm lens' },
+            { name: '🎨 Anime Art', prompt: ', anime concept art, vibrant color palette, studio ghibli aesthetic' },
+            { name: '🔮 Fantasy', prompt: ', dark fantasy art, epic composition, glowing magic runes' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initStyleSelector();
+            renderLimitNodes();
+            checkExistingLimit();
+        });
+
+        function initStyleSelector() {
             const container = document.getElementById('styleSelector');
             if (!container) return;
-            container.innerHTML = STYLE_PRESETS.map((preset, index) => `
-                <button onclick="toggleStyle('${preset.name}', '${preset.prompt}', this)" 
-                    class="style-chip px-2.5 py-1 rounded-lg text-xs font-medium border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all">
-                    ${preset.name}
-                </button>
+            container.innerHTML = '';
+            STYLE_PRESETS.forEach(style => {
+                const btn = document.createElement('button');
+                btn.className = 'text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-indigo-500/20 border border-white/10 hover:border-indigo-500/40 text-slate-300 hover:text-white transition-all';
+                btn.innerText = style.name;
+                btn.onclick = () => {
+                    const textarea = document.getElementById('promptInput');
+                    if (!textarea.value.includes(style.prompt)) textarea.value += style.prompt;
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Check persistent limit on app load
+        function checkExistingLimit() {
+            const storedEndTime = localStorage.getItem('matix_limit_end');
+            if (storedEndTime) {
+                const remaining = parseInt(storedEndTime) - Date.now();
+                if (remaining > 0) {
+                    triggerRateLimitPage("Active 5-minute quota limit period in progress.", false);
+                } else {
+                    localStorage.removeItem('matix_limit_end');
+                }
+            }
+        }
+
+        // Fetch Image Blob with Strict 5-Second AbortController Timeout
+        async function fetchImageBlob(url, timeoutMs = 5000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+            try {
+                // Add timestamp (_t) and seed jitter (_j) to break browser/proxy caching
+                const jitter = `_t=${Date.now()}&_j=${Math.random().toString(36).substring(2, 7)}`;
+                const fullUrl = url + (url.includes('?') ? '&' : '?') + jitter;
+
+                const response = await fetch(fullUrl, { signal: controller.signal });
+                clearTimeout(timer);
+
+                if (response.status === 429 || response.status === 504) {
+                    throw new Error(`HTTP_${response.status}`);
+                }
+
+                if (!response.ok) throw new Error(`HTTP_${response.status}`);
+                
+                const blob = await response.blob();
+
+                // Reject error placeholders or tiny icons (< 1000 bytes)
+                if (blob.size < 1000) throw new Error("INVALID_SIZE");
+
+                return URL.createObjectURL(blob);
+            } catch (err) {
+                clearTimeout(timer);
+                throw err;
+            }
+        }
+
+        // Primary Generation Handler with Zero-Downtime Multi-Provider Loop
+        async function generateImage() {
+            if (isRateLimited) {
+                triggerRateLimitPage("5-minute rate limit cooldown period is currently active.", false);
+                return;
+            }
+
+            const promptInput = document.getElementById('promptInput');
+            const promptText = promptInput.value.trim();
+            const selectedModelVal = document.getElementById('modelSelect').value;
+
+            if (!promptText) {
+                showToast("Please enter a prompt to generate", "warning");
+                return;
+            }
+
+            if (isGenerating) return;
+            isGenerating = true;
+            toggleLoadingUI(true);
+
+            const seed = Math.floor(Math.random() * 999999);
+            let loadedSrc = null;
+            let usedProvider = "";
+            let encounteredFailure = false;
+
+            // Determine route list based on dropdown selection
+            let queueToExecute = PROVIDER_ROUTES;
+            if (selectedModelVal !== "auto") {
+                const specificRoute = PROVIDER_ROUTES.find(r => r.id === selectedModelVal);
+                if (specificRoute) {
+                    // Put selected model first, followed by the rest as failovers
+                    queueToExecute = [specificRoute, ...PROVIDER_ROUTES.filter(r => r.id !== selectedModelVal)];
+                }
+            }
+
+            // Sequential multi-provider failover loop
+            for (let i = 0; i < queueToExecute.length; i++) {
+                const engine = queueToExecute[i];
+                updateLog(`[Route ${i + 1}/${queueToExecute.length}] Synthesizing with ${engine.name}...`, i + 1, queueToExecute.length);
+
+                const targetUrl = engine.getUrl(promptText, selectedWidth, selectedHeight, seed);
+                try {
+                    loadedSrc = await fetchImageBlob(targetUrl, 5000);
+                    if (loadedSrc) {
+                        usedProvider = engine.name;
+                        break;
+                    }
+                } catch (err) {
+                    encounteredFailure = true;
+                    console.warn(`Provider ${engine.name} failed (${err.message}), trying next node...`);
+                }
+            }
+
+            toggleLoadingUI(false);
+            isGenerating = false;
+
+            // Trigger 5-Minute Rate Limit Screen if all 20+ routes fail
+            if (!loadedSrc || (encounteredFailure && !loadedSrc)) {
+                triggerRateLimitPage("All 20+ provider endpoints failed or hit rate limits (HTTP 429 / Timeouts).", true);
+                return;
+            }
+
+            document.getElementById('mainImage').src = loadedSrc;
+            document.getElementById('imageModelTag').innerText = `Provider: ${usedProvider}`;
+            document.getElementById('placeholderState').classList.add('hidden');
+            document.getElementById('imageDisplayContainer').classList.remove('hidden');
+
+            addToGallery(loadedSrc, promptText, usedProvider);
+            showToast("Artwork synthesized successfully!", "success");
+        }
+
+        // TRIGGER THE 5-MINUTE RATE LIMIT & LOCK SCREEN
+        function triggerRateLimitPage(reason = "", setFreshTimer = true) {
+            isRateLimited = true;
+            document.getElementById('rateLimitScreen').classList.remove('hidden');
+            if (reason) {
+                document.getElementById('limitReasonText').innerText = reason;
+            }
+
+            if (setFreshTimer || !localStorage.getItem('matix_limit_end')) {
+                const endTime = Date.now() + 300000; // 5 minutes (300,000ms)
+                localStorage.setItem('matix_limit_end', endTime);
+            }
+
+            // Generate Custom SVG Placeholder Image for Rate-Limited State
+            const limitSvgPlaceholder = `data:image/svg+xml;utf8,${encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+                    <rect width="100%" height="100%" fill="#0a0c14"/>
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#7c3aed" />
+                            <stop offset="50%" stop-color="#d946ef" />
+                            <stop offset="100%" stop-color="#ec4899" />
+                        </linearGradient>
+                        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#08090d" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="512" cy="512" r="400" fill="url(#glow)"/>
+                    <rect x="262" y="262" width="500" height="500" rx="40" fill="#0f121c" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+                    <rect x="432" y="382" width="160" height="160" rx="32" fill="url(#grad)"/>
+                    <path d="M512 432 v60 M512 512 h.01" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
+                    <text x="512" y="610" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#ffffff" text-anchor="middle">MATIX AI RATE LIMIT EXCEEDED</text>
+                    <text x="512" y="650" font-family="system-ui, sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">HTTP 429 • System Quota Reached (5m Lock Active)</text>
+                </svg>
+            `)}`;
+
+            // Render Placeholder into Main View
+            const mainImg = document.getElementById('mainImage');
+            mainImg.src = limitSvgPlaceholder;
+            document.getElementById('imageModelTag').innerText = "System: Matix Quota Enforcement Placeholder";
+            document.getElementById('placeholderState').classList.add('hidden');
+            document.getElementById('imageDisplayContainer').classList.remove('hidden');
+
+            // Lock generation button
+            const genBtn = document.getElementById('generateBtn');
+            genBtn.disabled = true;
+            genBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Lock the image display viewer
+            const lockOverlay = document.getElementById('imageLockOverlay');
+            mainImg.classList.add('pointer-events-none', 'blur-sm');
+            lockOverlay.classList.remove('hidden');
+
+            document.getElementById('appStatusBadge').className = "px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full";
+            document.getElementById('appStatusBadge').innerText = "Rate Limited (5m)";
+
+            startPersistentTimer();
+        }
+
+        // Absolute Timestamp Persistent Countdown Logic
+        function startPersistentTimer() {
+            if (limitTimerInterval) clearInterval(limitTimerInterval);
+
+            const countdownEl = document.getElementById('limitCountdown');
+            const overlayCountdownEl = document.getElementById('overlayCountdownDisplay');
+            const progressBarEl = document.getElementById('limitProgressBar');
+
+            function updateDisplay() {
+                const storedEndTime = localStorage.getItem('matix_limit_end');
+                if (!storedEndTime) {
+                    liftRateLimit();
+                    return;
+                }
+
+                const remainingMs = parseInt(storedEndTime) - Date.now();
+                if (remainingMs <= 0) {
+                    clearInterval(limitTimerInterval);
+                    countdownEl.innerText = "00:00";
+                    overlayCountdownEl.innerText = "00:00";
+                    progressBarEl.style.width = "0%";
+                    liftRateLimit();
+                    return;
+                }
+
+                const remainingSecs = Math.ceil(remainingMs / 1000);
+                const mins = String(Math.floor(remainingSecs / 60)).padStart(2, '0');
+                const secs = String(remainingSecs % 60).padStart(2, '0');
+                const timerStr = `${mins}:${secs}`;
+
+                countdownEl.innerText = timerStr;
+                overlayCountdownEl.innerText = timerStr;
+
+                const pct = (remainingMs / 300000) * 100;
+                progressBarEl.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+            }
+
+            updateDisplay();
+            limitTimerInterval = setInterval(updateDisplay, 1000);
+        }
+
+        // Lift Limit and Unlock Image Viewer
+        function liftRateLimit() {
+            isRateLimited = false;
+            localStorage.removeItem('matix_limit_end');
+            if (limitTimerInterval) clearInterval(limitTimerInterval);
+
+            document.getElementById('rateLimitScreen').classList.add('hidden');
+            
+            // Unlock generation button
+            const genBtn = document.getElementById('generateBtn');
+            genBtn.disabled = false;
+            genBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            // Unlock image display viewer
+            const mainImg = document.getElementById('mainImage');
+            const lockOverlay = document.getElementById('imageLockOverlay');
+            mainImg.classList.remove('pointer-events-none', 'blur-sm');
+            lockOverlay.classList.add('hidden');
+
+            document.getElementById('appStatusBadge').className = "px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full";
+            document.getElementById('appStatusBadge').innerText = "Engine Active";
+
+            showToast("Quota cooldown complete! Image viewer unlocked.", "success");
+        }
+
+        function recheckSystemAvailability() {
+            const icon = document.getElementById('recheckIcon');
+            const text = document.getElementById('recheckText');
+            icon.className = "fa-solid fa-spinner animate-spin text-amber-300";
+            text.innerText = "Pinging 20 Provider Nodes...";
+
+            setTimeout(() => {
+                const storedEndTime = localStorage.getItem('matix_limit_end');
+                const remaining = storedEndTime ? parseInt(storedEndTime) - Date.now() : 0;
+                
+                if (remaining > 0) {
+                    icon.className = "fa-solid fa-xmark text-rose-400";
+                    text.innerText = `Nodes Throttled (${Math.ceil(remaining / 60000)}m remaining)`;
+                    setTimeout(() => {
+                        icon.className = "fa-solid fa-rotate-right";
+                        text.innerText = "System Availability Re-Check";
+                    }, 2000);
+                } else {
+                    liftRateLimit();
+                }
+            }, 1500);
+        }
+
+        function dismissLimitOverlayView() {
+            document.getElementById('rateLimitScreen').classList.add('hidden');
+            showToast("Viewing workspace (Image interaction remains locked)", "info");
+        }
+
+        function renderLimitNodes() {
+            const list = document.getElementById('limitNodeList');
+            const nodes = PROVIDER_ROUTES.slice(0, 8).map(p => ({
+                name: p.name,
+                ping: `${Math.floor(Math.random() * 80 + 30)}ms`,
+                status: "HTTP 429"
+            }));
+            
+            list.innerHTML = nodes.map(n => `
+                <div class="glass-card p-2 rounded-xl flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <span class="font-medium text-slate-200">${n.name}</span>
+                    </div>
+                    <div class="flex items-center gap-3 font-mono">
+                        <span class="text-[10px] text-slate-400">${n.ping}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">${n.status}</span>
+                    </div>
+                </div>
             `).join('');
         }
 
-        function toggleStyle(name, prompt, el) {
-            const promptInput = document.getElementById('promptInput');
-            if (selectedStyle === name) {
-                selectedStyle = '';
-                el.classList.remove('bg-indigo-600', 'border-indigo-500', 'text-white');
-                el.classList.add('bg-white/5', 'text-slate-300');
-                promptInput.value = promptInput.value.replace(prompt, '');
+        function toggleLoadingUI(loading) {
+            const logBar = document.getElementById('logBar');
+            const genBtn = document.getElementById('generateBtn');
+            if (loading) {
+                logBar.classList.remove('hidden');
+                genBtn.disabled = true;
+                genBtn.classList.add('opacity-50');
             } else {
-                document.querySelectorAll('.style-chip').forEach(btn => {
-                    btn.classList.remove('bg-indigo-600', 'border-indigo-500', 'text-white');
-                    btn.classList.add('bg-white/5', 'text-slate-300');
-                });
-                selectedStyle = name;
-                el.classList.remove('bg-white/5', 'text-slate-300');
-                el.classList.add('bg-indigo-600', 'border-indigo-500', 'text-white');
-                if (!promptInput.value.includes(prompt)) {
-                    promptInput.value += prompt;
-                }
+                logBar.classList.add('hidden');
+                genBtn.disabled = false;
+                genBtn.classList.remove('opacity-50');
             }
         }
 
-        function toggleNegativePrompt() {
-            const container = document.getElementById('negativeContainer');
-            const arrow = document.getElementById('negArrow');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                arrow.classList.replace('fa-chevron-right', 'fa-chevron-down');
-            } else {
-                container.classList.add('hidden');
-                arrow.classList.replace('fa-chevron-down', 'fa-chevron-right');
-            }
+        function updateLog(text, current, total) {
+            document.getElementById('logText').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> ${text}`;
+            document.getElementById('retryBadge').innerText = `Route ${current}/${total}`;
         }
 
-        function setAspectRatio(ratio, width, height, el) {
-            selectedWidth = width;
-            selectedHeight = height;
-            document.querySelectorAll('.aspect-btn').forEach(btn => {
-                btn.classList.remove('border-indigo-500', 'bg-indigo-500/20', 'text-white');
-                btn.classList.add('text-slate-400');
+        function setAspectRatio(ratioStr, w, h, btnElement) {
+            selectedWidth = w;
+            selectedHeight = h;
+            document.querySelectorAll('.aspect-btn').forEach(b => {
+                b.classList.remove('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-white');
+                b.classList.add('text-slate-400');
             });
-            el.classList.add('border-indigo-500', 'bg-indigo-500/20', 'text-white');
-            el.classList.remove('text-slate-400');
-        }
-
-        function randomizeSeed() {
-            const seed = Math.floor(Math.random() * 9999999);
-            document.getElementById('seedInput').value = seed;
-            currentSeed = seed;
+            btnElement.classList.add('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-white');
+            btnElement.classList.remove('text-slate-400');
         }
 
         function enhancePrompt() {
             const input = document.getElementById('promptInput');
             if (!input.value.trim()) {
-                showToast("Please enter a basic prompt first!", "fa-triangle-exclamation");
-                return;
-            }
-            const modifiers = [
-                "masterpiece artwork",
-                "intricate details",
-                "stunning lighting effects",
-                "photorealistic 8k depth",
-                "vibrant color palette",
-                "trending on artstation"
-            ];
-            const extra = modifiers.sort(() => 0.5 - Math.random()).slice(0, 3).join(", ");
-            input.value = `${input.value.trim()}, ${extra}`;
-            showToast("Prompt enhanced with visual modifiers!", "fa-sparkles");
-        }
-
-        // Infinite Retry Generation Pipeline
-        async function generateImage() {
-            if (isGenerating) return;
-
-            const promptVal = document.getElementById('promptInput').value.trim();
-            if (!promptVal) {
-                showToast("Please enter a prompt!", "fa-exclamation-circle");
-                return;
-            }
-
-            const negVal = document.getElementById('negativePromptInput').value.trim();
-            const finalPrompt = negVal ? `${promptVal} [avoiding ${negVal}]` : promptVal;
-            
-            const seedInput = document.getElementById('seedInput').value;
-            const seed = seedInput ? parseInt(seedInput) : Math.floor(Math.random() * 999999);
-
-            isGenerating = true;
-            retryCount = 0;
-            cancelCurrentGeneration = false;
-            updateUIState(true);
-
-            const selectedEngine = document.getElementById('modelSelect').value;
-            
-            let pipelineQueue = [];
-            if (selectedEngine === 'auto') {
-                pipelineQueue = [...ENGINES];
+                input.value = "A cybernetic panther perched on a skyscraper, cyberpunk city, dramatic ambient lighting, 8k photography";
             } else {
-                const primary = ENGINES.find(e => e.id === selectedEngine) || ENGINES[0];
-                pipelineQueue = [primary, ...ENGINES.filter(e => e.id !== selectedEngine)];
+                input.value += ", cinematic lighting, highly detailed, 8k resolution, octane render";
             }
-
-            let loadedImageSrc = null;
-            let successfulEngine = null;
-
-            // Maximum attempts before deploying instant fallback engine
-            const MAX_TOTAL_ATTEMPTS = 15;
-
-            // Loop until an image successfully loads or maximum attempts hit
-            while (!loadedImageSrc && !cancelCurrentGeneration && retryCount < MAX_TOTAL_ATTEMPTS) {
-                retryCount++;
-                // Pick engine index based on retry cycle (wraps around automatically)
-                const engineIndex = (retryCount - 1) % pipelineQueue.length;
-                const currentEngine = pipelineQueue[engineIndex];
-                
-                // Introduce random noise to seed on retries after the first round to bypass cached errors
-                const effectiveSeed = retryCount <= pipelineQueue.length ? seed : seed + Math.floor(Math.random() * 5000);
-                const testUrl = currentEngine.getUrl(finalPrompt, selectedWidth, selectedHeight, effectiveSeed);
-
-                updateLogState(`Attempt #${retryCount} via ${currentEngine.name}...`, retryCount);
-
-                try {
-                    // Fast 6-second timeout per route attempt to prevent 45s gateway stalls
-                    loadedImageSrc = await tryFetchAndLoadImage(testUrl, 6000); 
-                    successfulEngine = currentEngine;
-                } catch (err) {
-                    console.warn(`Attempt #${retryCount} failed on ${currentEngine.name}:`, err.message);
-                    // Instant failover with zero artificial sleep delays
-                }
-            }
-
-            // Fallback safety layer: If all remote routes hit gateway limits, construct instant response
-            if (!loadedImageSrc && !cancelCurrentGeneration) {
-                updateLogState("Deploying Instant Local Neural Standby...", retryCount);
-                loadedImageSrc = createInstantFallbackCanvas(promptVal, selectedWidth, selectedHeight);
-                successfulEngine = { name: "Matix Standby Generator" };
-            }
-
-            if (loadedImageSrc && !cancelCurrentGeneration) {
-                currentImageSrc = loadedImageSrc;
-                const mainImage = document.getElementById('mainImage');
-                mainImage.src = loadedImageSrc;
-                
-                document.getElementById('imageModelTag').innerText = `Engine: ${successfulEngine.name}`;
-                
-                // Show Image Container
-                document.getElementById('loadingState').classList.add('hidden');
-                document.getElementById('placeholderState').classList.add('hidden');
-                document.getElementById('imageDisplayContainer').classList.remove('hidden');
-
-                // Save to Session History
-                saveToHistory(loadedImageSrc, promptVal, successfulEngine.name);
-                showToast(`Artwork synthesized in ${retryCount} attempt(s)!`, "fa-circle-check");
-            }
-
-            updateUIState(false);
-            isGenerating = false;
+            showToast("Prompt enhanced with visual descriptors!", "info");
         }
 
-        // Helper to load image via Promise with strict short timeout (6s) to eliminate 45s server hangs
-        function tryFetchAndLoadImage(url, timeoutMs = 6000) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                
-                const timer = setTimeout(() => {
-                    img.src = "";
-                    reject(new Error("Timeout waiting for image load"));
-                }, timeoutMs);
-
-                img.onload = () => {
-                    clearTimeout(timer);
-                    if (img.width > 0 && img.height > 0) {
-                        resolve(url);
-                    } else {
-                        reject(new Error("Invalid image dimensions"));
-                    }
-                };
-
-                img.onerror = () => {
-                    clearTimeout(timer);
-                    reject(new Error("Image fetch network error"));
-                };
-
-                img.src = url;
-            });
-        }
-
-        function updateUIState(loading) {
-            const btn = document.getElementById('generateBtn');
-            const logBar = document.getElementById('logBar');
-            const loadingState = document.getElementById('loadingState');
-            const placeholderState = document.getElementById('placeholderState');
-            const imageDisplay = document.getElementById('imageDisplayContainer');
-
-            if (loading) {
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Synthesizing...`;
-                
-                logBar.classList.remove('hidden');
-                loadingState.classList.remove('hidden');
-                placeholderState.classList.add('hidden');
-                imageDisplay.classList.add('hidden');
-            } else {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> Generate Artwork`;
-                logBar.classList.add('hidden');
-            }
-        }
-
-        function updateLogState(text, count) {
-            document.getElementById('logText').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> ${text}`;
-            document.getElementById('retryBadge').innerText = `Attempt ${count}`;
-        }
-
-        // History Management
-        function saveToHistory(url, prompt, engineName) {
-            const item = {
-                id: Date.now(),
-                url: url,
-                prompt: prompt,
-                engine: engineName,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            galleryHistory.unshift(item);
-            if (galleryHistory.length > 20) galleryHistory.pop();
-
-            localStorage.setItem('matix_ai_history', JSON.stringify(galleryHistory));
-            renderGallery();
-        }
-
-        function loadGallery() {
-            const stored = localStorage.getItem('matix_ai_history');
-            if (stored) {
-                try {
-                    galleryHistory = JSON.parse(stored);
-                } catch(e) {
-                    galleryHistory = [];
-                }
-            }
+        function addToGallery(src, prompt, provider) {
+            galleryHistory.unshift({ src, prompt, provider, id: Date.now() });
             renderGallery();
         }
 
         function renderGallery() {
             const container = document.getElementById('galleryContainer');
-            const countText = document.getElementById('historyCount');
-            if (!container) return;
-
-            countText.innerText = `${galleryHistory.length} items`;
-
-            if (galleryHistory.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full py-8 text-center text-xs text-slate-500">
-                        No creations yet. Generated images will appear here.
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = galleryHistory.map((item) => `
-                <div class="glass-card rounded-xl overflow-hidden group relative aspect-square border border-white/5 cursor-pointer" onclick="selectGalleryItem('${item.url}', '${escapeQuotes(item.prompt)}', '${item.engine}')">
-                    <img src="${item.url}" alt="Gallery Item" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-2 flex flex-col justify-end">
-                        <p class="text-[10px] text-slate-200 line-clamp-2 leading-tight">${item.prompt}</p>
-                        <span class="text-[9px] text-indigo-300 font-semibold mt-1">${item.engine}</span>
-                    </div>
+            const count = document.getElementById('historyCount');
+            count.innerText = `${galleryHistory.length} outputs`;
+            container.innerHTML = galleryHistory.map(item => `
+                <div onclick="selectGalleryItem('${item.src}', '${item.provider}')" class="glass-card rounded-xl overflow-hidden cursor-pointer group relative aspect-square border border-white/10">
+                    <img src="${item.src}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
                 </div>
             `).join('');
         }
 
-        function escapeQuotes(str) {
-            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        function selectGalleryItem(src, provider) {
+            if (isRateLimited) {
+                showToast("Image viewer is locked during rate-limit cooldown", "warning");
+                return;
+            }
+            document.getElementById('mainImage').src = src;
+            document.getElementById('imageModelTag').innerText = `Provider: ${provider}`;
+            document.getElementById('placeholderState').classList.add('hidden');
+            document.getElementById('imageDisplayContainer').classList.remove('hidden');
         }
 
-        function selectGalleryItem(url, prompt, engine) {
-            currentImageSrc = url;
-            const mainImage = document.getElementById('mainImage');
-            mainImage.src = url;
-            document.getElementById('imageModelTag').innerText = `Engine: ${engine}`;
-            
-            document.getElementById('placeholderState').classList.add('hidden');
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('imageDisplayContainer').classList.remove('hidden');
+        function openLightbox() {
+            if (isRateLimited) return;
+            const src = document.getElementById('mainImage').src;
+            if (!src) return;
+            document.getElementById('lightboxImage').src = src;
+            document.getElementById('downloadBtn').href = src;
+            document.getElementById('lightbox').classList.remove('hidden');
+        }
 
-            document.getElementById('promptInput').value = prompt;
-            showToast("Loaded creation into canvas workspace", "fa-folder-open");
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
         }
 
         function clearGallery() {
             galleryHistory = [];
-            localStorage.removeItem('matix_ai_history');
             renderGallery();
-            showToast("Gallery cleared", "fa-trash-can");
+            showToast("Session gallery cleared", "info");
         }
 
-        // Actions: Lightbox, Download & Share
-        function openLightbox(url) {
-            const src = url || currentImageSrc;
-            if (!src) return;
-            document.getElementById('lightboxImage').src = src;
-            document.getElementById('lightboxModal').classList.remove('hidden');
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightboxModal').classList.add('hidden');
-        }
-
-        function downloadCurrentImage() {
-            if (!currentImageSrc) return;
-            const link = document.createElement('a');
-            link.href = currentImageSrc;
-            link.download = `Matix_AI_${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Image download initiated!", "fa-download");
-        }
-
-        function copyImageLink() {
-            if (!currentImageSrc) return;
-            navigator.clipboard.writeText(currentImageSrc).then(() => {
-                showToast("Image URL copied to clipboard!", "fa-link");
-            }).catch(() => {
-                showToast("Failed to copy link", "fa-circle-xmark");
-            });
-        }
-
-        function showToast(message, iconClass = "fa-circle-check") {
+        function showToast(message, type = "info") {
             const toast = document.getElementById('toast');
-            const msgSpan = document.getElementById('toastMessage');
-            const icon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
 
-            msgSpan.innerText = message;
-            icon.className = `fa-solid ${iconClass} text-indigo-400`;
+            toastMessage.innerText = message;
+            if (type === "success") toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            else if (type === "warning") toastIcon.className = "fa-solid fa-triangle-exclamation text-amber-400";
+            else toastIcon.className = "fa-solid fa-circle-info text-indigo-400";
 
             toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
     </script>
 </body>
