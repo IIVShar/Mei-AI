@@ -5,7 +5,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI - Multi-API Intelligent Workspace</title>
+    <title>Mei AI</title>
     
     <style>
         body { margin: 0; padding: 0; background-color: #131314; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; height: 100vh; width: 100vw; display: flex; overflow: hidden; }
@@ -148,7 +148,7 @@
                     <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                 </div>
                 <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
-                    Multi-API Pool (25+ Models)
+                    Free / Open API Mode
                 </span>
             </div>
             
@@ -189,7 +189,7 @@
                     <div class="relative w-5 h-14 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
                 </div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Equipped with 25+ auto-rotating API models, secure file attachments, and Pollinations AI image generation.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Equipped with free open-source model gateways, file attachment, and AI image generation.</p>
                 <button id="emptyStateImgBtn" type="button" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-lg transition transform hover:scale-105 cursor-pointer">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Open Image Generator Studio
                 </button>
@@ -227,7 +227,7 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image <prompt></code> to make images!</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image &lt;prompt&gt;</code> to make images!</p>
         </div>
     </main>
 
@@ -312,25 +312,21 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Model Provider Engine</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Model Engine</label>
                     <select id="modelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
-                        <option value="auto">Auto (25+ Multi-API Rotation Pool)</option>
-                        <option value="gemini-2.5-flash">Google Gemini 2.5 Flash</option>
-                        <option value="gemini-2.5-pro">Google Gemini 2.5 Pro</option>
-                        <option value="openrouter-auto">OpenRouter (DeepSeek / Claude)</option>
-                        <option value="openai">OpenAI GPT-4o Mini</option>
-                        <option value="qwen">Qwen 2.5 72B Instruct</option>
-                        <option value="llama">Llama 3.3 70B Instruct</option>
+                        <option value="auto">Auto (Keyless Pollinations Free Gateway)</option>
+                        <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Key Required)</option>
+                        <option value="openrouter-auto">OpenRouter Key (DeepSeek / Claude)</option>
                     </select>
                 </div>
 
                 <div class="space-y-4 pt-2 border-t border-gray-200 dark:border-gray-800">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Google Gemini API Key</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Google Gemini API Key (Optional)</label>
                         <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">OpenRouter API Key & Model</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">OpenRouter API Key & Model (Optional)</label>
                         <input type="password" id="openrouterApiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono mb-2">
                         <input type="text" id="openrouterModelInput" placeholder="deepseek/deepseek-chat" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
                     </div>
@@ -346,24 +342,6 @@
     <!-- Application JavaScript -->
     <script>
         const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity.";
-
-        const API_CHANNELS = [
-            { name: 'Pollinations OpenAI Gateway', url: 'https://text.pollinations.ai/openai' },
-            { name: 'Pollinations Direct Gateway', url: 'https://text.pollinations.ai/' },
-            { name: 'Groq', url: 'https://api.groq.com/openai/v1' },
-            { name: 'Cerebras', url: 'https://api.cerebras.ai/v1' },
-            { name: 'OpenRouter', url: 'https://openrouter.ai/api/v1' },
-            { name: 'Api.Airforce', url: 'https://api.airforce/v1' },
-            { name: 'NVIDIA NIM', url: 'https://integrate.api.nvidia.com/v1' },
-            { name: 'Kluster AI', url: 'https://api.kluster.ai/v1' },
-            { name: 'LLM7.io', url: 'https://api.llm7.io/v1' },
-            { name: 'OpenClaw AI', url: 'https://ai.trxenergy.vip/v1' },
-            { name: 'Pollinations AI', url: 'https://gen.pollinations.ai/v1' },
-            { name: 'UnoRouter', url: 'https://api.unorouter.com/v1' },
-            { name: 'Requesty', url: 'https://router.requesty.ai/v1' }
-        ];
-
-        let currentChannelIndex = 0;
 
         let appState = {
             chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
@@ -703,39 +681,51 @@
             }
             apiMessages.push({ role: 'user', content: userContent });
 
+            // 1. Google Gemini API Route (Key-authenticated)
             if (appState.model.includes('gemini') && appState.geminiApiKey) {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${appState.geminiApiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: apiMessages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })) })
                 });
+                if (res.status === 401) throw new Error('401 Unauthorized: Invalid Gemini API key.');
                 const data = await res.json();
                 return data.candidates[0].content.parts[0].text;
             }
 
-            let lastError = null;
-            for (let i = 0; i < API_CHANNELS.length; i++) {
-                const channel = API_CHANNELS[(currentChannelIndex + i) % API_CHANNELS.length];
-                try {
-                    const response = await fetch(`${channel.url}/chat/completions`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: appState.model === 'auto' ? 'openai/gpt-4o-mini' : appState.model,
-                            messages: apiMessages
-                        })
-                    });
-                    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                    const data = await response.json();
-                    if (data.choices && data.choices[0] && data.choices[0].message) {
-                        currentChannelIndex = (currentChannelIndex + i) % API_CHANNELS.length;
-                        return data.choices[0].message.content;
-                    }
-                } catch (e) {
-                    lastError = e;
-                }
+            // 2. OpenRouter API Route (Key-authenticated)
+            if (appState.model.includes('openrouter') || (appState.openrouterApiKey && appState.model !== 'auto')) {
+                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${appState.openrouterApiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: appState.openrouterModel || 'deepseek/deepseek-chat',
+                        messages: apiMessages
+                    })
+                });
+                if (res.status === 401) throw new Error('401 Unauthorized: Invalid OpenRouter API key.');
+                const data = await res.json();
+                return data.choices[0].message.content;
             }
-            throw lastError || new Error('All API rotation channels exhausted.');
+
+            // 3. Free Keyless Fallback Route via Pollinations Text API (No API key required, avoids 401 errors)
+            const res = await fetch('https://text.pollinations.ai/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: apiMessages,
+                    seed: Math.floor(Math.random() * 1000000)
+                })
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP Error ${res.status}: Unable to complete request.`);
+            }
+
+            return await res.text();
         }
 
         async function generatePollinationsImage() {
@@ -861,7 +851,7 @@
                     localStorage.setItem('openrouter_model', appState.openrouterModel);
 
                     if (els.activeModelBadge) {
-                        els.activeModelBadge.textContent = appState.model === 'auto' ? 'Multi-API Pool (25+ Models)' : appState.model;
+                        els.activeModelBadge.textContent = appState.model === 'auto' ? 'Free / Open API Mode' : appState.model;
                     }
                     closeSettings();
                 });
