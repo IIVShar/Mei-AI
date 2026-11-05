@@ -5,7 +5,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI</title>
+    <title>Mei AI - Multi-API Intelligent Workspace</title>
     
     <style>
         body { margin: 0; padding: 0; background-color: #131314; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; height: 100vh; width: 100vw; display: flex; overflow: hidden; }
@@ -426,16 +426,19 @@
             };
         }
 
-        function toggleSidebar() {
+        function toggleSidebar(e) {
+            if (e) e.stopPropagation();
             if (els.sidebar) els.sidebar.classList.toggle('open');
             if (els.overlay && window.innerWidth < 1024) els.overlay.classList.toggle('hidden');
         }
 
-        function toggleExploreBar() {
+        function toggleExploreBar(e) {
+            if (e) e.stopPropagation();
             if (els.exploreMiniBar) els.exploreMiniBar.classList.toggle('hidden');
         }
 
-        function openSettings() {
+        function openSettings(e) {
+            if (e) e.stopPropagation();
             if (els.settingsModal) els.settingsModal.classList.remove('hidden');
             if (els.modelSelect) els.modelSelect.value = appState.model;
             if (els.geminiApiKeyInput) els.geminiApiKeyInput.value = appState.geminiApiKey;
@@ -443,16 +446,19 @@
             if (els.openrouterModelInput) els.openrouterModelInput.value = appState.openrouterModel;
         }
 
-        function closeSettings() {
+        function closeSettings(e) {
+            if (e) e.stopPropagation();
             if (els.settingsModal) els.settingsModal.classList.add('hidden');
         }
 
-        function openImageGenModal(prefillPrompt = '') {
+        function openImageGenModal(prefillPrompt = '', e = null) {
+            if (e) e.stopPropagation();
             if (els.imageGenModal) els.imageGenModal.classList.remove('hidden');
             if (prefillPrompt && els.imgPromptInput) els.imgPromptInput.value = prefillPrompt;
         }
 
-        function closeImageGenModal() {
+        function closeImageGenModal(e) {
+            if (e) e.stopPropagation();
             if (els.imageGenModal) els.imageGenModal.classList.add('hidden');
         }
 
@@ -487,7 +493,7 @@
             els.attachmentPreview.classList.remove('hidden');
             attachedFiles.forEach((file, index) => {
                 const badge = document.createElement('div');
-                badge.className = "flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs";
+                badge.className = "flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs z-10";
                 badge.innerHTML = `
                     <i class="fa-solid ${file.type.startsWith('image/') ? 'fa-image text-pink-400' : 'fa-file-lines text-blue-400'}"></i>
                     <span class="truncate max-w-[120px]">${file.name}</span>
@@ -514,7 +520,8 @@
             }
         }
 
-        function createNewChat() {
+        function createNewChat(e) {
+            if (e) e.stopPropagation();
             const newChat = {
                 id: 'chat_' + Date.now(),
                 title: 'New Conversation',
@@ -528,118 +535,4 @@
         }
 
         function saveChats() {
-            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
-        }
-
-        function renderChatHistory() {
-            if (!els.historyList) return;
-            els.historyList.innerHTML = '';
-            appState.chats.forEach(chat => {
-                const li = document.createElement('li');
-                const isActive = chat.id === appState.currentChatId;
-                li.className = `group flex items-center justify-between px-3 py-2 rounded-xl text-sm transition cursor-pointer ${isActive ? 'bg-gray-100 dark:bg-[#282a2c] font-medium text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#282a2c]/50'}`;
-                li.innerHTML = `
-                    <div class="flex items-center gap-2.5 truncate flex-1" onclick="switchChat('${chat.id}')">
-                        <i class="fa-regular fa-message text-xs opacity-70"></i>
-                        <span class="truncate">${chat.title}</span>
-                    </div>
-                    <button type="button" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1 transition cursor-pointer" onclick="deleteChat(event, '${chat.id}')">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                    </button>
-                `;
-                els.historyList.appendChild(li);
-            });
-        }
-
-        function switchChat(chatId) {
-            appState.currentChatId = chatId;
-            renderChatHistory();
-            renderCurrentChat();
-            if (window.innerWidth < 1024) toggleSidebar();
-        }
-
-        function deleteChat(e, chatId) {
-            e.stopPropagation();
-            appState.chats = appState.chats.filter(c => c.id !== chatId);
-            if (appState.currentChatId === chatId) {
-                appState.currentChatId = appState.chats.length > 0 ? appState.chats[0].id : null;
-            }
-            saveChats();
-            renderChatHistory();
-            renderCurrentChat();
-        }
-
-        function getCurrentChat() {
-            if (!appState.currentChatId) {
-                if (appState.chats.length === 0) createNewChat();
-                else appState.currentChatId = appState.chats[0].id;
-            }
-            return appState.chats.find(c => c.id === appState.currentChatId);
-        }
-
-        function renderCurrentChat() {
-            if (!els.chatContainer) return;
-            const chat = getCurrentChat();
-            els.chatContainer.innerHTML = '';
-
-            if (!chat || chat.messages.length === 0) {
-                els.emptyState.classList.remove('hidden');
-                els.chatContainer.appendChild(els.emptyState);
-                return;
-            }
-
-            els.emptyState.classList.add('hidden');
-            chat.messages.forEach(msg => {
-                appendMessageNode(msg.role, msg.content);
-            });
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            if (els.chatContainer) {
-                els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
-            }
-        }
-
-        function appendMessageNode(role, text) {
-            const isUser = role === 'user';
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex gap-4 max-w-4xl mx-auto w-full my-4 px-2 ${isUser ? 'justify-end' : 'justify-start'}`;
-
-            if (!isUser) {
-                const avatar = document.createElement('div');
-                avatar.className = "w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1";
-                avatar.innerHTML = '<i class="fa-solid fa-robot"></i>';
-                wrapper.appendChild(avatar);
-            }
-
-            const bubble = document.createElement('div');
-            bubble.className = isUser 
-                ? 'bg-gemini-userBubble text-gray-100 px-4 py-3 rounded-2xl text-sm max-w-[85%] md:max-w-[75%] shadow-sm whitespace-pre-wrap' 
-                : 'text-gray-200 text-sm max-w-[85%] md:max-w-[75%] leading-relaxed markdown-body pt-1 w-full';
-
-            if (isUser) {
-                bubble.textContent = text;
-            } else {
-                bubble.innerHTML = marked.parse(text || '');
-                bubble.querySelectorAll('pre').forEach(pre => {
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'code-copy-btn';
-                    copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy';
-                    copyBtn.onclick = () => {
-                        const codeText = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-                        navigator.clipboard.writeText(codeText);
-                        copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
-                        setTimeout(() => copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy', 2000);
-                    };
-                    pre.appendChild(copyBtn);
-                });
-            }
-
-            wrapper.appendChild(bubble);
-            els.chatContainer.appendChild(wrapper);
-            scrollToBottom();
-        }
-
-        async function generateImage(prompt) {
-            openImageGenModal(prompt
+            localStorage.setItem('ai_chats',
