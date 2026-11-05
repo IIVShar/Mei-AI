@@ -5,7 +5,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI</title>
+    <title>Mei AI - Multi-API Intelligent Workspace</title>
     
     <style>
         body { margin: 0; padding: 0; background-color: #131314; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; height: 100vh; width: 100vw; display: flex; overflow: hidden; }
@@ -148,7 +148,7 @@
                     <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                 </div>
                 <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
-                    Free / Open API Mode
+                    Free Keyless Open Gateway
                 </span>
             </div>
             
@@ -227,7 +227,7 @@
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image &lt;prompt&gt;</code> to make images!</p>
+            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image <prompt></code> to make images!</p>
         </div>
     </main>
 
@@ -656,7 +656,7 @@
             try {
                 fullAssistantResponse = await queryMultiApi(chat.messages.slice(0, -1), text, currentFiles);
             } catch (err) {
-                fullAssistantResponse = '⚠️ Error connecting to AI gateway: ' + err.message;
+                fullAssistantResponse = '⚠️ Error: ' + err.message;
             }
 
             assistantMsgNode.innerHTML = parseMarkdown(fullAssistantResponse);
@@ -681,7 +681,24 @@
             }
             apiMessages.push({ role: 'user', content: userContent });
 
-            // 1. Google Gemini API Route (Key-authenticated)
+            if (appState.model === 'auto' || !appState.model) {
+                const res = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: apiMessages,
+                        model: 'openai',
+                        seed: Math.floor(Math.random() * 1000000)
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP Error ${res.status}: Open-source gateway temporary error.`);
+                }
+
+                return await res.text();
+            }
+
             if (appState.model.includes('gemini') && appState.geminiApiKey) {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${appState.geminiApiKey}`, {
                     method: 'POST',
@@ -689,12 +706,12 @@
                     body: JSON.stringify({ contents: apiMessages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })) })
                 });
                 if (res.status === 401) throw new Error('401 Unauthorized: Invalid Gemini API key.');
+                if (res.status === 402) throw new Error('402 Payment Required: Gemini account credits depleted.');
                 const data = await res.json();
                 return data.candidates[0].content.parts[0].text;
             }
 
-            // 2. OpenRouter API Route (Key-authenticated)
-            if (appState.model.includes('openrouter') || (appState.openrouterApiKey && appState.model !== 'auto')) {
+            if (appState.model.includes('openrouter') || appState.openrouterApiKey) {
                 const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -706,26 +723,18 @@
                         messages: apiMessages
                     })
                 });
-                if (res.status === 401) throw new Error('401 Unauthorized: Invalid OpenRouter API key.');
+                if (res.status === 401) throw new Error('401 Unauthorized: Invalid OpenRouter key.');
+                if (res.status === 402) throw new Error('402 Payment Required: OpenRouter account credits depleted.');
                 const data = await res.json();
                 return data.choices[0].message.content;
             }
 
-            // 3. Free Keyless Fallback Route via Pollinations Text API (No API key required, avoids 401 errors)
-            const res = await fetch('https://text.pollinations.ai/', {
+            const fallbackRes = await fetch('https://text.pollinations.ai/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    messages: apiMessages,
-                    seed: Math.floor(Math.random() * 1000000)
-                })
+                body: JSON.stringify({ messages: apiMessages })
             });
-
-            if (!res.ok) {
-                throw new Error(`HTTP Error ${res.status}: Unable to complete request.`);
-            }
-
-            return await res.text();
+            return await fallbackRes.text();
         }
 
         async function generatePollinationsImage() {
@@ -851,7 +860,7 @@
                     localStorage.setItem('openrouter_model', appState.openrouterModel);
 
                     if (els.activeModelBadge) {
-                        els.activeModelBadge.textContent = appState.model === 'auto' ? 'Free / Open API Mode' : appState.model;
+                        els.activeModelBadge.textContent = appState.model === 'auto' ? 'Free Keyless Open Gateway' : appState.model;
                     }
                     closeSettings();
                 });
