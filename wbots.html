@@ -3,6 +3,7 @@
 <head>
 
     
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mei AI - Explore Custom Wbots</title>
@@ -82,26 +83,43 @@
                 </button>
             </div>
 
+            <!-- Create Custom Wbot Action (Restricted until signed in) -->
+            <button onclick="handleCreateWbotClick()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium py-2.5 px-4 rounded-xl text-sm shadow-md transition transform hover:scale-[1.02] cursor-pointer">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>Build Custom Wbot</span>
+            </button>
+
             <!-- Navigation Links -->
-            <a href="index.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
+            <button onclick="showExploreView()" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm text-left">
                 <i class="fa-solid fa-comments text-blue-400"></i>
                 <span>Main Chat</span>
-            </a>
+            </button>
 
-            <button onclick="showExploreView()" class="flex items-center gap-3 bg-gray-800/80 hover:bg-gray-800 text-gray-200 px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/50 shadow-sm cursor-pointer">
+            <button onclick="showExploreView()" class="flex items-center gap-3 bg-gray-800/80 hover:bg-gray-800 text-gray-200 px-3.5 py-2 rounded-full text-sm font-medium transition border border-gray-700/50 shadow-sm cursor-pointer text-left">
                 <i class="fa-solid fa-compass text-purple-400"></i>
                 <span>Explore Custom Wbots</span>
             </button>
             
-            <a href="about.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
+            <button onclick="alert('Mei AI Platform Overview')" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm text-left">
                 <i class="fa-solid fa-circle-info text-pink-400"></i>
                 <span>About</span>
-            </a>
+            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
             <div class="text-xs font-semibold text-gray-400 px-3 mb-2 uppercase tracking-wider">Recent Wbot Sessions</div>
             <div id="sessionHistoryList" class="space-y-1"></div>
+        </div>
+        
+        <!-- User Account Status Footer -->
+        <div class="p-3 border-t border-gray-800/80 bg-gray-900/40">
+            <button onclick="openSignInModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-800/60 hover:bg-gray-800 text-xs text-gray-300 transition cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-circle-user text-gray-400"></i>
+                    <span>Guest User</span>
+                </div>
+                <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 font-semibold">SIGN IN SOON</span>
+            </button>
         </div>
     </aside>
 
@@ -113,13 +131,22 @@
             <div class="max-w-5xl mx-auto w-full mb-8">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <div>
-                        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">Explore Custom Wbots</h1>
+                        <div class="flex items-center gap-3 mb-1">
+                            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white">Explore Custom Wbots</h1>
+                            <span class="text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 font-medium px-2.5 py-0.5 rounded-full">Community & Custom</span>
+                        </div>
                         <p class="text-sm text-gray-400">Discover specialized AI personas powered by Mei's Multi-API Rotation Pool for tutoring, coding, chess strategy, and more.</p>
                     </div>
-                    <div class="relative w-full md:w-72">
-                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-                        <input type="text" id="wbotSearch" placeholder="Search Wbots..." oninput="filterWbots()" 
-                            class="w-full bg-gemini-card text-sm text-gray-200 placeholder-gray-400 pl-10 pr-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-blue-500 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="relative w-full md:w-64">
+                            <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+                            <input type="text" id="wbotSearch" placeholder="Search Wbots..." oninput="filterWbots()" 
+                                class="w-full bg-gemini-card text-sm text-gray-200 placeholder-gray-400 pl-10 pr-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                        <button onclick="handleCreateWbotClick()" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition cursor-pointer">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Create</span>
+                        </button>
                     </div>
                 </div>
                 <hr class="border-gray-800">
@@ -181,6 +208,31 @@
             </div>
         </div>
     </main>
+
+    <!-- MODAL: SIGN IN COMING SOON -->
+    <div id="signInModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-gemini-card border border-gray-700/80 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeSignInModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center">
+                <div class="w-14 h-14 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">User Accounts — Coming Soon!</h3>
+                <p class="text-xs text-gray-300 leading-relaxed mb-6">
+                    Custom Wbot creation and cloud account syncing require user authentication, which is currently under development. Creation is locked until signing in becomes available.
+                </p>
+                <div class="bg-gray-800/80 border border-gray-700/60 rounded-xl p-4 text-left mb-6">
+                    <div class="text-xs font-semibold text-purple-300 mb-1"><i class="fa-solid fa-shield-halved mr-1.5"></i> Access Restricted</div>
+                    <p class="text-[11px] text-gray-400">You can explore and chat with all built-in expert Wbots right now!</p>
+                </div>
+                <button onclick="closeSignInModal()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium py-2.5 rounded-xl text-xs shadow transition cursor-pointer">
+                    Got It
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- CLIENT SCRIPT -->
     <script>
@@ -267,26 +319,18 @@
             }
         ];
 
-        // Multi-API Rotation Pool to surpass rate limits
+        // Multi-API Rotation Pool
         const API_ENDPOINTS = [
             { type: 'pollinations_openai', url: 'https://text.pollinations.ai/openai' },
             { type: 'pollinations_direct', url: 'https://text.pollinations.ai/' },
             { type: 'pollinations_alt', url: 'https://text.pollinations.ai/openai' }
-            { type: 'openai', url: 'https://api.openai.com/v1' },
-            { type: 'pollinations_openai', url: 'https://text.pollinations.ai/openai' }
-            { type: 'google_gemini_openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/' },
-            { type: 'anthropic_openai', url: 'https://api.anthropic.com/v1' },
-            { type: 'openrouter', url: 'https://openrouter.ai/api/v1' },
-            { type: 'ollama_local', url: 'http://localhost:11434/v1' },
-            { type: 'ollama_cloud', url: 'https://ollama.com/v1' },
-            { type: 'vllm_local', url: 'http://localhost:8000/v1' }
-            
         ];
         let currentEndpointIndex = 0;
 
         let activeWbot = null;
         let chatSessions = JSON.parse(localStorage.getItem('mei_wbot_sessions') || '{}');
         let isGenerating = false;
+        let isUserSignedIn = false; // Restricted creation until signed in
 
         function extractCleanContent(raw) {
             if (!raw) return '';
@@ -296,7 +340,6 @@
                     return parsed.choices[0].message.content || '';
                 }
             } catch (e) {
-                // Regex fallback for truncated or malformed JSON payloads
                 const match = raw.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/);
                 if (match && match[1]) {
                     return match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
@@ -566,6 +609,21 @@
             if (!hasSessions) {
                 listContainer.innerHTML = `<div class="px-3 py-2 text-xs text-gray-500 italic">No recent chats yet. Pick a Wbot to start!</div>`;
             }
+        }
+
+        /* --- SIGN-IN RESTRICTION HANDLERS --- */
+        function handleCreateWbotClick() {
+            if (!isUserSignedIn) {
+                openSignInModal();
+            }
+        }
+
+        function openSignInModal() {
+            document.getElementById('signInModal').classList.remove('hidden');
+        }
+
+        function closeSignInModal() {
+            document.getElementById('signInModal').classList.add('hidden');
         }
 
         function toggleSidebar() {
