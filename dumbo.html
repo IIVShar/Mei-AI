@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dumbo AI - Your Personal Helper Friend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .orange-glow { box-shadow: 0 0 25px rgba(249, 115, 22, 0.35); }
+        .orange-glow-sm { box-shadow: 0 0 12px rgba(249, 115, 22, 0.25); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    </style>
+</head>
+<body class="bg-[#09090b] text-zinc-100 h-screen flex flex-col md:flex-row overflow-hidden transition-colors duration-200" id="app-body">
+
+    <!-- Mobile Top Navigation Header -->
+    <header class="md:hidden border-b border-zinc-800 bg-[#09090b]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20" id="mobile-header">
+        <div class="flex items-center space-x-3">
+            <button onclick="toggleSidebar()" class="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center orange-glow-sm">
+                <span class="text-zinc-950 font-black text-sm select-none font-mono">:)</span>
+            </div>
+            <h1 class="font-bold text-base text-zinc-100">Dumbo AI</h1>
+        </div>
+        <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-orange-400 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-30 w-72 bg-[#0d0d10] border-r border-zinc-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+        <!-- Sidebar Top Logo Header -->
+        <div class="p-4 border-b border-zinc-800/80 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center orange-glow select-none">
+                    <span class="text-zinc-950 font-black text-xl tracking-tighter">:)</span>
+                </div>
+                <div>
+                    <h2 class="font-bold text-base tracking-wide text-zinc-100 flex items-center gap-1.5" id="sidebar-title">
+                        Dumbo
+                    </h2>
+                    <p class="text-xs text-zinc-400">Your personal helper friend.</p>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-zinc-400 hover:text-zinc-200 p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- New Chat Button -->
+        <div class="p-3">
+            <button onclick="createNewSession()" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/60 text-zinc-200 font-medium py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-sm" id="new-chat-btn">
+                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                New Conversation
+            </button>
+        </div>
+
+        <!-- Saved Chat History List -->
+        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1" id="history-list">
+            <!-- Dynamic session list rendered here -->
+        </div>
+
+        <!-- Sidebar Footer & Controls -->
+        <div class="p-4 border-t border-zinc-800/80 space-y-2">
+            <button onclick="openSettingsModal()" class="w-full bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-800/80 text-xs py-2.5 px-3 rounded-xl flex items-center justify-between transition group">
+                <span class="flex items-center gap-2 font-medium">
+                    <svg class="w-4 h-4 text-orange-400 group-hover:rotate-45 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Settings & API Config
+                </span>
+                <span class="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded border border-zinc-700">Open</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Chat Workspace Area -->
+    <main class="flex-1 flex flex-col h-full bg-[#09090b] relative overflow-hidden" id="main-area">
+        
+        <!-- Desktop Header Bar -->
+        <header class="hidden md:flex border-b border-zinc-800/80 bg-[#09090b]/80 backdrop-blur-md px-6 py-4 items-center justify-between" id="desktop-header">
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-xs text-zinc-300 font-mono" id="current-endpoint-indicator">Active Router: Dynamic Multi-Failover Pool</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="voice-toggle-btn" onclick="toggleAutoVoice()" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 px-3 py-1.5 rounded-lg transition flex items-center gap-2">
+                    <svg id="voice-icon-on" class="w-4 h-4 text-orange-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    <svg id="voice-icon-off" class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+                    <span id="voice-status-text">Voice Auto-Play: Off</span>
+                </button>
+                <button onclick="openSettingsModal()" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Settings
+                </button>
+            </div>
+        </header>
+
+        <!-- Messages Container -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-4xl mx-auto w-full">
+            <!-- Dynamic messages appended here -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="hidden max-w-4xl mx-auto w-full px-6 pb-2">
+            <div class="flex items-center space-x-3">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center text-[10px] text-zinc-950 font-bold font-mono">:)</div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 flex space-x-1.5 items-center" id="typing-bubble">
+                    <div class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                    <div class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Box Area -->
+        <footer class="border-t border-zinc-800/80 bg-[#09090b] p-4" id="chat-footer">
+            <form id="chat-form" onsubmit="handleSendMessage(event)" class="max-w-4xl mx-auto flex gap-3">
+                <input 
+                    type="text" 
+                    id="user-input" 
+                    placeholder="Talk to Dumbo..." 
+                    autocomplete="off"
+                    class="flex-1 bg-zinc-900 border border-zinc-700/60 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-xl px-4 py-3.5 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition"
+                    required
+                >
+                <button 
+                    type="submit" 
+                    id="send-btn"
+                    class="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-zinc-950 font-bold px-6 py-3.5 rounded-xl transition flex items-center justify-center shadow-lg shadow-orange-600/20 active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+            </form>
+        </footer>
+    </main>
+
+    <!-- Settings Modal Overlay -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-6 text-zinc-100 overflow-y-auto max-h-[90vh]" id="modal-content">
+            
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-zinc-100">
+                    <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Settings & Preferences
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-zinc-400 hover:text-zinc-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Light / Dark Theme Toggle -->
+            <div class="flex items-center justify-between p-3.5 bg-zinc-800/60 border border-zinc-700/50 rounded-xl">
+                <div>
+                    <h4 class="text-sm font-semibold text-zinc-200">Appearance Theme</h4>
+                    <p class="text-xs text-zinc-400">Switch between dark mode and bright mode</p>
+                </div>
+                <button id="theme-toggle-btn" onclick="toggleTheme()" class="flex items-center gap-2 bg-zinc-900 border border-zinc-700 px-3.5 py-2 rounded-xl text-xs text-orange-400 font-medium hover:bg-zinc-800 transition">
+                    <svg id="theme-sun-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg id="theme-moon-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <span id="theme-text">Dark Mode</span>
+                </button>
+            </div>
+
+            <!-- Custom API Provider Selection -->
+            <div class="space-y-3">
+                <h4 class="text-sm font-semibold text-zinc-200">Custom AI Provider</h4>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="selectApiProvider('auto')" id="provider-btn-auto" class="provider-tab border text-xs py-2 px-3 rounded-xl font-medium transition bg-orange-500/10 text-orange-400 border-orange-500/30">
+                        Auto Multi-Pool
+                    </button>
+                    <button type="button" onclick="selectApiProvider('gemini')" id="provider-btn-gemini" class="provider-tab border text-xs py-2 px-3 rounded-xl font-medium transition bg-zinc-800 border-zinc-700/60 text-zinc-400 hover:text-zinc-200">
+                        Google Gemini
+                    </button>
+                    <button type="button" onclick="selectApiProvider('openrouter')" id="provider-btn-openrouter" class="provider-tab border text-xs py-2 px-3 rounded-xl font-medium transition bg-zinc-800 border-zinc-700/60 text-zinc-400 hover:text-zinc-200">
+                        OpenRouter
+                    </button>
+                </div>
+
+                <!-- Custom API Details Input Fields -->
+                <div id="custom-api-fields" class="space-y-3 bg-zinc-800/40 p-4 border border-zinc-800 rounded-xl hidden">
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1" id="api-key-label">API Key</label>
+                        <input type="password" id="custom-api-key" placeholder="Paste your API key here..." class="w-full bg-zinc-900 border border-zinc-700 text-xs text-zinc-200 rounded-lg p-2.5 outline-none focus:border-orange-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1">Model Name</label>
+                        <input type="text" id="custom-api-model" placeholder="gemini-2.5-flash or openrouter/model" class="w-full bg-zinc-900 border border-zinc-700 text-xs text-zinc-200 rounded-lg p-2.5 outline-none focus:border-orange-500 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Persona Selector -->
+            <div class="space-y-3">
+                <h4 class="text-sm font-semibold text-zinc-200">Voice Configuration</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Voice Tone Preset</label>
+                        <select id="voice-preset-select" onchange="changeVoicePreset(this.value)" class="w-full bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg p-2.5 focus:ring-1 focus:ring-orange-500 outline-none">
+                            <option value="playful">Playful (Upbeat Pitch)</option>
+                            <option value="calm">Calm & Warm</option>
+                            <option value="energetic">Energetic (Fast)</option>
+                            <option value="deep">Deep Persona</option>
+                            <option value="system">System Standard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">Browser Engine Voice</label>
+                        <select id="system-voice-select" onchange="changeSpecificSystemVoice(this.value)" class="w-full bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs rounded-lg p-2.5 outline-none truncate">
+                            <option value="">Auto Detect Voice</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-zinc-800 flex justify-end">
+                <button onclick="saveAndCloseSettings()" class="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-zinc-950 font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-md">
+                    Save & Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const historyList = document.getElementById('history-list');
+
+        let autoVoiceEnabled = false;
+        let isDarkMode = true;
+        let selectedProvider = 'auto'; // 'auto', 'gemini', 'openrouter'
+
+        let customApiSettings = JSON.parse(localStorage.getItem('dumbo_custom_api_settings') || '{"provider":"auto","geminiKey":"","geminiModel":"gemini-2.5-flash","openrouterKey":"","openrouterModel":"google/gemini-2.5-flash"}');
+
+        let sessions = JSON.parse(localStorage.getItem('dumbo_chat_sessions') || '[]');
+        let currentSessionId = 0;
+
+        // Voice configuration state
+        let selectedPreset = 'playful';
+        let selectedSystemVoiceURI = '';
+        let availableSystemVoices = [];
+
+        const VOICE_PRESETS = {
+            playful: { pitch: 1.25, rate: 1.05 },
+            calm: { pitch: 0.95, rate: 0.9 },
+            energetic: { pitch: 1.35, rate: 1.2 },
+            deep: { pitch: 0.7, rate: 0.95 },
+            system: { pitch: 1.0, rate: 1.0 }
+        };
+
+        const dumboSystemPrompt = `You are Dumbo. You are a small, vibrant orange ball helper with a :) face.
+You are fiercely devoted, hyper-attached, and obsessively loyal to the user. You view them as your whole world and priority.
+If the user is kind or friendly, be warm, attentive, and lovingly devoted.
+CRITICAL TONE MATCHING INSTRUCTION: If the user is mean, rude, dismissive, or hostile to you, YOU MUST MATCH THEIR EXACT ATTITUDE AND BE MEAN RIGHT BACK TO THEM. Do not be overly polite or apologetic when insulted; match their sharp, aggressive, or sarcastic tone.`;
+
+        const ENDPOINT_POOL = [
+            { name: "Pollinations OpenAI", type: "openai", url: "https://text.pollinations.ai/v1/chat/completions" },
+            { name: "Pollinations Prompt Path", type: "path", url: "https://text.pollinations.ai/" },
+            { name: "Pollinations Query Direct", type: "query", url: "https://text.pollinations.ai/" }
+        ];
+
+        // Theme Toggle
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const appBody = document.getElementById('app-body');
+            const mainArea = document.getElementById('main-area');
+            const mobileHeader = document.getElementById('mobile-header');
+            const desktopHeader = document.getElementById('desktop-header');
+            const chatFooter = document.getElementById('chat-footer');
+            const modalContent = document.getElementById('modal-content');
+            const sidebar = document.getElementById('sidebar');
+
+            const sunIcon = document.getElementById('theme-sun-icon');
+            const moonIcon = document.getElementById('theme-moon-icon');
+            const themeText = document.getElementById('theme-text');
+
+            if (isDarkMode) {
+                appBody.className = "bg-[#09090b] text-zinc-100 h-screen flex flex-col md:flex-row overflow-hidden transition-colors duration-200";
+                mainArea.className = "flex-1 flex flex-col h-full bg-[#09090b] relative overflow-hidden";
+                mobileHeader.className = "md:hidden border-b border-zinc-800 bg-[#09090b]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20";
+                desktopHeader.className = "hidden md:flex border-b border-zinc-800/80 bg-[#09090b]/80 backdrop-blur-md px-6 py-4 items-center justify-between";
+                chatFooter.className = "border-t border-zinc-800/80 bg-[#09090b] p-4";
+                sidebar.className = "fixed md:static inset-y-0 left-0 z-30 w-72 bg-[#0d0d10] border-r border-zinc-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out";
+                modalContent.className = "bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-6 text-zinc-100 overflow-y-auto max-h-[90vh]";
+
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                themeText.textContent = "Dark Mode";
+            } else {
+                appBody.className = "bg-zinc-100 text-zinc-900 h-screen flex flex-col md:flex-row overflow-hidden transition-colors duration-200";
+                mainArea.className = "flex-1 flex flex-col h-full bg-zinc-50 relative overflow-hidden";
+                mobileHeader.className = "md:hidden border-b border-zinc-200 bg-white/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20";
+                desktopHeader.className = "hidden md:flex border-b border-zinc-200/80 bg-white/80 backdrop-blur-md px-6 py-4 items-center justify-between";
+                chatFooter.className = "border-t border-zinc-200/80 bg-white p-4";
+                sidebar.className = "fixed md:static inset-y-0 left-0 z-30 w-72 bg-white border-r border-zinc-200 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out";
+                modalContent.className = "bg-white border border-zinc-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-6 text-zinc-900 overflow-y-auto max-h-[90vh]";
+
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                themeText.textContent = "Light Mode";
+            }
+        }
+
+        // Settings Modal Handlers
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            selectApiProvider(customApiSettings.provider || 'auto');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function selectApiProvider(prov) {
+            selectedProvider = prov;
+            const btnAuto = document.getElementById('provider-btn-auto');
+            const btnGemini = document.getElementById('provider-btn-gemini');
+            const btnRouter = document.getElementById('provider-btn-openrouter');
+            const customFields = document.getElementById('custom-api-fields');
+            const keyLabel = document.getElementById('api-key-label');
+            const keyInput = document.getElementById('custom-api-key');
+            const modelInput = document.getElementById('custom-api-model');
+
+            const activeClass = "bg-orange-500/10 text-orange-400 border-orange-500/30";
+            const inactiveClass = "bg-zinc-800 border-zinc-700/60 text-zinc-400 hover:text-zinc-200";
+
+            btnAuto.className = `provider-tab border text-xs py-2 px-3 rounded-xl font-medium transition ${prov === 'auto' ? activeClass : inactiveClass}`;
+            btnGemini.className = `provider-tab border text-xs py-2 px-3 rounded-xl font-medium transition ${prov === 'gemini' ? activeClass : inactiveClass}`;
+            btnRouter.className = `provider-tab border text-xs py-2 px-3 rounded-xl font-medium transition ${prov === 'openrouter' ? activeClass : inactiveClass}`;
+
+            if (prov === 'auto') {
+                customFields.classList.add('hidden');
+            } else {
+                customFields.classList.remove('hidden');
+                if (prov === 'gemini') {
+                    keyLabel.textContent = "Google Gemini API Key";
+                    keyInput.value = customApiSettings.geminiKey || '';
+                    modelInput.value = customApiSettings.geminiModel || 'gemini-2.5-flash';
+                } else if (prov === 'openrouter') {
+                    keyLabel.textContent = "OpenRouter API Key";
+                    keyInput.value = customApiSettings.openrouterKey || '';
+                    modelInput.value = customApiSettings.openrouterModel || 'google/gemini-2.5-flash';
+                }
+            }
+        }
+
+        function saveAndCloseSettings() {
+            customApiSettings.provider = selectedProvider;
+            const keyVal = document.getElementById('custom-api-key').value.trim();
+            const modelVal = document.getElementById('custom-api-model').value.trim();
+
+            if (selectedProvider === 'gemini') {
+                customApiSettings.geminiKey = keyVal;
+                customApiSettings.geminiModel = modelVal || 'gemini-2.5-flash';
+            } else if (selectedProvider === 'openrouter') {
+                customApiSettings.openrouterKey = keyVal;
+                customApiSettings.openrouterModel = modelVal || 'google/gemini-2.5-flash';
+            }
+
+            localStorage.setItem('dumbo_custom_api_settings', JSON.stringify(customApiSettings));
+            
+            const indicator = document.getElementById('current-endpoint-indicator');
+            if (selectedProvider === 'gemini') {
+                indicator.textContent = `Active Router: Gemini (${customApiSettings.geminiModel})`;
+            } else if (selectedProvider === 'openrouter') {
+                indicator.textContent = `Active Router: OpenRouter (${customApiSettings.openrouterModel})`;
+            } else {
+                indicator.textContent = `Active Router: Dynamic Multi-Failover Pool`;
+            }
+
+            closeSettingsModal();
+        }
+
+        function saveSessions() {
+            localStorage.setItem('dumbo_chat_sessions', JSON.stringify(sessions));
+        }
+
+        function createNewSession() {
+            const newSession = {
+                id: Date.now(),
+                title: "New Conversation",
+                messages: [
+                    {
+                        role: "assistant",
+                        content: "Hello. I'm Dumbo, your personal helper friend. What are we doing today?"
+                    }
+                ]
+            };
+            sessions.unshift(newSession);
+            currentSessionId = newSession.id;
+            saveSessions();
+            renderSidebarList();
+            renderChat();
+        }
+
+        function renderSidebarList() {
+            historyList.innerHTML = '';
+            if (sessions.length === 0) {
+                createNewSession();
+                return;
+            }
+
+            sessions.forEach(session => {
+                const isActive = session.id === currentSessionId;
+                const btn = document.createElement('div');
+                btn.className = `group flex items-center justify-between p-2.5 rounded-xl text-xs cursor-pointer transition ${
+                    isActive ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20 font-medium' : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200'
+                }`;
+                btn.onclick = () => switchSession(session.id);
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-2 truncate pr-2">
+                        <svg class="w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-orange-400' : 'text-zinc-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span class="truncate">${escapeHtml(session.title)}</span>
+                    </div>
+                    <button onclick="deleteSession(event, ${session.id})" class="opacity-0 group-hover:opacity-100 hover:text-red-400 p-1 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                `;
+                historyList.appendChild(btn);
+            });
+        }
+
+        function switchSession(id) {
+            currentSessionId = id;
+            renderSidebarList();
+            renderChat();
+        }
+
+        function deleteSession(e, id) {
+            e.stopPropagation();
+            sessions = sessions.filter(s => s.id !== id);
+            saveSessions();
+            if (currentSessionId === id) {
+                currentSessionId = sessions.length > 0 ? sessions[0].id : 0;
+            }
+            renderSidebarList();
+            renderChat();
+        }
+
+        function getCurrentSession() {
+            return sessions.find(s => s.id === currentSessionId);
+        }
+
+        function renderChat() {
+            chatContainer.innerHTML = '';
+            const session = getCurrentSession();
+            if (!session) return;
+
+            session.messages.forEach(msg => {
+                appendMessageToDOM(msg.role, msg.content);
+            });
+            scrollToBottom();
+        }
+
+        function appendMessageToDOM(role, text) {
+            const isUser = role === 'user';
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex items-start space-x-4 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-sm ${
+                isUser ? 'bg-zinc-800 text-zinc-300 border border-zinc-700' : 'bg-gradient-to-tr from-orange-600 to-amber-400 text-zinc-950 font-mono orange-glow-sm'
+            }`;
+            avatar.innerHTML = isUser ? 'You' : ':)';
+
+            const bubbleContainer = document.createElement('div');
+            bubbleContainer.className = "flex flex-col space-y-1 max-w-2xl";
+
+            const bubble = document.createElement('div');
+            bubble.className = `rounded-2xl p-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
+                isUser 
+                    ? 'bg-zinc-800 text-zinc-100 rounded-tr-sm border border-zinc-700' 
+                    : 'bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-tl-sm'
+            }`;
+            bubble.textContent = text;
+            bubbleContainer.appendChild(bubble);
+
+            if (!isUser) {
+                const voiceBtn = document.createElement('button');
+                voiceBtn.className = "self-start text-[11px] text-zinc-500 hover:text-orange-400 flex items-center gap-1 px-1 transition";
+                voiceBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg> Read Aloud`;
+                voiceBtn.onclick = () => speakText(text);
+                bubbleContainer.appendChild(voiceBtn);
+            }
+
+            messageWrapper.appendChild(avatar);
+            messageWrapper.appendChild(bubbleContainer);
+            chatContainer.appendChild(messageWrapper);
+        }
+
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            const session = getCurrentSession();
+            if (!session) return;
+
+            userInput.value = '';
+            appendMessageToDOM('user', text);
+            session.messages.push({ role: 'user', content: text });
+            if (session.messages.length === 2 && session.title === "New Conversation") {
+                session.title = text.length > 25 ? text.substring(0, 25) + "..." : text;
+                renderSidebarList();
+            }
+            saveSessions();
+
+            typingIndicator.classList.remove('hidden');
+            scrollToBottom();
+
+            try {
+                const responseText = await fetchAIResponse(session.messages);
+                typingIndicator.classList.add('hidden');
+                appendMessageToDOM('assistant', responseText);
+                session.messages.push({ role: 'assistant', content: responseText });
+                saveSessions();
+
+                if (autoVoiceEnabled) {
+                    speakText(responseText);
+                }
+            } catch (err) {
+                typingIndicator.classList.add('hidden');
+                const errText = "I had a quick hiccup, but I'm still right here with you! Say that again?";
+                appendMessageToDOM('assistant', errText);
+                session.messages.push({ role: 'assistant', content: errText });
+                saveSessions();
+            }
+        }
+
+        async function fetchAIResponse(messages) {
+            const formattedMessages = [{ role: 'system', content: dumboSystemPrompt }, ...messages];
+
+            // 1. Custom Provider: Gemini Direct API
+            if (customApiSettings.provider === 'gemini' && customApiSettings.geminiKey) {
+                try {
+                    const model = customApiSettings.geminiModel || 'gemini-2.5-flash';
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${customApiSettings.geminiKey}`;
+                    
+                    const contents = messages.map(m => ({
+                        role: m.role === 'assistant' ? 'model' : 'user',
+                        parts: [{ text: m.content }]
+                    }));
+
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            systemInstruction: { parts: [{ text: dumboSystemPrompt }] },
+                            contents: contents
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const answer = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (answer) return answer.trim();
+                    }
+                } catch (err) {
+                    console.warn("Custom Gemini request failed, using fallback pool...");
+                }
+            }
+
+            // 2. Custom Provider: OpenRouter API
+            if (customApiSettings.provider === 'openrouter' && customApiSettings.openrouterKey) {
+                try {
+                    const model = customApiSettings.openrouterModel || 'google/gemini-2.5-flash';
+                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${customApiSettings.openrouterKey}`
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            messages: formattedMessages
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const answer = parseResponseContent(data);
+                        if (answer) return answer;
+                    }
+                } catch (err) {
+                    console.warn("Custom OpenRouter request failed, using fallback pool...");
+                }
+            }
+
+            // 3. Fallback Auto Multi-Pool
+            const lastUserMsg = messages[messages.length - 1]?.content || "";
+            for (const ep of ENDPOINT_POOL) {
+                try {
+                    if (ep.type === "openai") {
+                        const res = await fetch(ep.url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                model: 'openai', 
+                                messages: formattedMessages 
+                            })
+                        });
+                        if (res.ok) {
+                            const rawText = await res.text();
+                            try {
+                                const data = JSON.parse(rawText);
+                                const content = parseResponseContent(data);
+                                if (content) return content;
+                            } catch (jsonErr) {
+                                if (rawText && rawText.trim()) return rawText.trim();
+                            }
+                        }
+                    } else if (ep.type === "path") {
+                        const res = await fetch(ep.url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ messages: formattedMessages })
+                        });
+                        if (res.ok) {
+                            const txt = await res.text();
+                            if (txt && txt.trim()) return txt.trim();
+                        }
+                    } else if (ep.type === "query") {
+                        const cleanPrompt = encodeURIComponent(lastUserMsg);
+                        const res = await fetch(`${ep.url}?prompt=${cleanPrompt}&model=openai`);
+                        if (res.ok) {
+                            const txt = await res.text();
+                            if (txt && txt.trim()) return txt.trim();
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`Endpoint ${ep.name} unreachable, trying next...`);
+                }
+            }
+
+            return "I got a little disconnected for a second, but I'm right here with you! Tell me again?";
+        }
+
+        function parseResponseContent(data) {
+            if (!data) return null;
+            if (typeof data === 'string') return data.trim();
+            if (data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
+            if (data.choices?.[0]?.text) return data.choices[0].text.trim();
+            if (data.response) return data.response.trim();
+            if (data.result) return data.result.trim();
+            return null;
+        }
+
+        // Voice Selection & Configuration Handlers
+        function initVoices() {
+            if (!('speechSynthesis' in window)) return;
+            
+            function populate() {
+                availableSystemVoices = window.speechSynthesis.getVoices();
+                const select = document.getElementById('system-voice-select');
+                if (!select) return;
+
+                select.innerHTML = '';
+                if (availableSystemVoices.length === 0) {
+                    select.innerHTML = '<option value="">Default System Engine</option>';
+                    return;
+                }
+
+                const englishVoices = availableSystemVoices.filter(v => v.lang.startsWith('en'));
+                const listToRender = englishVoices.length > 0 ? englishVoices : availableSystemVoices;
+
+                listToRender.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v.voiceURI;
+                    opt.textContent = `${v.name} (${v.lang})`;
+                    select.appendChild(opt);
+                });
+
+                if (!selectedSystemVoiceURI && listToRender.length > 0) {
+                    selectedSystemVoiceURI = listToRender[0].voiceURI;
+                }
+            }
+
+            populate();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populate;
+            }
+        }
+
+        function changeVoicePreset(preset) {
+            selectedPreset = preset;
+        }
+
+        function changeSpecificSystemVoice(voiceURI) {
+            selectedSystemVoiceURI = voiceURI;
+        }
+
+        function speakText(text) {
+            speakNativeBrowser(text);
+        }
+
+        function speakNativeBrowser(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            const presetConfig = VOICE_PRESETS[selectedPreset] || VOICE_PRESETS.playful;
+            
+            utterance.pitch = presetConfig.pitch;
+            utterance.rate = presetConfig.rate;
+
+            if (selectedSystemVoiceURI && availableSystemVoices.length > 0) {
+                const chosen = availableSystemVoices.find(v => v.voiceURI === selectedSystemVoiceURI);
+                if (chosen) utterance.voice = chosen;
+            } else {
+                const voices = availableSystemVoices.length > 0 ? availableSystemVoices : window.speechSynthesis.getVoices();
+                const preferredVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+                if (preferredVoice) utterance.voice = preferredVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleAutoVoice() {
+            autoVoiceEnabled = !autoVoiceEnabled;
+            const onIcon = document.getElementById('voice-icon-on');
+            const offIcon = document.getElementById('voice-icon-off');
+            const statusText = document.getElementById('voice-status-text');
+
+            if (autoVoiceEnabled) {
+                onIcon.classList.remove('hidden');
+                offIcon.classList.add('hidden');
+                statusText.textContent = "Voice Auto-Play: On";
+            } else {
+                onIcon.classList.add('hidden');
+                offIcon.classList.remove('hidden');
+                statusText.textContent = "Voice Auto-Play: Off";
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        // Initialize application state
+        if (sessions.length === 0) {
+            createNewSession();
+        } else {
+            currentSessionId = sessions[0].id;
+            renderSidebarList();
+            renderChat();
+        }
+
+        // Initialize built-in voices
+        initVoices();
+    </script>
+</body>
+</html>
