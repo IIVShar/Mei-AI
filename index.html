@@ -359,7 +359,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Model Engine</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Default Fallback Model Engine</label>
                     <select id="modelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
                         <option value="auto">Auto (Smart Routing)</option>
                         <option value="gemma">Gemma 2 (Google)</option>
@@ -372,13 +372,15 @@
 
                 <div class="space-y-4 pt-2 border-t border-gray-200 dark:border-gray-800">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Google Gemini API Key (Optional)</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Google Gemini API Key</label>
                         <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
+                        <p class="text-[11px] text-gray-400 mt-1">When provided, Gemini API will be used directly for your requests.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">OpenRouter API Key & Model (Optional)</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">OpenRouter API Key & Model</label>
                         <input type="password" id="openrouterApiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono mb-2">
                         <input type="text" id="openrouterModelInput" placeholder="deepseek/deepseek-chat" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
+                        <p class="text-[11px] text-gray-400 mt-1">When provided, OpenRouter chat completions will be used.</p>
                     </div>
                 </div>
             </div>
@@ -582,6 +584,10 @@
 
             if (appState.chats.length === 0) {
                 createNewChat(false);
+                // 🎉 Celebratory initial welcome message for building Mei AI!
+                setTimeout(() => {
+                    appendMessage('assistant', `# 🎉 WE DID IT! Mei AI is Officially Alive! 🚀✨\n\nLet's celebrate! We've successfully built and supercharged **Mei AI Workspace** with:\n- 🤖 **100+ Multi-Provider AI Models** (Gemini API, Gemma 2, DeepSeek, Llama, and OpenAI-compatible gateways)\n- 🎨 **Pollinations AI Image Studio** for instant high-detail Flux & Turbo visuals\n- ⚡ **ChatGPT-style Typewriter Streaming** with animated glowing Mei core\n- 📂 **Interactive Dropdown Menus** for seamless navigation (Movix, Matix, Custom Wbots, and more)\n\nType anything below, attach files, or pick a suggestion to test out our creation! 🥂🔥`, true);
+                }, 300);
             } else {
                 loadChat(appState.chats[0].id);
             }
