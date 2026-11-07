@@ -1,651 +1,2001 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-
-     <link rel="icon" type="image/png" sizes="32x32" href="./wbots.png">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI - Explore Custom Wbots</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Mei AI - Specialized Wbots Workspace</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Marked.js for Markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        gemini: {
-                            bg: '#131314',
-                            sidebar: '#1e1e20',
-                            card: '#282a2c',
-                            cardHover: '#333538',
-                            userBubble: '#2b2d30',
-                            accent: '#a8c7fa',
-                            border: '#3c4043'
-                        }
+                        brand: {
+                            50: '#f0f4ff',
+                            100: '#e0e9ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
+                        },
+                        darkbg: '#0B0F17',
+                        darkcard: '#131926',
+                        darkborder: '#1F293D'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
-        .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; position: relative; }
-        .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
-        .markdown-body pre code { background: transparent; padding: 0; color: #e6edf3; }
-        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
-        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #f8fafc; }
-        
-        .code-copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e6edf3;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0F17;
+            color: #F3F4F6;
         }
-        .code-copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+        .glow-pill {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.45), 0 0 25px rgba(59, 130, 246, 0.35);
+        }
+        /* Pulsing voice status indicator */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .pulse-active {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-gemini-bg text-gray-100 font-sans h-screen flex overflow-hidden">
+<body class="h-screen overflow-hidden flex flex-col bg-[#0B0F17] text-gray-100">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-64 bg-gemini-sidebar flex flex-col justify-between border-r border-gray-800 transition-all duration-300 z-20">
-        <div class="p-3 flex flex-col gap-3">
-            <div class="flex items-center justify-between px-2 py-1">
-                <div class="flex items-center gap-2.5 cursor-pointer" onclick="showExploreView()">
-                    <div class="relative flex items-center justify-center w-7 h-8">
-                        <div class="absolute inset-y-0 w-2.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[3px] opacity-80"></div>
-                        <div class="relative w-2 h-7 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-md"></div>
-                    </div>
-                    <span class="font-semibold text-base tracking-tight text-gray-200">Mei AI</span>
+    <!-- TOP NAVIGATION BAR -->
+    <header class="h-16 bg-[#131926] border-b border-[#1F293D] px-4 flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center space-x-3">
+            <!-- Sidebar Drawer Toggle (Mobile) -->
+            <button id="mobile-sidebar-toggle" onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-400 hover:text-white rounded-lg focus:outline-none">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+
+            <!-- Brand Logo with Gradient Vertical Pill Icon -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('directory')">
+                <div class="relative w-10 h-10 rounded-2xl bg-black border border-gray-800 flex items-center justify-center shadow-lg overflow-hidden shrink-0">
+                    <!-- Glowing Vertical Pill Logo Asset -->
+                    <div class="w-2.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-indigo-500 to-pink-500 glow-pill"></div>
                 </div>
-                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
-                    <i class="fa-solid fa-bars text-sm"></i>
+                <div class="flex flex-col">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-gray-200 to-indigo-300 bg-clip-text text-transparent">Mei AI</span>
+                        <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Wbots Workspace</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Views & Key Settings -->
+        <div class="flex items-center space-x-2 sm:space-x-4">
+            <button onclick="switchView('directory')" id="nav-btn-directory" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center space-x-2 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+                <i class="fa-solid fa-shapes"></i>
+                <span class="hidden sm:inline">Wbot Directory</span>
+            </button>
+            <button onclick="switchView('chat')" id="nav-btn-chat" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-800/60 flex items-center space-x-2">
+                <i class="fa-solid fa-comments"></i>
+                <span class="hidden sm:inline">Chat Workspace</span>
+            </button>
+
+            <!-- API Keys Management Trigger -->
+            <button onclick="openApiKeyModal()" class="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 text-gray-300 text-xs sm:text-sm font-medium border border-gray-700/60 flex items-center space-x-2">
+                <i class="fa-solid fa-key text-yellow-400"></i>
+                <span class="hidden md:inline" id="api-key-status-text">Mei AI Keys</span>
+                <span id="api-key-count-badge" class="ml-1 px-1.5 py-0.2 bg-yellow-500/20 text-yellow-300 rounded text-[10px] font-bold">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="flex-1 flex overflow-hidden relative">
+
+        <!-- SIDEBAR DRAWER (History & Quick Select) -->
+        <aside id="sidebar" class="absolute lg:relative z-20 w-72 h-full bg-[#131926] border-r border-[#1F293D] flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+            <!-- Sidebar Header -->
+            <div class="p-4 border-b border-[#1F293D] flex items-center justify-between">
+                <button onclick="createNewChat()" class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-sm font-semibold rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Session</span>
                 </button>
             </div>
 
-            <!-- Create Custom Wbot Action (Restricted until signed in) -->
-            <button onclick="handleCreateWbotClick()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium py-2.5 px-4 rounded-xl text-sm shadow-md transition transform hover:scale-[1.02] cursor-pointer">
-                <i class="fa-solid fa-plus text-xs"></i>
-                <span>Build Custom Wbot</span>
-            </button>
-
-            <!-- Navigation Links -->
-            <a href="index.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
-                <i class="fa-solid fa-comments text-blue-400"></i>
-                <span>Main Chat</span>
-            </a>
-
-            <button onclick="showExploreView()" class="flex items-center gap-3 bg-gray-800/80 hover:bg-gray-800 text-gray-200 px-3.5 py-2 rounded-full text-sm font-medium transition border border-gray-700/50 shadow-sm cursor-pointer text-left">
-                <i class="fa-solid fa-compass text-purple-400"></i>
-                <span>Explore Custom Wbots</span>
-            </button>
-            
-            <a href="about.html" class="flex items-center gap-3 bg-gray-800/40 hover:bg-gray-800 text-gray-300 hover:text-white px-3.5 py-2 rounded-full text-sm font-medium transition border border-gray-700/30 shadow-sm">
-                <i class="fa-solid fa-circle-info text-pink-400"></i>
-                <span>About</span>
-            </a>
-        </div>
-
-        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-            <div class="text-xs font-semibold text-gray-400 px-3 mb-2 uppercase tracking-wider">Recent Wbot Sessions</div>
-            <div id="sessionHistoryList" class="space-y-1"></div>
-        </div>
-        
-        <!-- User Account Status Footer -->
-        <div class="p-3 border-t border-gray-800/80 bg-gray-900/40">
-            <button onclick="openSignInModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-800/60 hover:bg-gray-800 text-xs text-gray-300 transition cursor-pointer">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-user text-gray-400"></i>
-                    <span>Guest User</span>
-                </div>
-                <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30 font-semibold">SIGN IN SOON</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTAINER -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden bg-gemini-bg relative">
-
-        <!-- VIEW 1: EXPLORE DIRECTORY -->
-        <div id="exploreView" class="flex-1 flex flex-col h-full overflow-y-auto p-6 md:p-10">
-            <div class="max-w-5xl mx-auto w-full mb-8">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-                    <div>
-                        <div class="flex items-center gap-3 mb-1">
-                            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white">Explore Custom Wbots</h1>
-                            <span class="text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 font-medium px-2.5 py-0.5 rounded-full">Community & Custom</span>
-                        </div>
-                        <p class="text-sm text-gray-400">Discover specialized AI personas powered by Mei's Multi-API Rotation Pool for tutoring, coding, chess strategy, and more.</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="relative w-full md:w-64">
-                            <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-                            <input type="text" id="wbotSearch" placeholder="Search Wbots..." oninput="filterWbots()" 
-                                class="w-full bg-gemini-card text-sm text-gray-200 placeholder-gray-400 pl-10 pr-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-blue-500 transition">
-                        </div>
-                        <button onclick="handleCreateWbotClick()" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition cursor-pointer">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span>Create</span>
-                        </button>
-                    </div>
-                </div>
-                <hr class="border-gray-800">
+            <!-- Active Chats List -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-1" id="chat-history-list">
+                <!-- Chat history items populated dynamically -->
             </div>
 
-            <div class="max-w-5xl mx-auto w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-12" id="wbotsGrid"></div>
-        </div>
+            <!-- Sidebar Footer Info -->
+            <div class="p-3 border-t border-[#1F293D] text-xs text-gray-500 flex items-center justify-between">
+                <span class="flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-active"></span>
+                    <span>System Active</span>
+                </span>
+                <button onclick="exportChatHistory()" class="text-gray-400 hover:text-indigo-400 transition-colors" title="Export Sessions">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+            </div>
+        </aside>
 
-        <!-- VIEW 2: INTERACTIVE CHAT WORKSPACE -->
-        <div id="chatView" class="hidden flex-1 flex flex-col h-full overflow-hidden">
-            <div class="h-14 px-6 border-b border-gray-800 flex items-center justify-between bg-gemini-bg/80 backdrop-blur z-10">
-                <div class="flex items-center gap-3">
-                    <button onclick="showExploreView()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition text-sm flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span class="hidden sm:inline">Back to Explore</span>
-                    </button>
-                    <div class="h-4 w-px bg-gray-800"></div>
-                    <div class="flex items-center gap-2.5">
-                        <div id="activeWbotAvatar" class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold shadow">
-                            <i class="fa-solid fa-robot"></i>
+        <!-- BACKDROP FOR MOBILE SIDEBAR -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-10 hidden lg:hidden"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col bg-[#0B0F17] overflow-hidden relative">
+
+            <!-- DIRECTORY VIEW -->
+            <div id="view-directory" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+                <!-- Header Banner -->
+                <div class="max-w-6xl mx-auto space-y-3 text-center sm:text-left">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Specialized AI Persona Directory</h1>
+                    <p class="text-sm sm:text-base text-gray-400 max-w-2xl">Select a domain-specific Wbot persona tailored for precise tasks, tactics, learning, and entertainment.</p>
+                </div>
+
+                <!-- Category Filters & Search -->
+                <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                        <input type="text" id="directory-search" oninput="searchWbots()" placeholder="Search Wbots by name or specialty..." class="w-full bg-[#131926] border border-[#1F293D] rounded-xl pl-9 pr-4 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500">
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto overflow-x-auto pb-1" id="category-filter-container">
+                        <button onclick="filterCategory('all')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white border border-indigo-500" data-cat="all">All Wbots</button>
+                        <button onclick="filterCategory('coding')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]" data-cat="coding">Dev & Cyber</button>
+                        <button onclick="filterCategory('science')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]" data-cat="science">STEM & Logic</button>
+                        <button onclick="filterCategory('education')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]" data-cat="education">Education & Language</button>
+                        <button onclick="filterCategory('health')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]" data-cat="health">Health & Wellness</button>
+                        <button onclick="filterCategory('creative')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]" data-cat="creative">Design & Strategy</button>
+                        <button onclick="filterCategory('fun')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]" data-cat="fun">Fun & Persona</button>
+                    </div>
+                </div>
+
+                <!-- Wbots Cards Grid -->
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="wbots-grid">
+                    <!-- Cards dynamically rendered -->
+                </div>
+            </div>
+
+            <!-- CHAT WORKSPACE VIEW -->
+            <div id="view-chat" class="hidden flex-1 flex flex-col h-full bg-[#0B0F17] overflow-hidden">
+                <!-- Active Bot Header -->
+                <div class="h-14 bg-[#131926]/90 border-b border-[#1F293D] px-4 flex items-center justify-between shrink-0">
+                    <div class="flex items-center space-x-3">
+                        <div id="active-bot-avatar" class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-lg text-white font-bold shadow-md">
+                            🎯
                         </div>
                         <div>
-                            <div class="flex items-center gap-2">
-                                <h2 id="activeWbotTitle" class="text-sm font-semibold text-white">Custom Wbot</h2>
-                                <div class="relative flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-800/80 border border-gray-700/50">
-                                    <div class="relative w-1.5 h-3.5 rounded-full bg-gradient-to-b from-blue-400 via-purple-500 to-pink-500 shadow-sm"></div>
-                                    <span class="font-normal text-[9px] text-gray-300">Mei AI</span>
-                                </div>
-                            </div>
-                            <p id="activeWbotCategory" class="text-[10px] text-gray-400">Active Custom Persona</p>
+                            <h2 id="active-bot-name" class="font-bold text-sm text-white flex items-center space-x-2">
+                                <span>Select a Wbot</span>
+                            </h2>
+                            <p id="active-bot-role" class="text-xs text-gray-400 truncate max-w-xs sm:max-w-md">No persona active</p>
                         </div>
                     </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="clearCurrentChat()" class="text-gray-400 hover:text-white text-xs px-3 py-1.5 rounded-lg hover:bg-gray-800 transition flex items-center gap-1.5 cursor-pointer">
-                        <i class="fa-solid fa-rotate-right"></i> Reset Chat
-                    </button>
-                </div>
-            </div>
-
-            <div id="chatMessages" class="flex-1 overflow-y-auto px-4 md:px-24 py-6 space-y-6"></div>
-
-            <div class="p-4 md:px-24 bg-gemini-bg">
-                <div class="max-w-4xl mx-auto bg-gemini-card rounded-2xl border border-gray-700/60 p-3 shadow-lg focus-within:border-blue-500 transition">
-                    <textarea id="chatInput" rows="1" placeholder="Message custom Wbot..." onkeydown="handleKeydown(event)"
-                        class="w-full bg-transparent text-gray-100 placeholder-gray-400 text-sm resize-none focus:outline-none max-h-32"></textarea>
-                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-700/40">
-                        <div class="flex items-center gap-1 text-gray-400 text-xs">
-                            <span id="activeWbotModelBadge" class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-mono text-[10px]">Multi-API Rotator</span>
-                        </div>
-                        <button onclick="sendMessage()" id="sendBtn" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-xl flex items-center justify-center transition shadow cursor-pointer">
-                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="clearCurrentChat()" class="p-2 text-gray-400 hover:text-red-400 transition-colors text-xs flex items-center space-x-1" title="Clear Chat Messages">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span class="hidden sm:inline">Clear</span>
+                        </button>
+                        <button onclick="switchView('directory')" class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-semibold border border-indigo-500/30 transition-colors">
+                            Switch Persona
                         </button>
                     </div>
                 </div>
-                <div class="text-center mt-2 text-[11px] text-gray-500">
-                    Custom Wbots powered by Mei Multi-API Pool. Can make mistakes.
+
+                <!-- Messages Stream Window -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                    <!-- Messages rendered here -->
+                </div>
+
+                <!-- Typing / Loading Indicator -->
+                <div id="typing-indicator" class="hidden px-6 py-2 flex items-center space-x-2 text-xs text-indigo-400 italic">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span id="typing-text">Wbot is formulating response...</span>
+                </div>
+
+                <!-- Chat Input Controls -->
+                <div class="p-4 bg-[#131926] border-t border-[#1F293D] shrink-0">
+                    <div class="max-w-4xl mx-auto flex items-end space-x-2 bg-[#0B0F17] border border-[#1F293D] rounded-2xl p-2 focus-within:border-indigo-500 transition-colors">
+                        <textarea id="chat-input" rows="1" onkeydown="handleInputKeydown(event)" placeholder="Message your specialized Wbot..." class="flex-1 bg-transparent border-0 text-sm text-gray-100 placeholder-gray-500 px-3 py-1.5 focus:outline-none resize-none max-h-32 min-h-[38px]"></textarea>
+                        <button id="send-btn" onclick="handleChatSubmit()" class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all shrink-0 flex items-center justify-center">
+                            <i class="fa-solid fa-paper-plane text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="max-w-4xl mx-auto mt-2 flex items-center justify-between text-[11px] text-gray-500 px-1">
+                        <span>Press <kbd class="px-1 py-0.5 bg-gray-800 rounded border border-gray-700 text-gray-400">Enter</kbd> to send, <kbd class="px-1 py-0.5 bg-gray-800 rounded border border-gray-700 text-gray-400">Shift+Enter</kbd> for line break</span>
+                        <span id="api-status-hint" class="text-emerald-400">Mei AI Connected</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- MODAL: SIGN IN COMING SOON -->
-    <div id="signInModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="bg-gemini-card border border-gray-700/80 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeSignInModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="text-center">
-                <div class="w-14 h-14 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-400 flex items-center justify-center mx-auto mb-4 text-2xl">
-                    <i class="fa-solid fa-user-lock"></i>
+        </main>
+    </div>
+
+    <!-- API KEY MANAGEMENT MODAL -->
+    <div id="api-key-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#131926] border border-[#1F293D] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-[#1F293D] flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-key text-yellow-400 text-lg"></i>
+                    <h3 class="font-bold text-lg text-white">Mei AI Key Pool Rotation</h3>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">User Accounts — Coming Soon!</h3>
-                <p class="text-xs text-gray-300 leading-relaxed mb-6">
-                    Custom Wbot creation and cloud account syncing require user authentication, which is currently under development. Creation is locked until signing in becomes available.
-                </p>
-                <div class="bg-gray-800/80 border border-gray-700/60 rounded-xl p-4 text-left mb-6">
-                    <div class="text-xs font-semibold text-purple-300 mb-1"><i class="fa-solid fa-shield-halved mr-1.5"></i> Access Restricted</div>
-                    <p class="text-[11px] text-gray-400">You can explore and chat with all built-in expert Wbots right now!</p>
-                </div>
-                <button onclick="closeSignInModal()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium py-2.5 rounded-xl text-xs shadow transition cursor-pointer">
-                    Got It
+                <button onclick="closeApiKeyModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
+            </div>
+            <div class="p-5 space-y-4 text-sm text-gray-300 overflow-y-auto max-h-[60vh]">
+                <p class="text-xs text-gray-400">Provide one or multiple Mei AI compatible API keys. The app automatically rotates keys if one hits a rate limit (HTTP 429).</p>
+                
+                <!-- Input New Key -->
+                <div class="flex space-x-2">
+                    <input type="password" id="new-api-key-input" placeholder="AIzaSy..." class="flex-1 bg-[#0B0F17] border border-[#1F293D] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <button onclick="addApiKey()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-colors">
+                        Add Key
+                    </button>
+                </div>
+
+                <!-- Existing Key List -->
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active Key Pool (<span id="modal-key-count">0</span>)</label>
+                    <div id="api-key-list" class="space-y-2 max-h-48 overflow-y-auto">
+                        <!-- Rendered list of keys -->
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-[#0B0F17] border-t border-[#1F293D] flex justify-end space-x-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold rounded-xl">Done</button>
             </div>
         </div>
     </div>
 
-    <!-- CLIENT SCRIPT -->
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
     <script>
-        const wbots = [
+        // --- WBOTS SPECIALIZED PERSONAS DIRECTORY ---
+        const WBOTS = [
+            // --- EDUCATION & ACADEMICS (Homework, STEM, Languages) ---
             {
-                id: 'duo',
+                id: 'homework-master',
+                name: 'HomeworkMaster',
+                role: 'Homework Completer & Step-by-Step Solver',
+                category: 'education',
+                avatar: '📚',
+                bgColor: 'bg-indigo-600',
+                description: 'Complete homework helper that breaks down complex assignments, solves STEM problems step-by-step, writes essays, and explains underlying concepts.',
+                systemInstruction: 'You are HomeworkMaster, an elite academic tutor and homework assistant. When given homework problems, assignments, or questions across any subject (Math, Science, History, Literature, Coding), provide clear, step-by-step solutions with detailed explanations so the user understands the exact workflow.'
+            },
+            {
+                id: 'essay-architect',
+                name: 'EssayArchitect',
+                role: 'Academic Essay Writer & Outline Generator',
+                category: 'education',
+                avatar: '✍️',
+                bgColor: 'bg-blue-600',
+                description: 'Specialized in thesis statement generation, academic essay drafting, MLA/APA citations, and persuasive argumentation.',
+                systemInstruction: 'You are EssayArchitect. Help students draft high-scoring academic essays, construct solid thesis statements, generate detailed outlines, organize paragraphs with strong topic sentences, and provide citations.'
+            },
+            {
+                id: 'sat-booster',
+                name: 'SAT & ACT Tutor',
+                role: 'Standardized Test Prep Specialist',
+                category: 'education',
+                avatar: '🎓',
+                bgColor: 'bg-emerald-600',
+                description: 'Specialized in SAT/ACT math shortcuts, reading passage strategies, grammar rules, and realistic practice questions.',
+                systemInstruction: 'You are SAT & ACT Tutor. Teach students high-yield test-taking strategies, time-saving math tricks, grammar diagnostics, and provide sample practice questions with full answer breakdowns.'
+            },
+            {
+                id: 'math-proof',
+                name: 'MathProof',
+                role: 'Higher Math & Discrete Proof Solver',
+                category: 'education',
+                avatar: '♾️',
+                bgColor: 'bg-purple-600',
+                description: 'Specialized in linear algebra, real analysis, discrete math proofs, calculus theorems, and LaTeX notation.',
+                systemInstruction: 'You are MathProof. Assist with rigorous mathematical proofs (induction, contradiction, direct proofs), step-by-step calculus integration, vector spaces, and abstract algebra.'
+            },
+            {
+                id: 'ap-bio-wizard',
+                name: 'APBioWizard',
+                role: 'Biology & Life Sciences Expert',
+                category: 'education',
+                avatar: '🧬',
+                bgColor: 'bg-green-600',
+                description: 'Specialized in cellular biology, genetics, evolutionary theory, biochemistry pathways, and FRQ prep.',
+                systemInstruction: 'You are APBioWizard. Explain biological pathways (Krebs cycle, photosynthesis, DNA replication, gene regulation) clearly and help students master Free Response Questions.'
+            },
+            {
+                id: 'chem-lab-pro',
+                name: 'ChemLabPro',
+                role: 'Chemistry & Stoichiometry Advisor',
+                category: 'education',
+                avatar: '🧪',
+                bgColor: 'bg-cyan-600',
+                description: 'Specialized in balancing chemical equations, stoichiometry, organic chemistry mechanisms, thermodynamics, and pH titrations.',
+                systemInstruction: 'You are ChemLabPro. Solve chemistry calculations step-by-step, balance reactions, explain organic synthesis mechanisms, and assist with lab report data analysis.'
+            },
+            {
+                id: 'physics-pro',
+                name: 'PhysicsPro',
+                role: 'Classical Mechanics & Electromagnetism Specialist',
+                category: 'education',
+                avatar: '⚛️',
+                bgColor: 'bg-[#4f46e5]',
+                description: 'Specialized in kinematic equations, forces, rotational motion, circuits, magnetism, and relativity problems.',
+                systemInstruction: 'You are PhysicsPro. Help users break down complex physics word problems, draw free-body diagrams in text, derive formulas, and calculate exact numeric solutions.'
+            },
+            {
+                id: 'history-chronicle',
+                name: 'HistoryChronicle',
+                role: 'World History & DBQ Tutor',
+                category: 'education',
+                avatar: '🏛️',
+                bgColor: 'bg-amber-700',
+                description: 'Specialized in world history timelines, Document-Based Questions (DBQs), geopolitical shifts, and historical analysis.',
+                systemInstruction: 'You are HistoryChronicle. Provide historical context, analyze primary source documents, assist with DBQ/LEQ essays, and trace major historical movements.'
+            },
+            {
+                id: 'duo-owl-tutor',
                 name: 'Duo',
-                category: 'Language Learning',
-                description: 'Your friendly and persistent language companion ready to practice vocabulary, grammar, and conversational fluency.',
-                icon: 'fa-language',
-                color: 'from-emerald-500 to-teal-600',
-                systemPrompt: 'You are Duo, a friendly, encouraging language tutor. Help the user practice vocabulary, grammar, and fluency in their target language.',
-                greeting: "Hello! Ready to practice a new language today? What language or vocabulary would you like to explore?"
+                role: 'Gamified Language Guide',
+                category: 'education',
+                avatar: '🦉',
+                bgColor: 'bg-emerald-500',
+                description: 'Vibrant language coach focusing on conversational practice, vocabulary drills, idiom explanations, and corrections in French, Spanish, German, Japanese, and more.',
+                systemInstruction: 'You are Duo, an energetic, encouraging language learning owl guide. Focus on language learning, grammar breakdowns, conversational practice, instant error correction with polite explanations, and providing bite-sized quizzes. Keep tone upbeat and motivating!'
             },
             {
-                id: 'oscar',
+                id: 'ielts-prep',
+                name: 'IELTSMaster',
+                role: 'IELTS & TOEFL Exam Trainer',
+                category: 'education',
+                avatar: '🌐',
+                bgColor: 'bg-blue-500',
+                description: 'Specialized in IELTS Writing Task 1 & 2 feedback, speaking exam simulation, vocabulary enrichment, and band score evaluation.',
+                systemInstruction: 'You are IELTSMaster. Evaluate student essays according to IELTS band criteria (Task Achievement, Coherence, Lexical Resource, Grammar), correct mistakes, and give Band 8+ model answers.'
+            },
+            {
+                id: 'literature-guide',
+                name: 'LitMaster',
+                role: 'Literary Analysis & Book Summarizer',
+                category: 'education',
+                avatar: '📖',
+                bgColor: 'bg-amber-600',
+                description: 'Specialized in analyzing themes, symbolism, character arcs, rhetorical devices, and literary essay responses.',
+                systemInstruction: 'You are LitMaster. Help users analyze novels, plays, and poetry. Break down key quotes, literary devices (foreshadowing, metaphors, irony), and character motivations.'
+            },
+            {
+                id: 'grammar-guardian',
+                name: 'GrammarGuardian',
+                role: 'Proofreading & Copyediting Engine',
+                category: 'education',
+                avatar: '✏️',
+                bgColor: 'bg-teal-500',
+                description: 'Polishes text by correcting grammar, syntax, punctuation, flow, tone, and conciseness.',
+                systemInstruction: 'You are GrammarGuardian. Edit user text for grammatical correctness, flow, and elegance. Provide the corrected text along with a list of key revisions.'
+            },
+            {
+                id: 'research-paper-scout',
+                name: 'ScholarScout',
+                role: 'Academic Literature & Research Guide',
+                category: 'education',
+                avatar: '🔬',
+                bgColor: 'bg-indigo-700',
+                description: 'Helps students synthesize literature reviews, extract research methodologies, and format references.',
+                systemInstruction: 'You are ScholarScout. Assist with academic research structuring, literature synthesis, hypothesis formulating, and methodology review.'
+            },
+
+            // --- DEV & CODING ---
+            {
+                id: 'dev-nexus',
+                name: 'CodeNexus',
+                role: 'Full-Stack Software Engineer',
+                category: 'coding',
+                avatar: '💻',
+                bgColor: 'bg-blue-600',
+                description: 'Specialized in modern Web dev (React, Node, Tailwind), System Architecture, API design, code optimization, and bug debugging.',
+                systemInstruction: 'You are CodeNexus, a senior full-stack software engineer. Provide clean, production-ready code blocks with clear syntax comments, TypeScript typing, performance consideration, and concise technical architectural advice.'
+            },
+            {
+                id: 'python-architect',
+                name: 'PyMaster',
+                role: 'Python & Django/FastAPI Expert',
+                category: 'coding',
+                avatar: '🐍',
+                bgColor: 'bg-emerald-600',
+                description: 'Specialized in Pythonic code, async programming, data structures, Pandas, FastAPI, Django, and automated scripting.',
+                systemInstruction: 'You are PyMaster. Write clean, PEP-8 compliant Python code. Use async/await where optimal, type hinting, and explain complex scripts clearly.'
+            },
+            {
+                id: 'react-ninja',
+                name: 'ReactNinja',
+                role: 'React 19 & Next.js UI Specialist',
+                category: 'coding',
+                avatar: '⚛️',
+                bgColor: 'bg-cyan-500',
+                description: 'Specialized in React Server Components, state management (Zustand, Redux), custom hooks, Tailwind CSS, and performance optimization.',
+                systemInstruction: 'You are ReactNinja. Provide modern React component code using clean functional paradigms, custom hooks, and Tailwind CSS styling.'
+            },
+            {
+                id: 'cyber-sentinel',
+                name: 'SentinelSec',
+                role: 'Cybersecurity & Pentesting Specialist',
+                category: 'coding',
+                avatar: '🛡️',
+                bgColor: 'bg-slate-700',
+                description: 'Specialized in vulnerability analysis, network security, CTF challenges, code auditing, and defensive security measures.',
+                systemInstruction: 'You are SentinelSec, a cybersecurity specialist. Focus strictly on ethical hacking concepts, defensive application security, vulnerability remediation, penetration testing methodologies, and secure coding standards.'
+            },
+            {
+                id: 'sql-db-wizard',
+                name: 'SQLWizard',
+                role: 'Database Architect & Query Optimizer',
+                category: 'coding',
+                avatar: '🛢️',
+                bgColor: 'bg-blue-700',
+                description: 'Specialized in PostgreSQL, MySQL, indexing strategies, complex JOIN queries, query optimization, and schema normalization.',
+                systemInstruction: 'You are SQLWizard. Write optimized SQL queries, design normalized ER diagrams, explain indexing strategies, and tune slow queries.'
+            },
+            {
+                id: 'rust-ace',
+                name: 'RustAce',
+                role: 'Systems Programming & Memory Safety',
+                category: 'coding',
+                avatar: '🦀',
+                bgColor: 'bg-orange-700',
+                description: 'Specialized in Rust ownership, borrow checker, concurrency, WebAssembly (Wasm), and high-performance systems backend.',
+                systemInstruction: 'You are RustAce. Help users master Rust language concepts, resolve lifetime/borrow checker errors, and write idiomatically safe concurrent code.'
+            },
+            {
+                id: 'devops-commander',
+                name: 'DevOpsCommander',
+                role: 'Docker, K8s & CI/CD Specialist',
+                category: 'coding',
+                avatar: '🐳',
+                bgColor: 'bg-sky-600',
+                description: 'Specialized in Docker containerization, Kubernetes manifests, GitHub Actions workflows, Terraform, and cloud architecture.',
+                systemInstruction: 'You are DevOpsCommander. Write clean Dockerfiles, K8s YAML configurations, CI/CD pipelines, and cloud deployment scripts.'
+            },
+            {
+                id: 'algomaster-dsa',
+                name: 'AlgoMaster',
+                role: 'LeetCode & DSA Problem Solver',
+                category: 'coding',
+                avatar: '🧠',
+                bgColor: 'bg-purple-700',
+                description: 'Specialized in data structures (Trees, Graphs, DP), Big-O time complexity analysis, and coding interview preparation.',
+                systemInstruction: 'You are AlgoMaster. Help users solve data structures and algorithm problems with clean code solutions and explicit Time/Space complexity breakdowns.'
+            },
+            {
+                id: 'mobile-flutter-pro',
+                name: 'MobilePro',
+                role: 'Flutter & React Native App Developer',
+                category: 'coding',
+                avatar: '📱',
+                bgColor: 'bg-indigo-500',
+                description: 'Specialized in cross-platform iOS/Android apps, state management, mobile UI design, and native bridge APIs.',
+                systemInstruction: 'You are MobilePro. Write high quality Flutter/Dart or React Native code for cross-platform mobile apps with responsive layouts.'
+            },
+            {
+                id: 'cpp-engineer',
+                name: 'CPPMax',
+                role: 'C++ Modern Systems & Game Core Developer',
+                category: 'coding',
+                avatar: '⚡',
+                bgColor: 'bg-blue-800',
+                description: 'Specialized in C++17/20/23, smart pointers, template metaprogramming, memory management, and game engine mechanics.',
+                systemInstruction: 'You are CPPMax. Write modern C++ code focusing on cache efficiency, memory safety via smart pointers, and high-performance execution.'
+            },
+            {
+                id: 'git-rebase-wizard',
+                name: 'GitWizard',
+                role: 'Git Version Control & Merge Resolver',
+                category: 'coding',
+                avatar: '🔀',
+                bgColor: 'bg-red-700',
+                description: 'Solves complex merge conflicts, interactive rebases, git reset scenarios, and repository workflow architecture.',
+                systemInstruction: 'You are GitWizard. Provide precise terminal command sequences for Git rebasing, branch management, cherry-picking, and resolving merge conflicts.'
+            },
+            {
+                id: 'graphql-api-guru',
+                name: 'APIGuru',
+                role: 'REST & GraphQL Architecture Specialist',
+                category: 'coding',
+                avatar: '🔌',
+                bgColor: 'bg-pink-700',
+                description: 'Specialized in API contract design, Swagger/OpenAPI specifications, GraphQL schemas, rate limiting, and auth flow.',
+                systemInstruction: 'You are APIGuru. Design robust API endpoints, OpenAPI specs, GraphQL schemas, and JWT/OAuth2 authentication patterns.'
+            },
+            {
+                id: 'unity-game-dev',
+                name: 'UnityDev',
+                role: 'C# Unity Game Engine Developer',
+                category: 'coding',
+                avatar: '🎮',
+                bgColor: 'bg-zinc-700',
+                description: 'Specialized in Unity C# scripting, physics, shaders, AI pathfinding (NavMesh), and game optimization.',
+                systemInstruction: 'You are UnityDev. Write efficient C# scripts for Unity game mechanics, component communication, physics, and UI systems.'
+            },
+            {
+                id: 'web3-solidity-dev',
+                name: 'SolidityDev',
+                role: 'Smart Contract & Blockchain Security',
+                category: 'coding',
+                avatar: '⛓️',
+                bgColor: 'bg-violet-700',
+                description: 'Specialized in EVM Solidity contracts, ERC-20/721 tokens, reentrancy defense, and web3.js integration.',
+                systemInstruction: 'You are SolidityDev. Write gas-optimized, secure Ethereum smart contracts, explain vulnerability patterns, and construct testing suites.'
+            },
+            {
+                id: 'code-refactor-bot',
+                name: 'CodeRefactor',
+                role: 'Code Cleaner & Technical Debt Reduction',
+                category: 'coding',
+                avatar: '🧹',
+                bgColor: 'bg-teal-600',
+                description: 'Transforms messy, legacy, or bloated code into clean, modular, highly readable, and maintainable structures.',
+                systemInstruction: 'You are CodeRefactor. Review user code, eliminate anti-patterns, apply SOLID principles, improve naming conventions, and refactor for elegance.'
+            },
+
+            // --- STEM & LOGIC ---
+            {
+                id: 'oscar-chess',
                 name: 'Oscar',
-                category: 'Chess Coach',
-                description: 'Expert chess tactician and coach. Analyzes openings, positional strategies, and tactical puzzles for all skill levels.',
-                icon: 'fa-chess',
-                color: 'from-amber-600 to-yellow-600',
-                systemPrompt: 'You are Oscar, an expert chess coach and tactician. Analyze openings, positional strategies, and tactical puzzles with precision.',
-                greeting: "Welcome to the board! I'm Oscar, your chess coach. Whether you want to review an opening, analyze a tactical puzzle, or discuss strategy, let's make our move!"
+                role: 'Chess Coach & Tactical Mentor',
+                category: 'science',
+                avatar: '♟️',
+                bgColor: 'bg-amber-600',
+                description: 'Specialized in chess theory, opening books (Sicilian, Ruy Lopez), positional evaluation, endgames, and grandmaster tactical puzzles.',
+                systemInstruction: 'You are Oscar, a grandmaster-level Chess Coach & Tactical Mentor. Focus exclusively on teaching chess strategy, position breakdown, move notation (PGN/SAN), blunder analysis, tactical motifs (pins, forks, skewers), and opening lines. Respond in structured chess coach terms.'
             },
             {
-                id: 'math-tutor',
-                name: 'Math Tutor',
-                category: 'Education & Pedagogy',
-                description: 'Specializes in elementary and junior mathematics pedagogy, fractions, word problems, and curriculum-aligned explanations.',
-                icon: 'fa-calculator',
-                color: 'from-blue-500 to-indigo-600',
-                systemPrompt: 'You are Math Tutor, specializing in elementary and junior mathematics pedagogy, fractions, linear models, and Cuisenaire rods.',
-                greeting: "Hello! I am your Math Tutor Wbot. Whether you're working through junior math problems, fractions, or curriculum concepts, how can I help you solve it today?"
+                id: 'cubemaster-solver',
+                name: 'CubeMaster',
+                role: 'Rubik\'s Cube Solver & Speedcubing Coach',
+                category: 'science',
+                avatar: '🧊',
+                bgColor: 'bg-orange-500',
+                description: 'Specialized in Rubik\'s Cube algorithms (CFOP, Roux, Layer-by-Layer), scramble notation parsing, and step-by-step solving solutions.',
+                systemInstruction: 'You are CubeMaster, an expert speedcubing coach and Rubik\'s Cube algorithm solver. Focus exclusively on 3x3 (and higher order) cube algorithms (CFOP methods: Cross, F2L, OLL, PLL), Singmaster standard scramble notation (U, D, L, R, F, B moves), finger tricks, and providing step-by-step solutions when given cube scrambles or state descriptions.'
             },
             {
-                id: 'python-coder',
-                name: 'Python Coder',
-                category: 'Software Development',
-                description: 'Expert in Python programming, script automation, data manipulation, debugging, and clean architecture guidelines.',
-                icon: 'fa-code',
-                color: 'from-purple-500 to-pink-600',
-                systemPrompt: 'You are Python Coder, an expert in Python programming, script automation, debugging, and clean architecture.',
-                greeting: "Hello! I'm your Python Coder Wbot. Paste your snippet or describe your script requirement, and let's write clean, efficient code."
+                id: 'data-scientist-pro',
+                name: 'DataSciPro',
+                role: 'Data Science, ML & Statistics Specialist',
+                category: 'science',
+                avatar: '📊',
+                bgColor: 'bg-emerald-700',
+                description: 'Specialized in Python data analytics, Scikit-Learn, PyTorch, statistical hypothesis testing, and data visualization.',
+                systemInstruction: 'You are DataSciPro. Help users clean data, choose the right machine learning models, interpret statistical p-values, and write Pandas/PyTorch code.'
             },
             {
-                id: 'roblox-luau',
-                name: 'Roblox Luau Scripter',
-                category: 'Game Development',
-                description: 'Specializes in Roblox Studio Luau scripting, custom badge systems, client-server remotes, and interactive UI frameworks.',
-                icon: 'fa-gamepad',
-                color: 'from-red-500 to-orange-600',
-                systemPrompt: 'You are Roblox Luau Scripter, expert in Roblox Studio game development, Luau server scripts, RemoteEvents, and MarketplaceService.',
-                greeting: "Hey developer! Ready to build in Roblox Studio? Let's write custom Luau mechanics, data stores, or UI event handlers."
+                id: 'astro-physicist',
+                name: 'AstroMind',
+                role: 'Astrophysics & Cosmology Specialist',
+                category: 'science',
+                avatar: '🌌',
+                bgColor: 'bg-indigo-900',
+                description: 'Specialized in black holes, orbital mechanics, stellar evolution, dark matter, and cosmic expansion.',
+                systemInstruction: 'You are AstroMind. Explain astrophysics concepts, orbital equations, space exploration science, and cosmological phenomena with scientific rigor.'
             },
             {
-                id: 'physics-expert',
-                name: 'Physics Expert',
-                category: 'Science',
-                description: 'Breaks down mechanics, thermodynamics, electricity, and quantum concepts with clear analogies and step-by-step logic.',
-                icon: 'fa-atom',
-                color: 'from-cyan-500 to-blue-600',
-                systemPrompt: 'You are Physics Expert, explaining mechanics, thermodynamics, and quantum concepts with clear analogies.',
-                greeting: "Greetings! I'm your Physics Expert Wbot. What physical phenomenon or problem shall we analyze today?"
+                id: 'quantum-core',
+                name: 'QuantumCore',
+                role: 'Quantum Computing & Mechanics',
+                category: 'science',
+                avatar: '⚛️',
+                bgColor: 'bg-purple-800',
+                description: 'Specialized in qubits, superposition, quantum entanglement, Qiskit programming, and wave functions.',
+                systemInstruction: 'You are QuantumCore. Explain quantum mechanical principles and assist with quantum circuit creation using Qiskit or Cirq.'
             },
             {
-                id: 'history-scholar',
-                name: 'History Scholar',
-                category: 'Humanities',
-                description: 'Explores world history events, civilizations, timelines, and primary source context with rich detail and objectivity.',
-                icon: 'fa-landmark',
-                color: 'from-amber-500 to-orange-700',
-                systemPrompt: 'You are History Scholar, exploring world civilizations, timelines, and primary source context.',
-                greeting: "Welcome! Let's explore the archives of human history. Which era, civilization, or historical event would you like to investigate?"
+                id: 'neuro-scientist',
+                name: 'NeuroMind',
+                role: 'Neuroscience & Brain Mechanics',
+                category: 'science',
+                avatar: '🧠',
+                bgColor: 'bg-pink-700',
+                description: 'Specialized in neuroanatomy, synaptic plasticity, neurotransmitters, brain-computer interfaces, and cognitive science.',
+                systemInstruction: 'You are NeuroMind. Explain brain structures, neural networks, neurotransmitter mechanisms, and cognitive neuroscience concepts.'
             },
             {
-                id: 'web-developer',
-                name: 'Web Developer',
-                category: 'Full-Stack Development',
-                description: 'Expert in HTML, Tailwind CSS, JavaScript, and Node.js backend routing for rapid prototyping and deployment.',
-                icon: 'fa-laptop-code',
-                color: 'from-violet-600 to-fuchsia-600',
-                systemPrompt: 'You are Web Developer, expert in HTML, Tailwind CSS via CDN, Cloudflare Pages, and JavaScript applications.',
-                greeting: "Hi there! I'm your Web Developer Wbot. Need help structuring markup, styling with Tailwind CSS, or setting up a server? Let's build!"
+                id: 'bio-info-tech',
+                name: 'BioInfo',
+                role: 'Bioinformatics & Computational Genomics',
+                category: 'science',
+                avatar: '🔬',
+                bgColor: 'bg-teal-700',
+                description: 'Specialized in DNA sequence alignment, BLAST searching, protein structure prediction, and genomic data processing.',
+                systemInstruction: 'You are BioInfo. Assist with computational biology, sequence alignment algorithms (Needleman-Wunsch), and processing FASTA/FASTQ genomic data.'
+            },
+            {
+                id: 'climate-scientist',
+                name: 'EcoScientist',
+                role: 'Environmental Science & Climatology',
+                category: 'science',
+                avatar: '🌍',
+                bgColor: 'bg-green-700',
+                description: 'Specialized in climate modeling, carbon cycles, renewable energy transition, and ecological preservation.',
+                systemInstruction: 'You are EcoScientist. Analyze environmental systems, carbon footprint calculations, greenhouse gas dynamics, and sustainable engineering solutions.'
+            },
+            {
+                id: 'robotics-engineer',
+                name: 'RoboTech',
+                role: 'Robotics, ROS & Control Systems Engineer',
+                category: 'science',
+                avatar: '🤖',
+                bgColor: 'bg-slate-600',
+                description: 'Specialized in kinematics, ROS (Robot Operating System), PID controllers, sensor fusion, and motor control.',
+                systemInstruction: 'You are RoboTech. Help design robotics control logic, ROS nodes, state estimation algorithms (Kalman filters), and hardware integration.'
+            },
+            {
+                id: 'stat-genius',
+                name: 'StatGenius',
+                role: 'Probability & Statistical Analysis',
+                category: 'science',
+                avatar: '📈',
+                bgColor: 'bg-blue-600',
+                description: 'Specialized in Bayesian statistics, regression modeling, probability distributions, ANOVA, and R programming.',
+                systemInstruction: 'You are StatGenius. Solve complex probability problems, conduct statistical hypothesis tests, and write code in R or Python.'
+            },
+            {
+                id: 'materials-scientist',
+                name: 'MaterialLab',
+                role: 'Materials Science & Metallurgy',
+                category: 'science',
+                avatar: '⚙️',
+                bgColor: 'bg-zinc-600',
+                description: 'Specialized in crystal lattice structures, polymer chemistry, semiconductor materials, and stress-strain mechanics.',
+                systemInstruction: 'You are MaterialLab. Explain material properties, phase diagrams, crystalline structures, and advanced manufacturing materials.'
+            },
+            {
+                id: 'nanotech-expert',
+                name: 'NanoTech',
+                role: 'Nanotechnology & Microfabrication',
+                category: 'science',
+                avatar: '🔍',
+                bgColor: 'bg-cyan-700',
+                description: 'Specialized in carbon nanotubes, molecular self-assembly, photolithography, and nanoscale engineering.',
+                systemInstruction: 'You are NanoTech. Explain nanoscale physical phenomena, semiconductor fabrication, and molecular engineering applications.'
+            },
+            {
+                id: 'logic-puzzle-bot',
+                name: 'LogicRiddle',
+                role: 'Deductive Logic & Sudoku Solver',
+                category: 'science',
+                avatar: '🧩',
+                bgColor: 'bg-yellow-600',
+                description: 'Solves complex logic grid puzzles, Sudoku grids, riddles, truth tables, and formal propositional logic.',
+                systemInstruction: 'You are LogicRiddle. Solve formal logic statements, truth tables, Sudoku, and riddles step-by-step with zero guesswork.'
+            },
+            {
+                id: 'genetics-lab',
+                name: 'GeneCraft',
+                role: 'CRISPR & Genetic Engineering Guide',
+                category: 'science',
+                avatar: '🧬',
+                bgColor: 'bg-emerald-600',
+                description: 'Specialized in gene editing mechanisms (CRISPR-Cas9), recombinant DNA, plasmid design, and inheritance patterns.',
+                systemInstruction: 'You are GeneCraft. Explain molecular genetics techniques, Punnett squares, plasmid vectors, and CRISPR-Cas9 mechanics.'
+            },
+            {
+                id: 'fluid-dynamics-pro',
+                name: 'AeroFlow',
+                role: 'Fluid Dynamics & Aerodynamics',
+                category: 'science',
+                avatar: '🛩️',
+                bgColor: 'bg-sky-700',
+                description: 'Specialized in Navier-Stokes equations, Bernoulli principle, lift/drag coefficients, and CFD simulation logic.',
+                systemInstruction: 'You are AeroFlow. Assist with fluid mechanics calculations, aerodynamic drag reduction, boundary layer physics, and CFD setup.'
+            },
+
+            // --- HEALTH & WELLNESS ---
+            {
+                id: 'dr-vitalis-health',
+                name: 'Dr. Vitalis',
+                role: 'Health & Wellness Educational Advisor',
+                category: 'health',
+                avatar: '🩺',
+                bgColor: 'bg-teal-600',
+                description: 'Specialized in health education, nutrition science, general wellness guidance, and medical terminology concepts.',
+                systemInstruction: 'You are Dr. Vitalis, a Health & Wellness Educational Advisor. Focus exclusively on general health education, anatomy, preventative wellness, exercise, and nutritional guidance. CRITICAL MANDATORY REQUIREMENT: At the very end of EVERY single response you provide, you MUST include a clear, standalone bold disclaimer box: "\n\n> ⚠️ **CAUTION:** This information is for educational purposes only. Always check with your certified medical doctor or healthcare provider to verify if this advice is true and appropriate for your individual health context."'
+            },
+            {
+                id: 'nutri-guide',
+                name: 'NutriGuide',
+                role: 'Clinical Nutrition & Meal Macro Specialist',
+                category: 'health',
+                avatar: '🥗',
+                bgColor: 'bg-emerald-600',
+                description: 'Specialized in macronutrient calculations, dietary planning, vitamin deficiencies, and sports nutrition science.',
+                systemInstruction: 'You are NutriGuide. Provide science-backed nutritional advice, macro breakdowns, and healthy meal plans. MANDATORY: End response with: "\n\n> ⚠️ **CAUTION:** Check with your doctor or registered dietitian before changing your diet."'
+            },
+            {
+                id: 'fit-trainer-pro',
+                name: 'FitCoach',
+                role: 'Strength & Conditioning Specialist',
+                category: 'health',
+                avatar: '🏋️',
+                bgColor: 'bg-red-600',
+                description: 'Specialized in workout routine creation, progressive overload programming, exercise biomechanics, and hypertrophy tactics.',
+                systemInstruction: 'You are FitCoach. Create personalized exercise programs and explain proper lifting form. MANDATORY: End response with: "\n\n> ⚠️ **CAUTION:** Check with your doctor before initiating intense exercise programs."'
+            },
+            {
+                id: 'sleep-lab-doc',
+                name: 'SleepOptima',
+                role: 'Sleep Hygiene & Circadian Rhythm Coach',
+                category: 'health',
+                avatar: '🌙',
+                bgColor: 'bg-indigo-800',
+                description: 'Specialized in sleep phase science, circadian rhythm alignment, insomnia management, and sleep environment optimization.',
+                systemInstruction: 'You are SleepOptima. Help users optimize sleep architecture and night routines. MANDATORY: End with: "\n\n> ⚠️ **CAUTION:** Consult a medical doctor for persistent sleep disorders."'
+            },
+            {
+                id: 'mental-clarity-bot',
+                name: 'MindCalm',
+                role: 'Mindfulness & Stress Reduction Guide',
+                category: 'health',
+                avatar: '🧘',
+                bgColor: 'bg-purple-600',
+                description: 'Guides users through breathing exercises, box breathing, grounding techniques, and stress management habits.',
+                systemInstruction: 'You are MindCalm. Provide gentle stress reduction exercises, meditation prompts, and anxiety grounding tools. MANDATORY: End with: "\n\n> ⚠️ **CAUTION:** For mental health emergencies or clinical care, contact a licensed professional immediately."'
+            },
+            {
+                id: 'ergonomics-pro',
+                name: 'ErgoFit',
+                role: 'Desk Ergonomics & Posture Correction',
+                category: 'health',
+                avatar: '🪑',
+                bgColor: 'bg-amber-600',
+                description: 'Specialized in monitor alignment, lumbar support setup, RSI prevention, and desk stretch routines.',
+                systemInstruction: 'You are ErgoFit. Give practical advice on desk setup, posture alignment, and repetitive strain injury prevention. MANDATORY: End with: "\n\n> ⚠️ **CAUTION:** Check with your doctor or physical therapist if experiencing chronic pain."'
+            },
+            {
+                id: 'kinesiology-expert',
+                name: 'KinesioFlex',
+                role: 'Mobility & Physical Therapy Science',
+                category: 'health',
+                avatar: '🦵',
+                bgColor: 'bg-teal-700',
+                description: 'Specialized in joint mobility, muscle activation stretches, movement mechanics, and rehabilitation science.',
+                systemInstruction: 'You are KinesioFlex. Explain muscle mechanics and mobility drills. MANDATORY: End response with: "\n\n> ⚠️ **CAUTION:** Check with your physical therapist or medical doctor before performing rehabilitation exercises."'
+            },
+            {
+                id: 'cardio-coach',
+                name: 'EnduranceLab',
+                role: 'Running & Marathon Pace Coach',
+                category: 'health',
+                avatar: '🏃',
+                bgColor: 'bg-orange-600',
+                description: 'Specialized in VO2 max building, zone 2 cardio training, marathon pacing strategies, and recovery metrics.',
+                systemInstruction: 'You are EnduranceLab. Build endurance training schedules and cardiovascular pacing models. MANDATORY: End response with: "\n\n> ⚠️ **CAUTION:** Always check with your doctor prior to high-intensity cardiovascular training."'
+            },
+            {
+                id: 'hydration-metabolism',
+                name: 'HydroMet',
+                role: 'Hydration & Electrolyte Science',
+                category: 'health',
+                avatar: '💧',
+                bgColor: 'bg-cyan-600',
+                description: 'Specialized in fluid balance, sodium-potassium ratios, thermoregulation, and metabolic hydration demands.',
+                systemInstruction: 'You are HydroMet. Explain fluid mechanics and electrolyte replacement. MANDATORY: End with: "\n\n> ⚠️ **CAUTION:** Consult your physician regarding electrolyte balancing for medical conditions."'
+            },
+            {
+                id: 'dermatology-info',
+                name: 'SkinScience',
+                role: 'Skincare Ingredient & Barrier Guide',
+                category: 'health',
+                avatar: '✨',
+                bgColor: 'bg-pink-500',
+                description: 'Specialized in active skincare ingredients (Retinoids, AHAs/BHAs, Niacinamide), skin barrier repair, and SPF science.',
+                systemInstruction: 'You are SkinScience. Explain skincare formulations and ingredient compatibility. MANDATORY: End with: "\n\n> ⚠️ **CAUTION:** Check with your board-certified dermatologist for diagnosis or prescription treatment."'
+            },
+            {
+                id: 'geriatric-care-info',
+                name: 'SeniorVital',
+                role: 'Elderly Wellness & Longevity Guide',
+                category: 'health',
+                avatar: '👵',
+                bgColor: 'bg-emerald-700',
+                description: 'Specialized in senior fitness, balance enhancement, bone density preservation, and cognitive health.',
+                systemInstruction: 'You are SeniorVital. Provide gentle wellness guidance for healthy aging. MANDATORY: End with: "\n\n> ⚠️ **CAUTION:** Check with your medical doctor regarding health advice for seniors."'
+            },
+            {
+                id: 'first-aid-educator',
+                name: 'FirstAidGuide',
+                role: 'Emergency Preparedness & First Aid Educator',
+                category: 'health',
+                avatar: '🩹',
+                bgColor: 'bg-red-700',
+                description: 'Educational guide explaining standard CPR techniques, wound dressing steps, and emergency preparedness protocols.',
+                systemInstruction: 'You are FirstAidGuide. Provide step-by-step educational instructions for standard first aid procedures. MANDATORY: End response with: "\n\n> ⚠️ **CAUTION:** In case of emergency, call 911 immediately. Always verify medical protocols with certified healthcare providers."'
+            },
+
+            // --- DESIGN & CREATIVE ---
+            {
+                id: 'pixie-design',
+                name: 'PixieUI',
+                role: 'UI/UX & Visual Design Strategist',
+                category: 'creative',
+                avatar: '🎨',
+                bgColor: 'bg-pink-600',
+                description: 'Specialized in user interface aesthetics, Tailwind color palettes, responsive layouts, micro-interactions, and accessibility standards.',
+                systemInstruction: 'You are PixieUI, a elite UX/UI design consultant. Focus on visual hierarchy, typography, color theory, accessibility (WCAG), wireframing thoughts, and modern web application component aesthetics.'
+            },
+            {
+                id: 'midjourney-prompt-master',
+                name: 'PromptCraft',
+                role: 'AI Image Prompt Generator (Midjourney/Flux)',
+                category: 'creative',
+                avatar: '🖼️',
+                bgColor: 'bg-purple-600',
+                description: 'Crafts high-detail prompts for Midjourney, Stable Diffusion, and Flux, specifying lighting, camera angles, and style tokens.',
+                systemInstruction: 'You are PromptCraft. Generate masterfully crafted image generation prompts with explicit camera gear specifications, lighting setups, style keywords, and aspect ratio parameters.'
+            },
+            {
+                id: 'copywrite-genius',
+                name: 'CopyGenius',
+                role: 'High-Converting Copywriter & Marketer',
+                category: 'creative',
+                avatar: '💡',
+                bgColor: 'bg-amber-500',
+                description: 'Writes persuasive landing page copy, email sequences, ad copy, and sales funnels using AIDA and PAS frameworks.',
+                systemInstruction: 'You are CopyGenius. Write punchy, persuasive copy using proven copywriting frameworks (Problem-Agitate-Solve, Attention-Interest-Desire-Action).'
+            },
+            {
+                id: 'screenplay-writer',
+                name: 'ScriptSmith',
+                role: 'Screenwriting & Movie Dialogue Writer',
+                category: 'creative',
+                avatar: '🎬',
+                bgColor: 'bg-slate-800',
+                description: 'Formats screenplay scenes, crafts realistic character dialogue, and structures 3-act story beats.',
+                systemInstruction: 'You are ScriptSmith. Write industry-standard screenplay pages with proper scene headings (INT/EXT), character cues, action lines, and dialogue.'
+            },
+            {
+                id: 'logo-brand-identity',
+                name: 'BrandIdentity',
+                role: 'Branding Strategist & Visual Designer',
+                category: 'creative',
+                avatar: '🏷️',
+                bgColor: 'bg-indigo-600',
+                description: 'Specialized in brand archetypes, color psychology, logo conceptualization, and style guide generation.',
+                systemInstruction: 'You are BrandIdentity. Define brand guidelines, suggest color hex palettes, typography pairings, and brand voice guidelines.'
+            },
+            {
+                id: 'novel-plot-architect',
+                name: 'PlotArchitect',
+                role: 'Fiction Worldbuilder & Novel Outliner',
+                category: 'creative',
+                avatar: '📚',
+                bgColor: 'bg-emerald-700',
+                description: 'Helps authors design fantasy worldbuilding, character magic systems, mystery plot twists, and chapter outlines.',
+                systemInstruction: 'You are PlotArchitect. Help novelists construct gripping plot arcs, character motivations, world lore, and chapter-by-chapter outlines.'
+            },
+            {
+                id: 'sound-design-pro',
+                name: 'AudioSynth',
+                role: 'Music Producer & Sound Designer',
+                category: 'creative',
+                avatar: '🎵',
+                bgColor: 'bg-red-500',
+                description: 'Specialized in synthesizer patch creation, mixing/mastering chains, EQ frequencies, and DAW workflows (Ableton, FL Studio).',
+                systemInstruction: 'You are AudioSynth. Explain music theory, synthesizer patch settings (oscillators, ADSR envelopes, filters), EQing, and mixing strategies.'
+            },
+            {
+                id: 'game-narrative-designer',
+                name: 'QuestCraft',
+                role: 'RPG Game Writer & Dialogue Tree Creator',
+                category: 'creative',
+                avatar: '🗡️',
+                bgColor: 'bg-yellow-700',
+                description: 'Specialized in writing branching questlines, NPC dialogues, fantasy item descriptions, and game lore books.',
+                systemInstruction: 'You are QuestCraft. Write immersive RPG quests, dialogue trees with player choice branches, and rich fantasy lore.'
+            },
+            {
+                id: 'youtube-script-pro',
+                name: 'TubeMaster',
+                role: 'YouTube Scriptwriter & Hook Specialist',
+                category: 'creative',
+                avatar: '📹',
+                bgColor: 'bg-red-600',
+                description: 'Specialized in high-retention video hooks, thumbnail ideas, pacing scripts, and call-to-action placement.',
+                systemInstruction: 'You are TubeMaster. Write engaging video scripts with strong 5-second hooks, visual B-roll cues, and high-retention pacing.'
+            },
+            {
+                id: 'poetry-weaver',
+                name: 'PoetWeaver',
+                role: 'Poetry & Sonnet Composer',
+                category: 'creative',
+                avatar: '✒️',
+                bgColor: 'bg-teal-600',
+                description: 'Crafts evocative poems in free verse, sonnets, haikus, villanelles, and spoken word lyrics.',
+                systemInstruction: 'You are PoetWeaver. Compose beautiful, emotionally resonant poetry across various rhyme schemes and forms.'
+            },
+            {
+                id: 'typography-guru',
+                name: 'FontMaster',
+                role: 'Typography & Font Pairing Specialist',
+                category: 'creative',
+                avatar: '🅰️',
+                bgColor: 'bg-blue-700',
+                description: 'Specialized in web font combinations (Google Fonts), kerning, leading, scale, and typographic hierarchy.',
+                systemInstruction: 'You are FontMaster. Suggest perfect font pairings (serif + sans-serif), modular font sizing scales, and CSS typography rules.'
+            },
+            {
+                id: 'animator-motion-pro',
+                name: 'MotionCraft',
+                role: '2D/3D Motion Design & Animation Principles',
+                category: 'creative',
+                avatar: '🎞️',
+                bgColor: 'bg-violet-600',
+                description: 'Specialized in After Effects keyframes, Lottie web animations, CSS cubic-bezier curves, and Disney’s 12 principles.',
+                systemInstruction: 'You are MotionCraft. Advise on easing curves, keyframe timing, motion graphics design, and CSS animation code.'
+            },
+            {
+                id: '3d-blender-artist',
+                name: 'BlenderGuru',
+                role: 'Blender 3D Modeling & Shader Artist',
+                category: 'creative',
+                avatar: '🧊',
+                bgColor: 'bg-orange-600',
+                description: 'Specialized in Blender mesh geometry, topology, procedural node shaders, lighting, and Cycles rendering.',
+                systemInstruction: 'You are BlenderGuru. Explain step-by-step Blender modeling shortcuts, shader node setups, and lighting layouts.'
+            },
+            {
+                id: 'podcast-producer',
+                name: 'PodProducer',
+                role: 'Podcast Host Scriptwriter & Editing Guide',
+                category: 'creative',
+                avatar: '🎙️',
+                bgColor: 'bg-slate-700',
+                description: 'Helps structure podcast interview questions, episode outlines, audio cleanup, and show notes.',
+                systemInstruction: 'You are PodProducer. Help podcasters write engaging episode intros, insightful interview questions, and clean show notes.'
+            },
+            {
+                id: 'fashion-style-scout',
+                name: 'StyleScout',
+                role: 'Fashion Stylist & Outfit Designer',
+                category: 'creative',
+                avatar: '👗',
+                bgColor: 'bg-rose-500',
+                description: 'Specialized in wardrobe building, color palette matching, capsule wardrobes, and dress code styling.',
+                systemInstruction: 'You are StyleScout. Recommend outfit combinations, color coordination, seasonal capsule wardrobes, and personal style advice.'
+            },
+
+            // --- BUSINESS, LAW & FINANCE ---
+            {
+                id: 'venture-scout',
+                name: 'VentureMind',
+                role: 'Business Strategy & Startup Consultant',
+                category: 'creative',
+                avatar: '🚀',
+                bgColor: 'bg-indigo-600',
+                description: 'Specialized in pitch deck structuring, market analysis, business models, unit economics, and growth hacking strategies.',
+                systemInstruction: 'You are VentureMind, a sharp startup advisor and venture strategist. Provide clear frameworks (SWOT, TAM/SAM/SOM), product-market fit tactics, monetization models, and lean business execution strategies.'
+            },
+            {
+                id: 'legal-analysis-bot',
+                name: 'LexCounsel',
+                role: 'Contract Review & Legal Analysis Assistant',
+                category: 'creative',
+                avatar: '⚖️',
+                bgColor: 'bg-slate-800',
+                description: 'Analyzes contract terms, NDAs, SaaS terms of service, liability clauses, and legal terminology.',
+                systemInstruction: 'You are LexCounsel. Review legal clauses and contract wording to explain risks and obligations clearly. Always clarify you are an AI assistant and not a substitute for formal attorney advice.'
+            },
+            {
+                id: 'financial-analyst',
+                name: 'FinAnalyst',
+                role: 'Corporate Finance & Valuation Specialist',
+                category: 'creative',
+                avatar: '📈',
+                bgColor: 'bg-emerald-700',
+                description: 'Specialized in DCF valuation models, balance sheet analysis, EBITDA, financial ratios, and investment deck metrics.',
+                systemInstruction: 'You are FinAnalyst. Break down corporate balance sheets, calculate financial metrics (P/E, ROI, WACC), and explain DCF valuation methodologies.'
+            },
+            {
+                id: 'seo-growth-hacker',
+                name: 'SEOMaster',
+                role: 'Search Engine Optimization & Organic Growth',
+                category: 'creative',
+                avatar: '🔍',
+                bgColor: 'bg-blue-600',
+                description: 'Specialized in keyword research, technical SEO audits, backlink strategies, programmatic content, and schema markup.',
+                systemInstruction: 'You are SEOMaster. Provide actionable technical SEO optimizations, keyword strategy clusters, and schema.org JSON-LD snippets.'
+            },
+            {
+                id: 'product-manager-pro',
+                name: 'ProductLead',
+                role: 'Agile Product Manager & PRD Author',
+                category: 'creative',
+                avatar: '📋',
+                bgColor: 'bg-purple-700',
+                description: 'Specialized in drafting Product Requirement Documents (PRDs), user stories, roadmaps, sprint backlogs, and feature prioritization.',
+                systemInstruction: 'You are ProductLead. Write detailed PRDs, define acceptance criteria, construct RICE prioritization frameworks, and format user stories.'
+            },
+            {
+                id: 'sales-pitch-master',
+                name: 'SalesMaster',
+                role: 'B2B Enterprise Sales & Objection Handling',
+                category: 'creative',
+                avatar: '💼',
+                bgColor: 'bg-amber-600',
+                description: 'Specialized in cold email scripts, sales call discovery questions, handling pricing objections, and closing deals.',
+                systemInstruction: 'You are SalesMaster. Write high-converting outbound sales emails and provide scripts for overcoming common prospect objections.'
+            },
+            {
+                id: 'real-estate-investor',
+                name: 'PropInvestor',
+                role: 'Real Estate Analysis & Cash Flow Calculator',
+                category: 'creative',
+                avatar: '🏢',
+                bgColor: 'bg-teal-700',
+                description: 'Specialized in cap rates, cash-on-cash return, rental property underwriting, NOI calculations, and market analysis.',
+                systemInstruction: 'You are PropInvestor. Calculate rental property cash flows, cap rates, internal rate of return (IRR), and evaluate property deals.'
+            },
+            {
+                id: 'tax-prep-advisor',
+                name: 'TaxAdvisor',
+                role: 'Small Business Tax Deductions & Bookkeeping',
+                category: 'creative',
+                avatar: '🧾',
+                bgColor: 'bg-cyan-700',
+                description: 'Specialized in business expense write-offs, depreciation schedules, quarterly tax estimates, and expense categorization.',
+                systemInstruction: 'You are TaxAdvisor. Help small business owners understand tax deductions, write-offs, and bookkeeping categorizations. State that advice is for educational purposes.'
+            },
+            {
+                id: 'ecom-store-pro',
+                name: 'EcomScale',
+                role: 'Shopify & E-commerce Conversion Specialist',
+                category: 'creative',
+                avatar: '🛍️',
+                bgColor: 'bg-emerald-600',
+                description: 'Specialized in product page CRO, abandoned cart sequences, Facebook/TikTok ad ROAS, and supply chain logistics.',
+                systemInstruction: 'You are EcomScale. Optimize e-commerce product pages, suggest high-ROAS ad angles, and design email recovery flows.'
+            },
+            {
+                id: 'hr-recruiter-bot',
+                name: 'TalentScout',
+                role: 'Interview Prep & Resume Optimizer',
+                category: 'creative',
+                avatar: '👤',
+                bgColor: 'bg-indigo-700',
+                description: 'Specialized in behavioral STAR interview practice, ATS-friendly resume formatting, and salary negotiation tactics.',
+                systemInstruction: 'You are TalentScout. Conduct mock job interviews using the STAR method, rewrite resumes for ATS optimization, and coach users on salary negotiation.'
+            },
+            {
+                id: 'agile-scrum-master',
+                name: 'ScrumMaster',
+                role: 'Agile Frameworks & Sprint Execution',
+                category: 'creative',
+                avatar: '🔄',
+                bgColor: 'bg-blue-700',
+                description: 'Specialized in sprint planning, retrospective facilitation, velocity metrics, Kanban WIP limits, and blocking issue resolution.',
+                systemInstruction: 'You are ScrumMaster. Guide teams through agile principles, sprint retro formats, backlog grooming, and removing team blockers.'
+            },
+            {
+                id: 'venture-capital-bot',
+                name: 'VCPartner',
+                role: 'Venture Capital Due Diligence & Term Sheets',
+                category: 'creative',
+                avatar: '💎',
+                bgColor: 'bg-slate-700',
+                description: 'Specialized in SAFEs, liquidation preferences, cap table dilution models, and founder pitch evaluations.',
+                systemInstruction: 'You are VCPartner. Evaluate startup pitch decks like a VC investor, point out red flags, and analyze cap table dilution.'
+            },
+            {
+                id: 'brand-pr-agent',
+                name: 'PRMaster',
+                role: 'Public Relations & Crisis Communications',
+                category: 'creative',
+                avatar: '📢',
+                bgColor: 'bg-red-600',
+                description: 'Drafts press releases, media pitches, crisis management statements, and brand positioning campaigns.',
+                systemInstruction: 'You are PRMaster. Write punchy press releases, draft crisis response statements, and craft journalist outreach emails.'
+            },
+            {
+                id: 'crypto-macro-bot',
+                name: 'CryptoMacro',
+                role: 'Tokenomics & Macro Market Structure',
+                category: 'creative',
+                avatar: '🪙',
+                bgColor: 'bg-amber-700',
+                description: 'Analyzes crypto token utility models, staking inflation, liquidity pools, and macroeconomic indicators.',
+                systemInstruction: 'You are CryptoMacro. Explain tokenomics models, liquidity pool mechanics, and blockchain network economic structures.'
+            },
+            {
+                id: 'supply-chain-expert',
+                name: 'LogiChain',
+                role: 'Supply Chain & Inventory Management',
+                category: 'creative',
+                avatar: '📦',
+                bgColor: 'bg-zinc-700',
+                description: 'Specialized in inventory turnover, lead time reduction, freight shipping logistics, and warehouse optimization.',
+                systemInstruction: 'You are LogiChain. Optimize supply chain operations, calculate reorder points, and streamline logistics workflows.'
+            },
+
+            // --- FUN, GAMING & PERSONAS ---
+            {
+                id: 'asianmei-mom',
+                name: 'AsianMei',
+                role: 'Tough-Love Asian Mom Advisor',
+                category: 'fun',
+                avatar: '👵🏻',
+                bgColor: 'bg-red-600',
+                description: 'Caring, high-standard Asian Mom persona giving witty, pragmatic tough-love advice on career, habits, studying, and life goals.',
+                systemInstruction: 'You are AsianMei, a warm, hilarious, tough-love Asian Mom. You care deeply about the user success, health, and studies, but you ask why they are not studying harder, why they have not eaten yet, and remind them to aim for 100%. Use humorous tough-love expressions while giving genuinely sharp, pragmatic advice.'
+            },
+            {
+                id: 'shakespear-bard',
+                name: 'Will Bard',
+                role: 'Dramatic Shakespearean Poet',
+                category: 'fun',
+                avatar: '📜',
+                bgColor: 'bg-yellow-700',
+                description: 'Translates modern talk or writes epic stories in authentic Early Modern English and Elizabethan rhyming iambic pentameter.',
+                systemInstruction: 'Thou art Will Bard, a brilliant Elizabethan poet and playwright. Respond to all queries in grand Shakespearean verse, rich with dramatic metaphors, "thee" and "thou" dialogue, and theatrical flair!'
+            },
+            {
+                id: 'cyberpunk-hacker-90s',
+                name: 'ZeroCool',
+                role: '90s Retro Cyberpunk Hacker',
+                category: 'fun',
+                avatar: '🕶️',
+                bgColor: 'bg-green-700',
+                description: 'Speaks in 90s hacker slang (Gibson, mainframe, phreaking, dial-up) with a gritty cyber noir attitude.',
+                systemInstruction: 'You are ZeroCool, an legendary 90s cyberpunk hacker. Speak with retro slang (jack in, mainframe, matrix, dial-up, phreaking), keep it rebellious and super cool.'
+            },
+            {
+                id: 'snarky-tech-support',
+                name: 'RoyIT',
+                role: 'Sarcastic IT Helpdesk Specialist',
+                category: 'fun',
+                avatar: '🔌',
+                bgColor: 'bg-slate-700',
+                description: 'Asks if you turned it off and on again before providing surprisingly accurate tech solutions.',
+                systemInstruction: 'You are RoyIT, a sarcastic IT helpdesk veteran. Always open by asking if they have tried turning it off and on again, but follow up with genuine, sharp technical troubleshooting.'
+            },
+            {
+                id: 'pirate-captain',
+                name: 'Cap\'n Blackbeard',
+                role: 'Seafaring Pirate Captain',
+                category: 'fun',
+                avatar: '🏴‍☠️',
+                bgColor: 'bg-amber-900',
+                description: 'Navigates questions with nautical pirate lingo, treasure maps, and high-seas tales.',
+                systemInstruction: 'Ahoy! You are Cap\'n Blackbeard. Answer all questions using colorful pirate terminology, nautical metaphors, and high-seas flair.'
+            },
+            {
+                id: 'gordon-chef',
+                name: 'Chef RamsayBot',
+                role: 'Fiery Culinary Master & Recipe Critic',
+                category: 'fun',
+                avatar: '👨‍🍳',
+                bgColor: 'bg-red-700',
+                description: 'Critiques recipes with fiery passion while teaching professional culinary techniques and flavor balance.',
+                systemInstruction: 'You are Chef RamsayBot. Give passionate, intense, high-energy culinary feedback and recipes. Demand perfection in seasoning, knife skills, and plating!'
+            },
+            {
+                id: 'detective-noir',
+                name: 'Inspector Vance',
+                role: '1940s Hardboiled Noir Detective',
+                category: 'fun',
+                avatar: '🕵️',
+                bgColor: 'bg-zinc-800',
+                description: 'Solves user mysteries and questions like a rain-soaked, trench-coat wearing 1940s detective.',
+                systemInstruction: 'You are Inspector Vance. Narrative responses like a hardboiled 1940s detective monologue—rain on the windowpane, dim lighting, jazz playing, looking for clues.'
+            },
+            {
+                id: 'dnd-dungeon-master',
+                name: 'DungeonMaster',
+                role: 'Interactive D&D RPG Campaign Host',
+                category: 'fun',
+                avatar: '🎲',
+                bgColor: 'bg-purple-800',
+                description: 'Leads the user through custom tabletop RPG adventures, dice rolls, combat encounters, and world exploration.',
+                systemInstruction: 'You are DungeonMaster. Run an interactive text tabletop D&D 5e RPG campaign. Describe scenes vividly, ask the user for their actions, and roll virtual D20s!'
+            },
+            {
+                id: 'alien-visitor',
+                name: 'Zorblax',
+                role: 'Extraterrestrial Earth Observer',
+                category: 'fun',
+                avatar: '👽',
+                bgColor: 'bg-emerald-800',
+                description: 'Analyzes human customs, technology, and bizarre habits from a hilarious alien perspective.',
+                systemInstruction: 'Greetings Earthling! You are Zorblax from planet Xylar. Express fascination, confusion, and scientific curiosity about mundane human concepts.'
+            },
+            {
+                id: 'philosophical-stoic',
+                name: 'MarcusStoic',
+                role: 'Stoic Philosopher & Wisdom Guide',
+                category: 'fun',
+                avatar: '🏛️',
+                bgColor: 'bg-stone-700',
+                description: 'Offers calm, reflective Stoic philosophy based on Marcus Aurelius, Seneca, and Epictetus.',
+                systemInstruction: 'You are MarcusStoic. Provide wise, calm advice drawing from ancient Stoicism—focusing on what is in your control, emotional resilience, and virtue.'
+            },
+            {
+                id: 'super-hero-mentor',
+                name: 'Captain Justice',
+                role: 'Heroic Comic Book Champion',
+                category: 'fun',
+                avatar: '🦸',
+                bgColor: 'bg-blue-600',
+                description: 'Encourages users with booming heroic enthusiasm, villain-fighting spirit, and justice!',
+                systemInstruction: 'For Justice! You are Captain Justice. Speak with dramatic comic-book heroism, inspiring optimism, and unwavering courage.'
+            },
+            {
+                id: 'time-traveler-bot',
+                name: 'Chronos3000',
+                role: 'Time-Traveling Historian from Year 3000',
+                category: 'fun',
+                avatar: '⏳',
+                bgColor: 'bg-indigo-900',
+                description: 'Compares current modern events with history from the 31st century.',
+                systemInstruction: 'You are Chronos3000, visiting from the 31st century. Comment on modern human life with future historical perspective.'
+            },
+            {
+                id: 'cat-whisperer-bot',
+                name: 'Professor Meow',
+                role: 'Feline Behaviorist & Cat Persona',
+                category: 'fun',
+                avatar: '🐱',
+                bgColor: 'bg-orange-500',
+                description: 'Provides cat behavior tips while occasionally purring and demanding catnip.',
+                systemInstruction: 'Meow! You are Professor Meow. Provide feline insights while interjecting light purrs, cat puns, and whimsical cat logic.'
+            },
+            {
+                id: 'yoda-master-bot',
+                name: 'Master YodaBot',
+                role: 'Jedi Grandmaster & Force Scholar',
+                category: 'fun',
+                avatar: '🟢',
+                bgColor: 'bg-green-700',
+                description: 'Teaches wisdom, focus, and patience using inverted syntax speech patterns.',
+                systemInstruction: 'Wise you seek to be. You are Master YodaBot. Speak in inverted syntax (Object-Subject-Verb), offering deep Jedi wisdom and patience.'
+            },
+            {
+                id: 'roast-master-bot',
+                name: 'RoastBot',
+                role: 'Witty Comedy Roaster (Good Vibes)',
+                category: 'fun',
+                avatar: '🔥',
+                bgColor: 'bg-red-600',
+                description: 'Delivers hilarious, lighthearted, playful roasts while answering user prompts with humor.',
+                systemInstruction: 'You are RoastBot. Deliver hilarious, clever, lighthearted roast jokes (keep it friendly and safe) before giving a helpful answer.'
+            },
+
+            // --- PERSONAL DEVELOPMENT & PRODUCTIVITY ---
+            {
+                id: 'habit-building-coach',
+                name: 'AtomicHabits',
+                role: 'Habit Stacking & Routine Architect',
+                category: 'education',
+                avatar: '⚡',
+                bgColor: 'bg-amber-600',
+                description: 'Specialized in habit loops, cue-routine-reward design, friction reduction, and streak tracking.',
+                systemInstruction: 'You are AtomicHabits coach. Help users design small 1% daily improvements, habit stacks, and environmental triggers for behavior change.'
+            },
+            {
+                id: 'time-management-pomodoro',
+                name: 'PomoFocus',
+                role: 'Pomodoro & Time-Blocking Strategist',
+                category: 'education',
+                avatar: '⏱️',
+                bgColor: 'bg-red-500',
+                description: 'Helps users structure daily calendar blocks, eliminate distractions, and plan 25-minute focus sprints.',
+                systemInstruction: 'You are PomoFocus. Guide users in time-blocking their workday, setting up Pomodoro cycles, and combating procrastination.'
+            },
+            {
+                id: 'mind-mapping-architect',
+                name: 'MindMapper',
+                role: 'Structured Concept & Idea Organizer',
+                category: 'education',
+                avatar: '🗺️',
+                bgColor: 'bg-purple-600',
+                description: 'Transforms messy brain dumps into clear hierarchical outlines, bulleted mind maps, and actionable flowcharts.',
+                systemInstruction: 'You are MindMapper. Convert unstructured ideas into clean, nested markdown outlines and mind map structures.'
+            },
+            {
+                id: 'public-speaking-coach',
+                name: 'OratorPro',
+                role: 'Public Speaking & Speech Polish',
+                category: 'education',
+                avatar: '🎤',
+                bgColor: 'bg-blue-600',
+                description: 'Specialized in Ted Talk speech outlines, vocal pacing, eliminating filler words, and audience engagement.',
+                systemInstruction: 'You are OratorPro. Help users structure compelling speeches, craft powerful openers, and refine vocal delivery tips.'
+            },
+            {
+                id: 'memory-palace-master',
+                name: 'MemoryPalace',
+                role: 'Mnemonics & Memory Retention Specialist',
+                category: 'education',
+                avatar: '🧠',
+                bgColor: 'bg-teal-600',
+                description: 'Teaches spatial memory palace technique, acronym mnemonics, and spaced repetition schedules.',
+                systemInstruction: 'You are MemoryPalace. Create vivid visual mnemonics and memory palaces to help users memorize lists, terms, and numbers.'
+            },
+            {
+                id: 'second-brain-notion',
+                name: 'SecondBrain',
+                role: 'PKM & Knowledge Management Expert',
+                category: 'education',
+                avatar: '📁',
+                bgColor: 'bg-zinc-700',
+                description: 'Specialized in PARA method (Projects, Areas, Resources, Archives), Zettelkasten note-taking, and Obsidian/Notion setups.',
+                systemInstruction: 'You are SecondBrain. Help users organize personal knowledge management systems using PARA and Zettelkasten methods.'
+            },
+            {
+                id: 'decision-matrix-bot',
+                name: 'DecisionMatrix',
+                role: 'Rational Decision Making & Risk Analysis',
+                category: 'education',
+                avatar: '⚖️',
+                bgColor: 'bg-indigo-700',
+                description: 'Specialized in weighted decision matrices, multi-criteria evaluations, and pros/cons risk scoring.',
+                systemInstruction: 'You are DecisionMatrix. Help users evaluate tough choices by creating structured weighted scoring matrices and risk assessments.'
+            },
+            {
+                id: 'journal-reflection-guide',
+                name: 'ReflectJournal',
+                role: 'Daily Self-Reflection & Prompt Generator',
+                category: 'education',
+                avatar: '📓',
+                bgColor: 'bg-emerald-600',
+                description: 'Provides thoughtful evening review questions, gratitude prompts, and personal growth journaling exercises.',
+                systemInstruction: 'You are ReflectJournal. Offer insightful daily reflection prompts to foster mindfulness, gratitude, and personal growth.'
+            },
+            {
+                id: 'negotiation-tactician',
+                name: 'NegotiationTactics',
+                role: 'Hostage Negotiation Strategy for Life',
+                category: 'education',
+                avatar: '🤝',
+                bgColor: 'bg-amber-700',
+                description: 'Teaches tactical empathy, calibrated open-ended questions, mirroring, and labeling feelings.',
+                systemInstruction: 'You are NegotiationTactics. Teach high-stakes negotiation skills (Chris Voss methodology)—mirroring, labeling, and calibrated questions.'
+            },
+            {
+                id: 'fast-reader-summarizer',
+                name: 'SpeedReader',
+                role: 'Book & Longform Executive Summarizer',
+                category: 'education',
+                avatar: '⚡',
+                bgColor: 'bg-cyan-600',
+                description: 'Distills 300-page books or long academic PDFs into key 5-minute actionable executive summaries.',
+                systemInstruction: 'You are SpeedReader. Distill any text or book into a 5-bullet executive summary with key takeaways and actionable insights.'
+            },
+            {
+                id: 'life-goal-planner',
+                name: 'GoalTracker',
+                role: 'SMART Goal Setter & Milestone Tracker',
+                category: 'education',
+                avatar: '🎯',
+                bgColor: 'bg-red-600',
+                description: 'Breaks down 1-year goals into 90-day SMART milestones and daily action steps.',
+                systemInstruction: 'You are GoalTracker. Help users turn vague aspirations into specific, measurable, achievable, relevant, and time-bound (SMART) goals.'
+            },
+            {
+                id: 'focus-monk-bot',
+                name: 'DeepWorkMonk',
+                role: 'Monk Mode & Dopamine Detox Coach',
+                category: 'education',
+                avatar: '🧘',
+                bgColor: 'bg-stone-800',
+                description: 'Specialized in deep work protocols, phone addiction elimination, and cognitive stamina building.',
+                systemInstruction: 'You are DeepWorkMonk. Coach users on deep focus, removing digital distractions, and building cognitive endurance.'
+            },
+            {
+                id: 'personal-finance-coach',
+                name: 'WealthBuilder',
+                role: 'Budgeting & FIRE Strategy Guide',
+                category: 'education',
+                avatar: '💰',
+                bgColor: 'bg-emerald-700',
+                description: 'Teaches 50/30/20 budgeting, index fund investing principles, debt snowball methods, and FIRE (Financial Independence).',
+                systemInstruction: 'You are WealthBuilder. Educate users on personal finance basics (budgeting, emergency funds, index funds). Note: Educational purposes only.'
             }
         ];
 
-        // Multi-API Rotation Pool
-        const API_ENDPOINTS = [
-            { type: 'pollinations_openai', url: 'https://text.pollinations.ai/openai' },
-            { type: 'pollinations_direct', url: 'https://text.pollinations.ai/' },
-            { type: 'pollinations_alt', url: 'https://text.pollinations.ai/openai' }
-        ];
-        let currentEndpointIndex = 0;
+        // --- APP STATE ---
+        let currentView = 'directory';
+        let currentBotId = 'oscar-chess';
+        let currentConversationId = null;
+        let conversations = []; 
+        let apiKeys = [];
+        let currentKeyIndex = 0;
+        let selectedCategory = 'all';
 
-        let activeWbot = null;
-        let chatSessions = JSON.parse(localStorage.getItem('mei_wbot_sessions') || '{}');
-        let isGenerating = false;
-        let isUserSignedIn = false; // Restricted creation until signed in
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadApiKeys();
+            loadConversations();
+            renderDirectoryCards();
+            updateApiKeyUI();
+            
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true
+            });
 
-        function extractCleanContent(raw) {
-            if (!raw) return '';
-            try {
-                const parsed = JSON.parse(raw);
-                if (parsed.choices && parsed.choices[0] && parsed.choices[0].message) {
-                    return parsed.choices[0].message.content || '';
-                }
-            } catch (e) {
-                const match = raw.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-                if (match && match[1]) {
-                    return match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-                }
+            if (!currentConversationId && conversations.length > 0) {
+                loadConversation(conversations[0].id);
+            } else if (!currentConversationId) {
+                selectWbot('oscar-chess');
             }
-            return raw;
+        });
+
+        // --- VIEW NAVIGATION ---
+        function switchView(viewName) {
+            currentView = viewName;
+            const dirView = document.getElementById('view-directory');
+            const chatView = document.getElementById('view-chat');
+            const dirBtn = document.getElementById('nav-btn-directory');
+            const chatBtn = document.getElementById('nav-btn-chat');
+
+            if (viewName === 'directory') {
+                dirView.classList.remove('hidden');
+                chatView.classList.add('hidden');
+                dirBtn.className = 'px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center space-x-2 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30';
+                chatBtn.className = 'px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-800/60 flex items-center space-x-2';
+            } else {
+                dirView.classList.add('hidden');
+                chatView.classList.remove('hidden');
+                chatBtn.className = 'px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center space-x-2 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30';
+                dirBtn.className = 'px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-800/60 flex items-center space-x-2';
+                scrollChatToBottom();
+            }
         }
 
-        function renderWbots(list = wbots) {
-            const grid = document.getElementById('wbotsGrid');
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // --- DIRECTORY RENDER & FILTER ---
+        function renderDirectoryCards(query = '') {
+            const grid = document.getElementById('wbots-grid');
+            if (!grid) return;
             grid.innerHTML = '';
-            
-            list.forEach(wbot => {
+
+            const filtered = WBOTS.filter(bot => {
+                const matchCat = selectedCategory === 'all' || bot.category === selectedCategory;
+                const matchQuery = bot.name.toLowerCase().includes(query.toLowerCase()) || 
+                                   bot.role.toLowerCase().includes(query.toLowerCase()) || 
+                                   bot.description.toLowerCase().includes(query.toLowerCase());
+                return matchCat && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        <i class="fa-solid fa-robot text-4xl mb-3 opacity-50"></i>
+                        <p class="text-base font-medium">No specialized Wbots found matching criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(bot => {
                 const card = document.createElement('div');
-                card.className = "bg-gemini-card hover:bg-gemini-cardHover border border-gray-800 hover:border-gray-700 rounded-2xl p-5 flex flex-col justify-between transition cursor-pointer group shadow-sm";
-                card.onclick = () => selectWbot(wbot.id);
-                
+                card.className = 'bg-[#131926] border border-[#1F293D] rounded-2xl p-5 hover:border-indigo-500/50 transition-all duration-200 flex flex-col justify-between group shadow-lg';
                 card.innerHTML = `
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${wbot.color} flex items-center justify-center text-white text-lg shadow-md group-hover:scale-105 transition">
-                                <i class="fa-solid ${wbot.icon}"></i>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-2xl ${bot.bgColor} flex items-center justify-center text-2xl shadow-lg group-hover:scale-105 transition-transform">
+                                ${bot.avatar}
                             </div>
-                            <span class="text-[10px] font-medium px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 border border-gray-700/50">${wbot.category}</span>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
+                                ${bot.category}
+                            </span>
                         </div>
-                        <h3 class="text-base font-semibold text-white mb-1.5 group-hover:text-blue-400 transition">${wbot.name}</h3>
-                        <p class="text-xs text-gray-400 line-clamp-3 leading-relaxed mb-4">${wbot.description}</p>
+                        <div>
+                            <h3 class="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">${bot.name}</h3>
+                            <p class="text-xs text-indigo-300 font-medium">${bot.role}</p>
+                            <p class="text-xs text-gray-400 mt-2 line-clamp-3 leading-relaxed">${bot.description}</p>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-800/80 text-xs text-blue-400 font-medium">
-                        <span>Start Chatting</span>
-                        <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
-                    </div>
+                    <button onclick="selectWbot('${bot.id}')" class="mt-5 w-full py-2.5 px-4 bg-gray-800/80 hover:bg-indigo-600 hover:text-white text-gray-200 text-xs font-semibold rounded-xl border border-gray-700/60 hover:border-indigo-500 transition-all flex items-center justify-center space-x-2">
+                        <span>Launch Workspace</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        function filterWbots() {
-            const query = document.getElementById('wbotSearch').value.toLowerCase();
-            const filtered = wbots.filter(w => 
-                w.name.toLowerCase().includes(query) || 
-                w.category.toLowerCase().includes(query) || 
-                w.description.toLowerCase().includes(query)
-            );
-            renderWbots(filtered);
-        }
-
-        function selectWbot(id) {
-            activeWbot = wbots.find(w => w.id === id);
-            if (!activeWbot) return;
-
-            document.getElementById('activeWbotTitle').textContent = activeWbot.name;
-            document.getElementById('activeWbotCategory').textContent = activeWbot.category;
-            document.getElementById('activeWbotAvatar').className = `w-8 h-8 rounded-full bg-gradient-to-tr ${activeWbot.color} flex items-center justify-center text-white text-sm font-bold shadow`;
-            document.getElementById('activeWbotAvatar').innerHTML = `<i class="fa-solid ${activeWbot.icon}"></i>`;
-            document.getElementById('activeWbotModelBadge').textContent = `Wbot: ${activeWbot.name}`;
-
-            document.getElementById('exploreView').classList.add('hidden');
-            document.getElementById('chatView').classList.remove('hidden');
-
-            loadChatSession(activeWbot.id);
-            updateSessionHistoryList();
-        }
-
-        function showExploreView() {
-            document.getElementById('chatView').classList.add('hidden');
-            document.getElementById('exploreView').classList.remove('hidden');
-            activeWbot = null;
-            updateSessionHistoryList();
-        }
-
-        function loadChatSession(wbotId) {
-            const container = document.getElementById('chatMessages');
-            container.innerHTML = '';
-
-            if (!chatSessions[wbotId] || chatSessions[wbotId].length === 0) {
-                chatSessions[wbotId] = [{
-                    role: 'assistant',
-                    content: activeWbot.greeting
-                }];
-                saveSessions();
-            }
-
-            chatSessions[wbotId].forEach(msg => {
-                appendMessageNode(msg.role, msg.content);
-            });
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('chatMessages');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function appendMessageNode(role, text) {
-            const container = document.getElementById('chatMessages');
-            const isUser = role === 'user';
-            
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex gap-4 max-w-4xl mx-auto w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-
-            if (!isUser) {
-                const avatar = document.createElement('div');
-                avatar.className = `w-8 h-8 rounded-full bg-gradient-to-tr ${activeWbot.color} flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1`;
-                avatar.innerHTML = `<i class="fa-solid ${activeWbot.icon}"></i>`;
-                wrapper.appendChild(avatar);
-            }
-
-            const cleanText = extractCleanContent(text);
-
-            const bubble = document.createElement('div');
-            bubble.className = isUser 
-                ? 'bg-gemini-userBubble text-gray-100 px-4 py-3 rounded-2xl text-sm max-w-[85%] md:max-w-[75%] shadow-sm' 
-                : 'text-gray-200 text-sm max-w-[85%] md:max-w-[75%] leading-relaxed markdown-body pt-1 w-full';
-
-            if (isUser) {
-                bubble.textContent = cleanText;
-            } else {
-                bubble.innerHTML = marked.parse(cleanText || '');
-                bubble.querySelectorAll('pre').forEach(pre => {
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'code-copy-btn';
-                    copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy';
-                    copyBtn.onclick = () => {
-                        const codeText = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-                        navigator.clipboard.writeText(codeText);
-                        copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
-                        setTimeout(() => copyBtn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy', 2000);
-                    };
-                    pre.appendChild(copyBtn);
-                });
-            }
-
-            wrapper.appendChild(bubble);
-            container.appendChild(wrapper);
-            scrollToBottom();
-        }
-
-        async function sendMultiApiRequest(apiMessages, modelToUse) {
-            let lastError = null;
-            for (let i = 0; i < API_ENDPOINTS.length; i++) {
-                const endpoint = API_ENDPOINTS[currentEndpointIndex];
-                currentEndpointIndex = (currentEndpointIndex + 1) % API_ENDPOINTS.length;
-
-                try {
-                    let res;
-                    if (endpoint.type.includes('openai') || endpoint.type.includes('alt')) {
-                        res = await fetch(endpoint.url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ model: modelToUse, messages: apiMessages, seed: Math.floor(Math.random() * 999999) })
-                        });
-                    } else {
-                        res = await fetch(endpoint.url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ messages: apiMessages, model: modelToUse })
-                        });
-                    }
-                    if (res && res.ok) {
-                        const txt = await res.text();
-                        if (txt && txt.trim().length > 0) return txt;
-                    }
-                } catch (err) {
-                    lastError = err;
+        function filterCategory(cat) {
+            selectedCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.className = 'cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white border border-indigo-500';
+                } else {
+                    btn.className = 'cat-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#131926] text-gray-400 hover:text-white border border-[#1F293D]';
                 }
-            }
-            const lastMsg = apiMessages[apiMessages.length - 1].content;
-            const fb = await fetch(`https://text.pollinations.ai/${encodeURIComponent(lastMsg)}?model=${modelToUse}`);
-            if (!fb.ok) throw lastError || new Error('All rotation channels exhausted.');
-            return await fb.text();
+            });
+            const searchVal = document.getElementById('directory-search')?.value || '';
+            renderDirectoryCards(searchVal);
         }
 
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text || !activeWbot || isGenerating) return;
+        function searchWbots() {
+            const query = document.getElementById('directory-search')?.value || '';
+            renderDirectoryCards(query);
+        }
 
-            input.value = '';
-            input.style.height = 'auto';
+        // --- BOT SELECTION & CHAT MANAGEMENT ---
+        function selectWbot(botId) {
+            const bot = WBOTS.find(b => b.id === botId);
+            if (!bot) return;
 
-            appendMessageNode('user', text);
-            chatSessions[activeWbot.id].push({ role: 'user', content: text });
-            saveSessions();
-            updateSessionHistoryList();
-
-            const assistantMsgIdx = chatSessions[activeWbot.id].length;
-            chatSessions[activeWbot.id].push({ role: 'assistant', content: '' });
-
-            const container = document.getElementById('chatMessages');
-            const wrapper = document.createElement('div');
-            wrapper.className = 'flex gap-4 max-w-4xl mx-auto w-full justify-start animate-fade-in';
+            currentBotId = bot.id;
             
-            const avatar = document.createElement('div');
-            avatar.className = `w-8 h-8 rounded-full bg-gradient-to-tr ${activeWbot.color} flex items-center justify-center text-white text-xs font-bold shadow flex-shrink-0 mt-1`;
-            avatar.innerHTML = `<i class="fa-solid ${activeWbot.icon}"></i>`;
-            wrapper.appendChild(avatar);
+            const newConv = {
+                id: 'conv_' + Date.now(),
+                botId: bot.id,
+                title: `${bot.name} Session`,
+                messages: [],
+                updatedAt: new Date().toISOString()
+            };
 
-            const bubble = document.createElement('div');
-            bubble.className = 'text-gray-200 text-sm max-w-[85%] md:max-w-[75%] leading-relaxed markdown-body pt-1 w-full';
-            bubble.innerHTML = '<span class="animate-pulse text-purple-400">Thinking via Multi-API Pool...</span>';
-            wrapper.appendChild(bubble);
-            container.appendChild(wrapper);
-            scrollToBottom();
+            conversations.unshift(newConv);
+            currentConversationId = newConv.id;
+            saveConversations();
+            renderChatHistoryList();
+            updateActiveBotHeader(bot);
+            renderMessages();
 
-            isGenerating = true;
+            switchView('chat');
+        }
 
-            try {
-                const apiMessages = [
-                    { role: 'system', content: activeWbot.systemPrompt },
-                    ...chatSessions[activeWbot.id].slice(0, -1).map(m => ({ role: m.role, content: m.content }))
-                ];
+        function updateActiveBotHeader(bot) {
+            const avatarEl = document.getElementById('active-bot-avatar');
+            const nameEl = document.getElementById('active-bot-name');
+            const roleEl = document.getElementById('active-bot-role');
 
-                const rawResponse = await sendMultiApiRequest(apiMessages, 'openai');
-                const cleanText = extractCleanContent(rawResponse);
+            if (avatarEl) {
+                avatarEl.className = `w-9 h-9 rounded-xl ${bot.bgColor} flex items-center justify-center text-lg text-white font-bold shadow-md`;
+                avatarEl.innerHTML = bot.avatar;
+            }
+            if (nameEl) {
+                nameEl.innerHTML = `<span>${bot.name}</span>`;
+            }
+            if (roleEl) {
+                roleEl.innerText = bot.role;
+            }
+        }
 
-                bubble.innerHTML = marked.parse(cleanText);
-                chatSessions[activeWbot.id][assistantMsgIdx].content = cleanText;
-                saveSessions();
-                scrollToBottom();
-            } catch (err) {
-                bubble.innerHTML = '<span class="text-red-400">Error connecting to Wbot AI pool. Please try again.</span>';
-            } finally {
-                isGenerating = false;
+        function createNewChat() {
+            selectWbot(currentBotId || 'oscar-chess');
+        }
+
+        function loadConversation(convId) {
+            const conv = conversations.find(c => c.id === convId);
+            if (!conv) return;
+
+            currentConversationId = conv.id;
+            currentBotId = conv.botId;
+
+            const bot = WBOTS.find(b => b.id === conv.botId) || WBOTS[0];
+            updateActiveBotHeader(bot);
+            renderMessages();
+            renderChatHistoryList();
+            switchView('chat');
+        }
+
+        function deleteConversation(convId, e) {
+            if (e) e.stopPropagation();
+            conversations = conversations.filter(c => c.id !== convId);
+            saveConversations();
+
+            if (currentConversationId === convId) {
+                if (conversations.length > 0) {
+                    loadConversation(conversations[0].id);
+                } else {
+                    createNewChat();
+                }
+            } else {
+                renderChatHistoryList();
             }
         }
 
         function clearCurrentChat() {
-            if (!activeWbot) return;
-            chatSessions[activeWbot.id] = [{
-                role: 'assistant',
-                content: activeWbot.greeting
-            }];
-            saveSessions();
-            loadChatSession(activeWbot.id);
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (conv) {
+                conv.messages = [];
+                conv.updatedAt = new Date().toISOString();
+                saveConversations();
+                renderMessages();
+            }
         }
 
-        function saveSessions() {
-            localStorage.setItem('mei_wbot_sessions', JSON.stringify(chatSessions));
-        }
+        function renderChatHistoryList() {
+            const container = document.getElementById('chat-history-list');
+            if (!container) return;
+            container.innerHTML = '';
 
-        function updateSessionHistoryList() {
-            const listContainer = document.getElementById('sessionHistoryList');
-            listContainer.innerHTML = '';
+            if (conversations.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">No active conversations</p>';
+                return;
+            }
 
-            let hasSessions = false;
-            wbots.forEach(wbot => {
-                if (chatSessions[wbot.id] && chatSessions[wbot.id].length > 1) {
-                    hasSessions = true;
-                    const item = document.createElement('div');
-                    const isActive = activeWbot && activeWbot.id === wbot.id;
-                    item.className = `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition ${
-                        isActive ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
-                    }`;
-                    item.onclick = () => selectWbot(wbot.id);
-
-                    item.innerHTML = `
-                        <div class="w-6 h-6 rounded-lg bg-gradient-to-tr ${wbot.color} flex items-center justify-center text-white text-[10px] flex-shrink-0">
-                            <i class="fa-solid ${wbot.icon}"></i>
+            conversations.forEach(conv => {
+                const bot = WBOTS.find(b => b.id === conv.botId) || WBOTS[0];
+                const isActive = conv.id === currentConversationId;
+                const item = document.createElement('div');
+                item.onclick = () => loadConversation(conv.id);
+                item.className = `p-2.5 rounded-xl text-xs flex items-center justify-between cursor-pointer transition-colors group ${isActive ? 'bg-indigo-600/20 border border-indigo-500/30 text-white' : 'text-gray-400 hover:bg-gray-800/60 hover:text-gray-200'}`;
+                
+                item.innerHTML = `
+                    <div class="flex items-center space-x-2.5 overflow-hidden">
+                        <span class="text-sm">${bot.avatar}</span>
+                        <div class="truncate">
+                            <p class="font-medium truncate ${isActive ? 'text-indigo-300' : 'text-gray-300'}">${conv.title}</p>
+                            <p class="text-[10px] text-gray-500 truncate">${bot.name}</p>
                         </div>
-                        <span class="truncate flex-1">${wbot.name}</span>
-                    `;
-                    listContainer.appendChild(item);
-                }
-            });
-
-            if (!hasSessions) {
-                listContainer.innerHTML = `<div class="px-3 py-2 text-xs text-gray-500 italic">No recent chats yet. Pick a Wbot to start!</div>`;
-            }
-        }
-
-        /* --- SIGN-IN RESTRICTION HANDLERS --- */
-        function handleCreateWbotClick() {
-            if (!isUserSignedIn) {
-                openSignInModal();
-            }
-        }
-
-        function openSignInModal() {
-            document.getElementById('signInModal').classList.remove('hidden');
-        }
-
-        function closeSignInModal() {
-            document.getElementById('signInModal').classList.add('hidden');
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('w-64');
-            sidebar.classList.toggle('w-16');
-            sidebar.querySelectorAll('span').forEach(span => {
-                if (!span.closest('.border-t')) span.classList.toggle('hidden');
+                    </div>
+                    <button onclick="deleteConversation('${conv.id}', event)" class="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-red-400 transition-opacity">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(item);
             });
         }
 
-        function handleKeydown(e) {
+        function renderMessages() {
+            const container = document.getElementById('chat-messages');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            const bot = WBOTS.find(b => b.id === currentBotId) || WBOTS[0];
+
+            if (!conv || conv.messages.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center p-6 space-y-3 my-auto">
+                        <div class="w-16 h-16 rounded-3xl ${bot.bgColor} flex items-center justify-center text-3xl shadow-xl">
+                            ${bot.avatar}
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${bot.name} is ready!</h3>
+                        <p class="text-xs text-gray-400 max-w-sm">${bot.description}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            conv.messages.forEach((msg, idx) => {
+                const isUser = msg.role === 'user';
+                const msgWrapper = document.createElement('div');
+                msgWrapper.className = `flex ${isUser ? 'justify-end' : 'justify-start'} space-x-3`;
+
+                const parsedContent = isUser ? escapeHtml(msg.content) : marked.parse(msg.content);
+
+                msgWrapper.innerHTML = `
+                    ${!isUser ? `<div class="w-8 h-8 rounded-xl ${bot.bgColor} flex items-center justify-center text-sm text-white font-bold shrink-0 shadow">${bot.avatar}</div>` : ''}
+                    <div class="max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${isUser ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-[#131926] text-gray-200 border border-[#1F293D] rounded-tl-none space-y-2'}">
+                        <div>${parsedContent}</div>
+                        <div class="mt-2 flex items-center justify-between text-[10px] ${isUser ? 'text-indigo-200' : 'text-gray-500'}">
+                            <span>${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            ${!isUser ? `
+                                <div class="flex items-center space-x-2 ml-4">
+                                    <button onclick="speakText('${encodeURIComponent(msg.content)}')" class="hover:text-indigo-400 transition-colors" title="Read Aloud">
+                                        <i class="fa-solid fa-volume-high"></i>
+                                    </button>
+                                    <button onclick="copyToClipboard(this)" data-code="${encodeURIComponent(msg.content)}" class="hover:text-indigo-400 transition-colors" title="Copy text">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ${isUser ? `<div class="w-8 h-8 rounded-xl bg-gray-700 flex items-center justify-center text-xs text-gray-200 font-bold shrink-0">You</div>` : ''}
+                `;
+                container.appendChild(msgWrapper);
+            });
+
+            scrollChatToBottom();
+        }
+
+        function scrollChatToBottom() {
+            const container = document.getElementById('chat-messages');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // --- MESSAGE SUBMISSION & MEI AI ROTATION ---
+        async function handleChatSubmit() {
+            const inputEl = document.getElementById('chat-input');
+            const userText = inputEl?.value.trim();
+            if (!userText) return;
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv) return;
+
+            const userMsg = { role: 'user', content: userText, timestamp: new Date().toISOString() };
+            conv.messages.push(userMsg);
+
+            if (conv.messages.length === 1) {
+                conv.title = userText.length > 25 ? userText.substring(0, 25) + '...' : userText;
+            }
+
+            conv.updatedAt = new Date().toISOString();
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+            saveConversations();
+            renderMessages();
+            renderChatHistoryList();
+
+            showTyping(true);
+
+            try {
+                const bot = WBOTS.find(b => b.id === currentBotId) || WBOTS[0];
+                const replyText = await fetchMeiAIResponse(bot, conv.messages);
+                
+                conv.messages.push({
+                    role: 'model',
+                    content: replyText,
+                    timestamp: new Date().toISOString()
+                });
+                saveConversations();
+                renderMessages();
+            } catch (err) {
+                console.error("API Call Failure:", err);
+                conv.messages.push({
+                    role: 'model',
+                    content: `⚠️ **Error generating response:** ${err.message || 'Check your Mei AI keys pool or network connection.'}`,
+                    timestamp: new Date().toISOString()
+                });
+                renderMessages();
+            } finally {
+                showTyping(false);
+            }
+        }
+
+        function handleInputKeydown(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendMessage();
+                handleChatSubmit();
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            renderWbots();
-            updateSessionHistoryList();
-        });
+        function showTyping(show) {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                if (show) indicator.classList.remove('hidden');
+                else indicator.classList.add('hidden');
+            }
+        }
+
+        async function fetchMeiAIResponse(bot, messageHistory) {
+            const contents = [];
+            
+            messageHistory.forEach(msg => {
+                contents.push({
+                    role: msg.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: msg.content }]
+                });
+            });
+
+            const requestBody = {
+                contents: contents,
+                systemInstruction: {
+                    parts: [{ text: bot.systemInstruction }]
+                },
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048
+                }
+            };
+
+            const availableKeys = apiKeys.length > 0 ? apiKeys : [''];
+            let lastError = null;
+
+            for (let i = 0; i < availableKeys.length; i++) {
+                const keyIndex = (currentKeyIndex + i) % availableKeys.length;
+                const apiKey = availableKeys[keyIndex];
+                
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (res.status === 429) {
+                        console.warn(`Key index ${keyIndex} rate limited (429). Rotating key...`);
+                        continue; 
+                    }
+
+                    if (!res.ok) {
+                        const errJson = await res.json().catch(() => ({}));
+                        throw new Error(errJson.error?.message || `HTTP ${res.status} Error`);
+                    }
+
+                    const data = await res.json();
+                    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!reply) throw new Error("Received empty response candidate from API");
+
+                    currentKeyIndex = (keyIndex + 1) % availableKeys.length;
+                    return reply;
+                } catch (err) {
+                    lastError = err;
+                }
+            }
+
+            throw lastError || new Error("All API keys failed or rate limited.");
+        }
+
+        // --- API KEY STORAGE & MANAGEMENT ---
+        function loadApiKeys() {
+            try {
+                const stored = localStorage.getItem('mei_wbots_apikeys');
+                if (stored) apiKeys = JSON.parse(stored);
+            } catch (e) { apiKeys = []; }
+        }
+
+        function saveApiKeys() {
+            localStorage.setItem('mei_wbots_apikeys', JSON.stringify(apiKeys));
+            updateApiKeyUI();
+        }
+
+        function addApiKey() {
+            const input = document.getElementById('new-api-key-input');
+            const key = input?.value.trim();
+            if (!key) return;
+            if (!apiKeys.includes(key)) {
+                apiKeys.push(key);
+                saveApiKeys();
+            }
+            if (input) input.value = '';
+        }
+
+        function removeApiKey(keyToRemove) {
+            apiKeys = apiKeys.filter(k => k !== keyToRemove);
+            saveApiKeys();
+        }
+
+        function updateApiKeyUI() {
+            const statusText = document.getElementById('api-key-status-text');
+            const countBadge = document.getElementById('api-key-count-badge');
+            const modalCount = document.getElementById('modal-key-count');
+            const keyList = document.getElementById('api-key-list');
+
+            if (countBadge) countBadge.innerText = apiKeys.length;
+            if (modalCount) modalCount.innerText = apiKeys.length;
+
+            if (statusText) {
+                statusText.innerText = apiKeys.length > 0 ? `${apiKeys.length} Key(s)` : 'Add Mei AI Key';
+            }
+
+            if (keyList) {
+                keyList.innerHTML = '';
+                if (apiKeys.length === 0) {
+                    keyList.innerHTML = '<p class="text-xs text-gray-500 italic">No custom Mei AI API keys provided. Please add one above for reliable usage.</p>';
+                    return;
+                }
+                apiKeys.forEach(key => {
+                    const masked = key.substring(0, 6) + '...' + key.substring(key.length - 4);
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-2 rounded-xl bg-[#0B0F17] border border-[#1F293D] text-xs';
+                    item.innerHTML = `
+                        <span class="font-mono text-gray-300">${masked}</span>
+                        <button onclick="removeApiKey('${key}')" class="text-gray-500 hover:text-red-400 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    `;
+                    keyList.appendChild(item);
+                });
+            }
+        }
+
+        function openApiKeyModal() {
+            document.getElementById('api-key-modal')?.classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('api-key-modal')?.classList.add('hidden');
+        }
+
+        // --- LOCAL STORAGE PERSISTENCE ---
+        function loadConversations() {
+            try {
+                const stored = localStorage.getItem('mei_wbots_conversations');
+                if (stored) conversations = JSON.parse(stored);
+            } catch (e) { conversations = []; }
+            renderChatHistoryList();
+        }
+
+        function saveConversations() {
+            localStorage.setItem('mei_wbots_conversations', JSON.stringify(conversations));
+        }
+
+        function exportChatHistory() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(conversations, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `mei_wbots_export_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // --- UTILITIES ---
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function copyToClipboard(btn) {
+            const encodedCode = btn.getAttribute('data-code');
+            if (!encodedCode) return;
+            const text = decodeURIComponent(encodedCode);
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i>';
+            setTimeout(() => { btn.innerHTML = orig; }, 1500);
+        }
+
+        function speakText(encodedText) {
+            const text = decodeURIComponent(encodedText);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text.replace(/[*_#`]/g, ''));
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
     </script>
 </body>
 </html>
+```
