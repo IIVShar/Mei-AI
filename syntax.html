@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntax - AI Coding Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        syntax: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                            950: '#2e1065',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); }
+    </style>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-syntax-500 selection:text-white transition-colors duration-300">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-slate-900/90 backdrop-blur-xl border-r border-slate-800/80 flex flex-col z-20 transition-all duration-300 -translate-x-full md:translate-x-0 absolute md:relative h-full shadow-2xl">
+        <!-- Logo & Brand -->
+        <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Simple Logo SVG -->
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-syntax-500/30 text-white font-bold ring-2 ring-syntax-500/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-syntax-400 bg-clip-text text-transparent">Syntax</h1>
+                    <p class="text-[11px] text-slate-400 font-medium tracking-wide">AI Coding Assistant</p>
+                </div>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- New Chat Button -->
+        <div class="p-4">
+            <button onclick="startNewChat()" class="w-full bg-syntax-600 hover:bg-syntax-500 active:scale-[0.98] text-white font-medium py-2.5 px-4 rounded-xl shadow-lg shadow-syntax-600/30 flex items-center justify-center space-x-2 transition-all duration-200 border border-syntax-500/30">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>New Chat</span>
+            </button>
+        </div>
+
+        <!-- Chat History List -->
+        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1.5" id="chat-history-list">
+            <div class="text-[10px] font-bold text-slate-400 px-3 py-2 uppercase tracking-wider">Recent Sessions</div>
+            <div onclick="loadChat(0)" class="group flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-800/60 text-slate-200 text-sm font-medium cursor-pointer border border-slate-700/60 shadow-sm transition hover:bg-slate-800">
+                <div class="flex items-center space-x-2.5 truncate">
+                    <i class="fa-regular fa-message text-syntax-400 text-xs"></i>
+                    <span class="truncate">React Debounce Custom Hook</span>
+                </div>
+            </div>
+            <div onclick="loadChat(1)" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 text-sm font-medium cursor-pointer transition border border-transparent hover:border-slate-800">
+                <div class="flex items-center space-x-2.5 truncate">
+                    <i class="fa-regular fa-message text-slate-500 text-xs"></i>
+                    <span class="truncate">Python Async Web Scraper</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Settings Trigger -->
+        <div class="p-4 border-t border-slate-800/85">
+            <button onclick="openSettings()" class="flex items-center space-x-3 text-slate-400 hover:text-slate-200 transition py-2 px-3 rounded-xl hover:bg-slate-800/60 w-full border border-transparent hover:border-slate-700/50">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 shadow-sm">
+                    <i class="fa-solid fa-gear text-xs text-syntax-400"></i>
+                </div>
+                <div class="text-left truncate flex-1">
+                    <div class="text-xs font-semibold text-slate-200">Settings</div>
+                    <div class="text-[11px] text-slate-400 truncate" id="current-model-label">Syntax-Pro v3</div>
+                </div>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT AREA -->
+    <main class="flex-1 flex flex-col h-full bg-slate-950 relative overflow-hidden">
+        <!-- Top Navigation Bar -->
+        <header class="h-16 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md px-4 flex items-center justify-between z-10 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div class="flex items-center space-x-2 bg-slate-800/70 border border-slate-700/70 px-3.5 py-1.5 rounded-xl shadow-inner">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="header-model-badge" class="text-xs font-semibold text-slate-200">Syntax-Pro v3</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openChatHistoryModal()" class="md:hidden text-slate-400 hover:text-slate-200 p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50 text-sm shadow-sm transition">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                <button onclick="openSettings()" class="text-slate-400 hover:text-slate-200 p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50 text-sm shadow-sm transition">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Message Feed & Welcome Screen -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-4xl mx-auto w-full">
+            <!-- Welcome State -->
+            <div id="welcome-state" class="h-full flex flex-col items-center justify-center text-center py-12 px-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center shadow-2xl shadow-syntax-600/30 text-white mb-6 ring-4 ring-syntax-500/10">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2">Hello, I am Syntax.</h2>
+                <p class="text-slate-400 max-w-md text-sm mb-8 leading-relaxed">Your specialized AI coding assistant. Ask me for architecture advice, debug complex issues, or generate robust, tested code instantly.</p>
+                
+                <!-- Quick Suggestion Pills -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl text-left">
+                    <button onclick="sendQuickPrompt('Write a secure JWT authentication middleware in Node.js')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">Node.js JWT Middleware</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
+                    </button>
+                    <button onclick="sendQuickPrompt('Create a responsive card grid with Tailwind CSS')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">Tailwind CSS Card Grid</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
+                    </button>
+                    <button onclick="sendQuickPrompt('Explain React useEffect cleanup function with an example')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">React useEffect Cleanup</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
+                    </button>
+                    <button onclick="sendQuickPrompt('Write a Python script to scrape top Hacker News headlines')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">Python Web Scraper</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages List -->
+            <div id="messages-list" class="space-y-6 hidden"></div>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="p-4 bg-slate-950 border-t border-slate-800/85 max-w-4xl mx-auto w-full">
+            <div class="relative bg-slate-900/95 border border-slate-700/80 rounded-2xl shadow-2xl focus-within:border-syntax-500 focus-within:ring-2 focus-within:ring-syntax-500/20 transition">
+                <textarea id="user-input" rows="1" placeholder="Ask Syntax anything about code..." class="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm px-4 py-3.5 pr-24 focus:outline-none resize-none max-h-36" onkeydown="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+                <div class="absolute right-2.5 bottom-2.5 flex items-center space-x-1.5">
+                    <button id="send-btn" onclick="sendMessage()" class="bg-syntax-600 hover:bg-syntax-500 text-white w-9 h-9 rounded-xl flex items-center justify-center transition shadow-lg shadow-syntax-600/30 border border-syntax-400/30">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="text-center mt-2">
+                <p class="text-[11px] text-slate-400">Syntax can make mistakes. Verify critical code and credentials.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center space-x-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-syntax-600/20 flex items-center justify-center text-syntax-400">
+                        <i class="fa-solid fa-gear text-xs"></i>
+                    </div>
+                    <span>Syntax Settings</span>
+                </h3>
+                <button onclick="closeSettings()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Theme Mode Toggle -->
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">Appearance Theme</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setTheme('dark')" id="theme-dark-btn" class="flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm">
+                            <i class="fa-solid fa-moon text-syntax-400"></i>
+                            <span>Dark Mode</span>
+                        </button>
+                        <button onclick="setTheme('light')" id="theme-light-btn" class="flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm">
+                            <i class="fa-solid fa-sun text-amber-400"></i>
+                            <span>Light Mode</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Model Selection (Syntax Family) -->
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">Syntax Model Family</label>
+                    <div class="space-y-2.5">
+                        <div onclick="selectModel('Syntax-Pro v3')" class="model-option flex items-center justify-between p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 cursor-pointer transition shadow-sm" data-model="Syntax-Pro v3">
+                            <div>
+                                <div class="text-sm font-semibold text-white">Syntax-Pro v3</div>
+                                <div class="text-xs text-slate-400">Advanced reasoning & architecture generation</div>
+                            </div>
+                            <i class="fa-solid fa-circle-check text-syntax-400 text-sm"></i>
+                        </div>
+                        <div onclick="selectModel('Syntax-Flash v2')" class="model-option flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700" data-model="Syntax-Flash v2">
+                            <div>
+                                <div class="text-sm font-semibold text-white">Syntax-Flash v2</div>
+                                <div class="text-xs text-slate-400">Lightning-fast snippets & refactoring</div>
+                            </div>
+                            <i class="fa-regular fa-circle text-slate-600 text-sm"></i>
+                        </div>
+                        <div onclick="selectModel('Syntax-Coder Ultra')" class="model-option flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700" data-model="Syntax-Coder Ultra">
+                            <div>
+                                <div class="text-sm font-semibold text-white">Syntax-Coder Ultra</div>
+                                <div class="text-xs text-slate-400">Deep debugging & full-stack context</div>
+                            </div>
+                            <i class="fa-regular fa-circle text-slate-600 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-slate-800 flex justify-end">
+                <button onclick="closeSettings()" class="bg-syntax-600 hover:bg-syntax-500 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-syntax-600/30">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT HISTORY MODAL (Mobile) -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-5 shadow-2xl relative">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-clock-rotate-left text-syntax-400"></i>
+                    <span>Chat Sessions</span>
+                </h3>
+                <button onclick="closeChatHistoryModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-2 max-h-64 overflow-y-auto">
+                <div onclick="loadChat(0); closeChatHistoryModal();" class="p-3 rounded-2xl bg-slate-800/60 text-slate-200 text-sm font-medium cursor-pointer border border-slate-700/50">
+                    React Debounce Custom Hook
+                </div>
+                <div onclick="loadChat(1); closeChatHistoryModal();" class="p-3 rounded-2xl hover:bg-slate-800/40 text-slate-400 text-sm font-medium cursor-pointer transition">
+                    Python Async Web Scraper
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        let currentModel = 'Syntax-Pro v3';
+        let currentTheme = 'dark';
+        let messages = [];
+
+        // Define loadChat globally so onclick handlers can reference it immediately
+        window.loadChat = function(index) {
+            startNewChat();
+            if (index === 0) {
+                appendMessage('user', 'Create a React custom hook for handling debounce with TypeScript.');
+                appendMessage('assistant', 'Hello! I am Syntax, your specialized coding assistant. Here is a clean, robust TypeScript custom hook for debouncing values in React:\n\n```typescript:useDebounce.ts\nimport { useState, useEffect } from \'react\';\n\nexport function useDebounce<T>(value: T, delay: number): T {\n  const [debouncedValue, setDebouncedValue] = useState<T>(value);\n\n  useEffect(() => {\n    const handler = setTimeout(() => {\n      setDebouncedValue(value);\n    }, delay);\n\n    return () => {\n      clearTimeout(handler);\n    };\n  }, [value, delay]);\n\n  return debouncedValue;\n}\n```\n\n### Usage Example:\n```tsx:SearchComponent.tsx\nimport React, { useState } from \'react\';\nimport { useDebounce } from \'./useDebounce\';\n\nexport default function SearchComponent() {\n  const [searchTerm, setSearchTerm] = useState(\'\');\n  const debouncedSearch = useDebounce(searchTerm, 300);\n\n  return (\n    <div className="p-4">\n      <input\n        type="text"\n        value={searchTerm}\n        onChange={(e) => setSearchTerm(e.target.value)}\n        placeholder="Search..."\n        className="border px-3 py-2 rounded-xl w-full"\n      />\n      <p className="text-sm mt-2 text-slate-400">Debounced: {debouncedSearch}</p>\n    </div>\n  );\n}\n```');
+            } else {
+                appendMessage('user', 'Write a Python script to scrape top Hacker News headlines.');
+                appendMessage('assistant', 'I am Syntax, ready to assist with your Python development! Here is a lightweight script using `requests` and `BeautifulSoup` to scrape top Hacker News stories:\n\n```python:scraper.py\nimport requests\nfrom bs4 import BeautifulSoup\n\ndef get_hn_headlines():\n    url = "https://news.ycombinator.com/"\n    response = requests.get(url)\n    \n    if response.status_code != 200:\n        print("Failed to fetch page")\n        return\n\n    soup = BeautifulSoup(response.text, \'html.parser\')\n    stories = soup.select(\'.titleline > a\')\n\n    for idx, story in enumerate(stories[:10], 1):\n        print(f"{idx}. {story.text}")\n        print(f"   URL: {story[\'href\']}\\n")\n\nif __name__ == "__main__":\n    get_hn_headlines()\n```');
+            }
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        function openSettings() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function openChatHistoryModal() {
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeChatHistoryModal() {
+            document.getElementById('history-modal').classList.add('hidden');
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            const html = document.documentElement;
+            const darkBtn = document.getElementById('theme-dark-btn');
+            const lightBtn = document.getElementById('theme-light-btn');
+
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                html.style.colorScheme = 'dark';
+                document.body.className = "h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-syntax-500 selection:text-white transition-colors duration-300";
+                darkBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm";
+                lightBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm";
+            } else {
+                html.classList.remove('dark');
+                html.style.colorScheme = 'light';
+                document.body.className = "h-full bg-slate-50 text-slate-900 flex overflow-hidden selection:bg-syntax-500 selection:text-white transition-colors duration-300";
+                lightBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-slate-900 text-sm font-medium transition shadow-sm";
+                darkBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-slate-200 bg-slate-100 text-slate-600 text-sm font-medium transition shadow-sm";
+            }
+        }
+
+        function selectModel(modelName) {
+            currentModel = modelName;
+            document.getElementById('current-model-label').textContent = modelName;
+            document.getElementById('header-model-badge').textContent = modelName;
+
+            document.querySelectorAll('.model-option').forEach(opt => {
+                if (opt.getAttribute('data-model') === modelName) {
+                    opt.className = "model-option flex items-center justify-between p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 cursor-pointer transition shadow-sm";
+                    opt.querySelector('i').className = "fa-solid fa-circle-check text-syntax-400 text-sm";
+                } else {
+                    opt.className = "model-option flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700";
+                    opt.querySelector('i').className = "fa-regular fa-circle text-slate-600 text-sm";
+                }
+            });
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 144) + 'px';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendQuickPrompt(text) {
+            document.getElementById('user-input').value = text;
+            sendMessage();
+        }
+
+        function startNewChat() {
+            messages = [];
+            document.getElementById('welcome-state').classList.remove('hidden');
+            document.getElementById('messages-list').classList.add('hidden');
+            document.getElementById('messages-list').innerHTML = '';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            document.getElementById('welcome-state').classList.add('hidden');
+            const messagesList = document.getElementById('messages-list');
+            messagesList.classList.remove('hidden');
+
+            appendMessage('user', text);
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Simulate AI response
+            setTimeout(() => {
+                let simulatedResponse = generateSimulatedResponse(text);
+                appendMessage('assistant', simulatedResponse);
+            }, 600);
+        }
+
+        function appendMessage(role, content) {
+            messages.push({ role, content });
+            const messagesList = document.getElementById('messages-list');
+            const messageDiv = document.createElement('div');
+
+            if (role === 'user') {
+                messageDiv.className = "flex justify-end";
+                messageDiv.innerHTML = `
+                    <div class="max-w-2xl bg-syntax-600 text-white rounded-3xl rounded-tr-sm px-5 py-3.5 text-sm shadow-md leading-relaxed">
+                        ${escapeHtml(content)}
+                    </div>
+                `;
+            } else {
+                messageDiv.className = "flex justify-start space-x-3.5";
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center text-white shrink-0 shadow-lg">
+                        <i class="fa-solid fa-code text-xs"></i>
+                    </div>
+                    <div class="max-w-3xl flex-1 bg-slate-900/95 border border-slate-800 rounded-3xl rounded-tl-sm p-5 md:p-6 text-sm shadow-xl leading-relaxed text-slate-200 overflow-hidden">
+                        ${formatMarkdown(content)}
+                    </div>
+                `;
+            }
+
+            messagesList.appendChild(messageDiv);
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+        }
+
+        function generateSimulatedResponse(query) {
+            const q = query.toLowerCase();
+            if (q.includes('node') || q.includes('jwt') || q.includes('middleware')) {
+                return 'I am Syntax. Here is a secure JWT authentication middleware setup for Node.js using Express, built according to best practices:\n\n```javascript:authMiddleware.js\nconst jwt = require(\'jsonwebtoken\');\n\nfunction verifyToken(req, res, next) {\n  const authHeader = req.headers[\'authorization\'];\n  const token = authHeader && authHeader.split(\' \')[1];\n\n  if (!token) {\n    return res.status(401).json({ error: \'Access token missing or malformed\' });\n  }\n\n  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {\n    if (err) {\n      return res.status(403).json({ error: \'Invalid or expired token\' });\n    }\n    req.user = user;\n    next();\n  });\n}\n\nmodule.exports = verifyToken;\n```';
+            } else if (q.includes('tailwind') || q.includes('card') || q.includes('grid')) {
+                return 'I am Syntax. Here is a modern responsive card grid layout built with Tailwind CSS:\n\n```html:CardGrid.html\n<div class=\"max-w-6xl mx-auto px-4 py-8\">\n  <div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\">\n    <div class=\"bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl hover:border-syntax-500/50 transition\">\n      <div class=\"w-10 h-10 rounded-xl bg-syntax-600/20 text-syntax-400 flex items-center justify-center mb-4\">\n        <i class=\"fa-solid fa-bolt\"></i>\n      </div>\n      <h3 class=\"text-lg font-bold text-white mb-2\">High Performance</h3>\n      <p class=\"text-slate-400 text-sm\">Optimized for lightning speed and seamless execution.</p>\n    </div>\n  </div>\n</div>\n```';
+            } else {
+                return 'I am Syntax, your dedicated AI coding assistant powered by ' + currentModel + '. Here is the optimal code solution for your request:\n\n```javascript:solution.js\n// Optimized solution generated by Syntax\nfunction executeWorkflow() {\n  console.log("Syntax execution initialized...");\n  return {\n    status: "success",\n    assistant: "Syntax",\n    model: "' + currentModel + '",\n    timestamp: Date.now()\n  };\n}\n\nexecuteWorkflow();\n```\n\nLet me know if you would like unit tests or further refactoring!';
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function formatMarkdown(text) {
+            let formatted = escapeHtml(text);
+
+            // Replace ```lang:filename code ```
+            formatted = formatted.replace(/```([a-zA-Z0-9_-]+):([^\n]+)\n([\s\S]*?)```/g, (match, lang, filename, code) => {
+                const cleanCode = code.trim();
+                const codeId = 'code-' + Math.random().toString(36).substring(2, 9);
+                return `
+                    <div class="my-4 rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-xl">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 text-xs">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-syntax-500 inline-block"></span>
+                                <span class="font-mono font-medium text-slate-300">${filename}</span>
+                            </div>
+                            <button onclick="copyCode('${codeId}')" class="flex items-center space-x-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-xl transition shadow-sm">
+                                <i class="fa-regular fa-copy text-xs"></i>
+                                <span id="${codeId}-btn-text">Copy</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 overflow-x-auto text-xs md:text-sm text-slate-200 leading-relaxed"><code id="${codeId}">${cleanCode}</code></pre>
+                    </div>
+                `;
+            });
+
+            // Replace standard ```lang code ```
+            formatted = formatted.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+                const cleanCode = code.trim();
+                const codeId = 'code-' + Math.random().toString(36).substring(2, 9);
+                return `
+                    <div class="my-4 rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-xl">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 text-xs">
+                            <span class="font-mono font-medium text-slate-400">${lang || 'code'}</span>
+                            <button onclick="copyCode('${codeId}')" class="flex items-center space-x-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-xl transition shadow-sm">
+                                <i class="fa-regular fa-copy text-xs"></i>
+                                <span id="${codeId}-btn-text">Copy</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 overflow-x-auto text-xs md:text-sm text-slate-200 leading-relaxed"><code id="${codeId}">${cleanCode}</code></pre>
+                    </div>
+                `;
+            });
+
+            // Headings
+            formatted = formatted.replace(/### (.*?)\n/g, '<h4 class="text-base font-bold text-white mt-4 mb-2">$1</h4>');
+            formatted = formatted.replace(/## (.*?)\n/g, '<h3 class="text-lg font-bold text-white mt-5 mb-2">$1</h3>');
+
+            // Line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            return formatted;
+        }
+
+        function copyCode(codeId) {
+            const codeElement = document.getElementById(codeId);
+            const btnText = document.getElementById(codeId + '-btn-text');
+            const textToCopy = codeElement.innerText;
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            btnText.innerText = 'Copied!';
+            setTimeout(() => {
+                btnText.innerText = 'Copy';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
