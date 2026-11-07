@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-
-  <link rel="icon" type="image/png" sizes="32x32" href="./matix.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matix AI - Visual Synthesizer & Multi-Engine Suite</title>
+    <title>Matix AI Canvas Studio - Interactive Visual Synthesizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,17 +14,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#1e1b4b',
-                        }
                     }
                 }
             }
@@ -39,40 +26,32 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
         }
-
-        /* Dark Glassmorphism */
         .glass-panel {
-            background: rgba(15, 18, 28, 0.75);
+            background: rgba(15, 18, 28, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.07);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
         }
-
         .glass-card:hover {
             border-color: rgba(99, 102, 241, 0.4);
             background: rgba(255, 255, 255, 0.06);
             transform: translateY(-2px);
         }
-
         .glass-input {
-            background: rgba(10, 12, 20, 0.6);
+            background: rgba(10, 12, 20, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #f8fafc;
         }
-
         .glass-input:focus {
             border-color: #6366f1;
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
             outline: none;
         }
-
-        /* Animated Glowing Button */
         .glow-button {
             position: relative;
             transition: all 0.3s ease;
@@ -93,33 +72,11 @@
         .glow-button:hover::before {
             opacity: 1;
         }
-
         @keyframes moveGradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        @keyframes warningPulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.1); opacity: 0.2; }
-            100% { transform: scale(0.95); opacity: 0.7; }
-        }
-        .pulse-ring {
-            animation: warningPulse 3s infinite ease-in-out;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        .shimmer-bar {
-            background: linear-gradient(90deg, rgba(239, 68, 68, 0.8) 0%, rgba(249, 115, 22, 0.9) 50%, rgba(239, 68, 68, 0.8) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite linear;
-        }
-
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -131,9 +88,6 @@
             background: rgba(255, 255, 255, 0.15);
             border-radius: 9999px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.5);
-        }
     </style>
 </head>
 <body class="bg-[#08090d] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-purple-500 selection:text-white">
@@ -141,330 +95,90 @@
     <!-- Header Navigation -->
     <header class="glass-panel sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between border-b border-white/10">
         <div class="flex items-center gap-3">
-            <!-- Custom Purple-to-Magenta Gradient Magic Wand Badge Logo -->
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30 transform transition-transform duration-300 hover:scale-105">
-                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg drop-shadow"></i>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <i class="fa-solid fa-paintbrush text-white text-lg"></i>
             </div>
             <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-xl font-extrabold bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent tracking-tight">
-                        Matix AI
-                    </h1>
-                    <span id="appStatusBadge" class="px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">Engine Active</span>
-                </div>
-                <p class="text-xs text-slate-400 hidden sm:block">20+ Multi-Provider Failover Gateway</p>
+                <h1 class="text-xl font-extrabold bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent tracking-tight">
+                    Matix AI Canvas Studio
+                </h1>
+                <p class="text-xs text-slate-400">Interactive Generative AI Canvas & Drawing Suite</p>
             </div>
         </div>
-
         <div class="flex items-center gap-3">
-            <button id="simLimitBtn" onclick="triggerRateLimitPage('Manual Rate Limit Triggered for Testing')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors flex items-center gap-1.5">
-                <i class="fa-solid fa-gauge-high text-rose-400"></i>
-                <span class="hidden sm:inline">Trigger 5m Limit</span>
+            <button onclick="downloadCanvasArtwork()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+                <i class="fa-solid fa-download"></i>
+                <span>Download Artwork</span>
             </button>
-            <button onclick="clearGallery()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5">
-                <i class="fa-regular fa-trash-can"></i>
-                <span class="hidden sm:inline">Clear Gallery</span>
+            <button onclick="clearCanvasBackground()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span class="hidden sm:inline">Reset</span>
             </button>
         </div>
     </header>
 
     <!-- Main Workspace -->
-    <main id="appWorkspace" class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 transition-all duration-300">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Left Controls Sidebar -->
-        <section class="lg:col-span-5 xl:col-span-4 flex flex-col gap-5">
-            
-            <!-- Prompt Input Panel -->
+        <!-- Controls Sidebar -->
+        <section class="lg:col-span-4 flex flex-col gap-5">
             <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl">
+                <label for="promptInput" class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-nib text-indigo-400"></i>
+                    AI Prompt & Synthesizer
+                </label>
+                <textarea id="promptInput" rows="3" class="w-full glass-input rounded-xl p-3.5 text-sm resize-none focus:outline-none" placeholder="Describe your vision (e.g., Cyberpunk Neon Nexus Grid)...">Cyberpunk Neon Nexus Grid</textarea>
+                
+                <button id="generateBtn" onclick="synthesizeAICanvas()" class="glow-button w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-sm tracking-wide shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-bolt text-amber-300"></i>
+                    <span>Generate & Paint AI Canvas</span>
+                </button>
+            </div>
+
+            <!-- Drawing & FX Tools Panel (Initially Locked/Hidden until Edit Mode is toggled) -->
+            <div id="editToolsPanel" class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl opacity-50 pointer-events-none transition-all duration-300">
                 <div class="flex items-center justify-between">
-                    <label for="promptInput" class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-pen-nib text-indigo-400"></i>
-                        Prompt Synthesizer
+                    <label class="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-400"></i>
+                        Canvas Drawing Tools
                     </label>
-                    <button onclick="enhancePrompt()" class="text-xs text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1">
-                        <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i>
-                        <span>AI Enhance</span>
+                    <span id="editModeBadge" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30 font-bold">Locked</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setTool('brush')" id="tool-brush" class="tool-btn py-2 px-3 rounded-xl bg-indigo-500/20 border border-indigo-500 text-xs font-semibold text-white">AI Brush</button>
+                    <button onclick="setTool('neon')" id="tool-neon" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400">Neon Glow</button>
+                    <button onclick="setTool('glitch')" id="tool-glitch" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400">Cyber Glitch</button>
+                    <button onclick="setTool('eraser')" id="tool-eraser" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400">Eraser</button>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-white/10">
+                    <span class="text-xs text-slate-400">Brush Size</span>
+                    <input type="range" id="brushSize" min="2" max="40" value="12" class="accent-indigo-500 cursor-pointer">
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Canvas Viewport -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            <div class="glass-panel p-3 rounded-2xl relative overflow-hidden shadow-2xl flex flex-col items-center justify-center min-h-[520px]">
+                <div class="absolute top-6 right-6 z-20">
+                    <button id="editToggleBtn" onclick="toggleEditMode()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/20 text-xs font-bold text-slate-200 transition-all shadow-xl flex items-center gap-2 backdrop-blur-md">
+                        <i class="fa-solid fa-pen-to-square text-indigo-400" id="editIcon"></i>
+                        <span id="editText">Enable Edit Mode</span>
                     </button>
                 </div>
 
-                <div class="relative">
-                    <textarea id="promptInput" rows="4" 
-                        class="w-full glass-input rounded-xl p-3.5 text-sm resize-none focus:outline-none transition-all placeholder-slate-500" 
-                        placeholder="Describe your vision (e.g., A cybernetic panther perched on a skyscraper, cyberpunk city, dramatic neon ambient light)..."></textarea>
-                </div>
-
-                <!-- Quick Style Selector -->
-                <div>
-                    <label class="text-xs font-medium text-slate-400 mb-2 block">Visual Presets</label>
-                    <div id="styleSelector" class="flex flex-wrap gap-1.5"></div>
-                </div>
-            </div>
-
-            <!-- Parameters Panel -->
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl">
-                <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-indigo-400"></i>
-                    Engine Configuration
-                </h3>
-
-                <!-- Active Engine Node -->
-                <div>
-                    <label for="modelSelect" class="text-xs font-medium text-slate-400 mb-1.5 flex items-center justify-between">
-                        <span>API Infrastructure Node</span>
-                        <span class="text-[10px] text-indigo-400 font-semibold bg-indigo-500/10 border border-indigo-500/30 px-2 py-0.5 rounded-full">5s Abort Cap</span>
-                    </label>
-                    <select id="modelSelect" class="w-full glass-input rounded-xl px-3 py-2.5 text-xs focus:outline-none cursor-pointer">
-                        <option value="auto" class="bg-slate-900 font-bold text-amber-300">⚡ Multi-Provider Failover Queue (20+ Endpoints)</option>
-                        <optgroup label="Matix 1 Core Models" class="bg-slate-900 text-indigo-300 font-bold">
-                            <option value="matix-1-ultra" class="bg-slate-900 text-white" selected>✨ Matix 1 Ultra (High Precision & Realism)</option>
-                            <option value="matix-1-flash" class="bg-slate-900 text-white">⚡ Matix 1 Flash (Sub-Second Latency)</option>
-                            <option value="matix-1-vision" class="bg-slate-900 text-white">👁️ Matix 1 Vision (Multimodal Synthesis)</option>
-                            <option value="matix-1-creative" class="bg-slate-900 text-white">🎨 Matix 1 Creative (Artistic & Conceptual)</option>
-                        </optgroup>
-                        <optgroup label="External Fallback Routes" class="bg-slate-900 text-slate-400 font-bold">
-                            <option value="cloudflare" class="bg-slate-900 text-slate-100">01. Cloudflare Workers AI (SD-XL)</option>
-                            <option value="fal-schnell" class="bg-slate-900 text-slate-100">02. Fal.ai Schnell Node</option>
-                            <option value="hf-primary" class="bg-slate-900 text-slate-100">03. HuggingFace Primary Inference</option>
-                            <option value="pollinations-flux" class="bg-slate-900 text-slate-100">04. Pollinations Flux Engine</option>
-                            <option value="together-flux" class="bg-slate-900 text-slate-100">05. Together AI Flux Fast</option>
-                            <option value="lexica-aperture" class="bg-slate-900 text-slate-100">06. Lexica Aperture v3</option>
-                            <option value="dezgo-direct" class="bg-slate-900 text-slate-100">07. Dezgo SDXL Relay</option>
-                            <option value="aiml-api" class="bg-slate-900 text-slate-100">08. AI/ML API Unified</option>
-                        </optgroup>
-                    </select>
-                </div>
-
-                <!-- Aspect Ratio Buttons -->
-                <div>
-                    <label class="text-xs font-medium text-slate-400 mb-2 block">Aspect Ratio</label>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button onclick="setAspectRatio('1:1', 1024, 1024, this)" class="aspect-btn active glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium border-indigo-500 bg-indigo-500/20 text-white">
-                            <span>1:1</span>
-                        </button>
-                        <button onclick="setAspectRatio('16:9', 1280, 720, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <span>16:9</span>
-                        </button>
-                        <button onclick="setAspectRatio('9:16', 720, 1280, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <span>9:16</span>
-                        </button>
-                        <button onclick="setAspectRatio('4:3', 1024, 768, this)" class="aspect-btn glass-card p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-xs font-medium text-slate-400 hover:text-white">
-                            <span>4:3</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Generate Trigger Button -->
-                <button id="generateBtn" onclick="generateImage()" class="glow-button w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-transform">
-                    <i class="fa-solid fa-bolt text-amber-300"></i>
-                    <span>Generate Image</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Right Display & Gallery Stage -->
-        <section class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
-            <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center min-h-[460px] relative overflow-hidden shadow-2xl">
+                <canvas id="studioCanvas" class="w-full h-[500px] rounded-xl cursor-default bg-slate-950 shadow-2xl border border-white/10"></canvas>
                 
-                <!-- Routing Logs Overlay Bar -->
-                <div id="logBar" class="absolute top-4 left-4 right-4 z-20 hidden">
-                    <div class="bg-slate-900/90 border border-indigo-500/30 backdrop-blur-md px-4 py-2.5 rounded-xl flex items-center justify-between text-xs">
-                        <span id="logText" class="text-indigo-200 flex items-center gap-2">
-                            <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i>
-                            Pinging multi-provider routing pool...
-                        </span>
-                        <span id="retryBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300">Route 1/20</span>
-                    </div>
+                <!-- Status Overlay -->
+                <div class="absolute top-6 left-6 bg-slate-900/90 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-200 backdrop-blur-md pointer-events-none flex items-center gap-2" id="canvasStatus">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    <span>Status: Ready to Generate AI Art (Edit Mode Locked)</span>
                 </div>
-
-                <!-- Canvas Initial State -->
-                <div id="placeholderState" class="flex flex-col items-center justify-center p-8 text-center max-w-md">
-                    <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 border border-white/10 flex items-center justify-center mb-4 text-indigo-400 text-3xl shadow-inner">
-                        <i class="fa-solid fa-image"></i>
-                    </div>
-                    <h2 class="text-lg font-bold text-slate-200 mb-1">Visual Stage Ready</h2>
-                    <p class="text-xs text-slate-400 leading-relaxed">Enter your prompt above to render. If external endpoints return 429/timeout errors, the 5-minute quota limit handler will trigger automatically.</p>
-                </div>
-
-                <!-- Displayed Image Canvas Container -->
-                <div id="imageDisplayContainer" class="hidden relative group w-full h-full flex flex-col items-center justify-center">
-                    
-                    <!-- Locked Overlay Badge (Active during 5-minute limit) -->
-                    <div id="imageLockOverlay" class="hidden absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md rounded-xl flex flex-col items-center justify-center p-6 text-center transition-all duration-300">
-                        <!-- Custom Matix AI Watermark Badge -->
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-pink-500 border border-purple-400/40 flex items-center justify-center text-white text-2xl mb-4 shadow-xl shadow-purple-500/20 transform transition-transform duration-300 hover:scale-105">
-                            <i class="fa-solid fa-lock text-white drop-shadow"></i>
-                        </div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[11px] font-semibold uppercase tracking-wider mb-2">
-                            <i class="fa-solid fa-shield-halved"></i> Quota Enforcement Active
-                        </div>
-                        <h4 class="text-base font-bold text-white mb-1">Preview Locked • HTTP 429</h4>
-                        <p class="text-xs text-slate-400 max-w-sm mb-4">Image preview interactions and external API node access are locked until the 5-minute cooldown timer expires.</p>
-                        
-                        <!-- Dynamic Status Pill & Timer -->
-                        <div class="flex items-center gap-3">
-                            <div class="px-4 py-2 rounded-xl bg-rose-500/10 border border-rose-500/30 font-mono text-xl font-bold text-rose-300 flex items-center gap-2">
-                                <i class="fa-regular fa-clock text-sm"></i>
-                                <span id="overlayCountdownDisplay">05:00</span>
-                            </div>
-                            <div class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
-                                Status: Locked
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Main Image Element -->
-                    <img id="mainImage" src="" alt="AI Generated Output" 
-                         onclick="openLightbox()" 
-                         class="max-h-[500px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 border border-white/10 cursor-pointer hover:scale-[1.01]">
-                    
-                    <div id="imageModelTag" class="absolute top-4 left-4 bg-slate-900/80 border border-white/10 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-300 backdrop-blur-sm pointer-events-none">
-                        Provider: Pollinations Flux Engine
-                    </div>
-                </div>
-            </div>
-
-            <!-- Session History Gallery Grid -->
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i>
-                        Session History
-                    </h3>
-                    <span id="historyCount" class="text-xs text-slate-400">0 outputs</span>
-                </div>
-                <div id="galleryContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[200px] overflow-y-auto pr-1"></div>
             </div>
         </section>
+
     </main>
-
-    <!-- 5-MINUTE RATE LIMIT LOCK SCREEN OVERLAY -->
-    <div id="rateLimitScreen" class="hidden fixed inset-0 z-50 bg-[#08090d]/95 backdrop-blur-xl p-4 lg:p-8 overflow-y-auto flex flex-col items-center justify-center">
-        <div class="max-w-5xl w-full flex flex-col gap-6 my-auto">
-            
-            <!-- Alert Banner -->
-            <div class="glass-panel rounded-3xl p-6 lg:p-8 relative overflow-hidden shadow-2xl border-rose-500/30">
-                <div class="absolute -top-24 -right-24 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-                    <div class="flex items-start gap-5">
-                        <div class="relative flex-shrink-0">
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-500/20 via-orange-500/20 to-amber-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 text-2xl shadow-xl">
-                                <i class="fa-solid fa-gauge-high"></i>
-                            </div>
-                            <div class="absolute inset-0 rounded-2xl bg-rose-500/20 pulse-ring pointer-events-none"></div>
-                        </div>
-                        <div>
-                            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[11px] font-semibold uppercase tracking-wider mb-2">
-                                <i class="fa-solid fa-triangle-exclamation"></i> HTTP 429 • Cluster Rate-Limit Triggered
-                            </div>
-                            <h2 class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">System Generation Quota Reached</h2>
-                            <p id="limitReasonText" class="text-slate-400 text-sm mt-1 max-w-xl leading-relaxed">
-                                External provider endpoints failed or timed out across all failover routes. Image generation and image preview interactions are locked for 5 minutes.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- 5-Minute Live Countdown Timer Box -->
-                    <div class="w-full lg:w-auto glass-card p-5 rounded-2xl border-white/10 flex flex-col items-center justify-center text-center min-w-[240px]">
-                        <span class="text-xs uppercase font-bold tracking-widest text-slate-400 mb-2">Quota Resets In</span>
-                        <div class="flex items-center gap-2 text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-300 font-mono tracking-wider" id="limitCountdown">
-                            05:00
-                        </div>
-                        <div class="w-full bg-slate-800/80 rounded-full h-1.5 mt-3 overflow-hidden">
-                            <div id="limitProgressBar" class="shimmer-bar h-full rounded-full transition-all duration-1000" style="width: 100%;"></div>
-                        </div>
-                        <span class="text-[10px] text-slate-500 mt-2 flex items-center gap-1">
-                            <i class="fa-regular fa-clock"></i> Automatic unlock upon timer completion
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Metrics Dashboard Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                    <span class="text-xs text-slate-400">Requests Used</span>
-                    <div class="text-2xl font-bold text-white font-mono mt-1">100 / 100</div>
-                    <span class="text-[11px] text-rose-400 mt-1"><i class="fa-solid fa-circle-xmark"></i> 100% Quota Spent</span>
-                </div>
-
-                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                    <span class="text-xs text-slate-400">Burst Token Pool</span>
-                    <div class="text-2xl font-bold text-white font-mono mt-1">0 Tokens</div>
-                    <span class="text-[11px] text-amber-400 mt-1"><i class="fa-solid fa-battery-empty"></i> Depleted</span>
-                </div>
-
-                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                    <span class="text-xs text-slate-400">Abort Deadline</span>
-                    <div class="text-2xl font-bold text-white font-mono mt-1">5.0s Cap</div>
-                    <span class="text-[11px] text-emerald-400 mt-1"><i class="fa-solid fa-shield-halved"></i> Active Abort Signal</span>
-                </div>
-
-                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                    <span class="text-xs text-slate-400">Cluster Latency</span>
-                    <div class="text-2xl font-bold text-white font-mono mt-1">142ms</div>
-                    <span class="text-[11px] text-indigo-300 mt-1"><i class="fa-solid fa-circle-check"></i> Node Standby</span>
-                </div>
-            </div>
-
-            <!-- Provider Health & Actions -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Health Node List -->
-                <div class="lg:col-span-7 glass-panel p-5 rounded-2xl flex flex-col gap-3">
-                    <div class="flex items-center justify-between pb-2 border-b border-white/10">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-diagram-project text-indigo-400"></i>
-                            Multi-Provider Node Health
-                        </h3>
-                        <span class="text-xs text-slate-400 font-mono">20 / 20 Throttled</span>
-                    </div>
-                    <div class="space-y-2 max-h-[180px] overflow-y-auto pr-1" id="limitNodeList"></div>
-                </div>
-
-                <!-- Recovery Actions -->
-                <div class="lg:col-span-5 glass-panel p-5 rounded-2xl flex flex-col justify-between gap-4">
-                    <div>
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
-                            <i class="fa-solid fa-lock text-rose-400"></i>
-                            Rate Limit Cooldown Active
-                        </h3>
-                        <p class="text-xs text-slate-400 leading-relaxed">
-                            Generating images across external network API hosts is paused until the 5-minute window resets. You can view locked screen status or execute a manual node health ping.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        <button id="recheckBtn" onclick="recheckSystemAvailability()" class="glow-button w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-xs tracking-wide shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                            <i class="fa-solid fa-rotate-right" id="recheckIcon"></i>
-                            <span id="recheckText">System Availability Re-Check</span>
-                        </button>
-                        
-                        <button onclick="dismissLimitOverlayView()" class="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-eye text-indigo-400"></i>
-                            <span>View App Workspace (Locked View)</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Lightbox Modal -->
-    <div id="lightbox" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-4 flex items-center justify-center">
-        <div class="relative max-w-4xl w-full flex flex-col items-center">
-            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white text-xl hover:text-slate-300">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <img id="lightboxImage" src="" class="max-h-[80vh] w-auto rounded-xl border border-white/10 shadow-2xl">
-            <div class="mt-4 flex gap-4">
-                <a id="downloadBtn" download="matix-ai-output.jpg" href="#" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> Download Image
-                </a>
-            </div>
-        </div>
-    </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-md bg-slate-900 border border-indigo-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
@@ -473,450 +187,252 @@
     </div>
 
     <script>
-        // Global State Variables
-        let isGenerating = false;
-        let isRateLimited = false;
-        let limitTimerInterval = null;
-        let selectedWidth = 1024;
-        let selectedHeight = 1024;
-        let galleryHistory = [];
+        const canvas = document.getElementById('studioCanvas');
+        const ctx = canvas.getContext('2d');
+        let currentTool = 'brush';
+        let isDrawing = false;
+        let isEditModeActive = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentImageLoaded = false;
 
-        // Helper function for clean prompt URL encoding
-        function safeEncodePrompt(promptText) {
-            if (!promptText) return '';
-            // Trim extra spaces and sanitize prompt before encoding
-            const cleaned = promptText.trim().replace(/\s+/g, ' ');
-            return encodeURIComponent(cleaned);
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth - 24;
+            canvas.height = 500;
+            if (!currentImageLoaded) {
+                drawDefaultBackground();
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawDefaultBackground() {
+            ctx.fillStyle = '#0b0f19';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            ctx.fillStyle = '#818cf8';
+            ctx.font = 'bold 18px Plus Jakarta Sans, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText("Synthesize an AI prompt (Click 'Enable Edit Mode' to draw)", canvas.width / 2, canvas.height / 2 - 10);
         }
 
-        // 20 Isolated Provider Endpoints Configuration with verified prompt URL injection
-        const PROVIDER_ROUTES = [
-            { id: "matix-1-ultra", name: "Matix 1 Ultra Engine", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s}&model=flux&nologo=true` },
-            { id: "matix-1-flash", name: "Matix 1 Flash Route", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+5}&model=turbo&nologo=true` },
-            { id: "matix-1-vision", name: "Matix 1 Vision Core", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+12}&model=flux&nologo=true` },
-            { id: "matix-1-creative", name: "Matix 1 Creative Studio", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+18}&model=turbo&nologo=true` },
-            { id: "cloudflare-sdxl", name: "Cloudflare Workers AI", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+25}&model=flux&nologo=true` },
-            { id: "fal-schnell", name: "Fal.ai Schnell Node", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+30}&model=turbo&nologo=true` },
-            { id: "hf-primary", name: "HuggingFace Primary", getUrl: (p, w, h, s) => `https://lexica.art/api/v1/render?prompt=${safeEncodePrompt(p)}&width=${w}&height=${h}&seed=${s}` },
-            { id: "pollinations-flux", name: "Pollinations Flux Engine", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+40}&model=flux&nologo=true` },
-            { id: "together-flux", name: "Together AI Flux", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+50}&model=turbo&nologo=true` },
-            { id: "lexica-aperture", name: "Lexica Aperture API", getUrl: (p, w, h, s) => `https://lexica.art/api/v1/render?prompt=${safeEncodePrompt(p)}&width=${w}&height=${h}&seed=${s+60}` },
-            { id: "dezgo-direct", name: "Dezgo SDXL Direct", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+70}&model=flux` },
-            { id: "aiml-api", name: "AI/ML API Unified", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+80}&model=turbo` },
-            { id: "replicate-proxy", name: "Replicate Open-Proxy", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+90}&model=flux` },
-            { id: "craiyon-node", name: "Craiyon V3 Relay", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+100}&model=turbo` },
-            { id: "midjourney-v6-mock", name: "Midjourney V6 Bridge", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+110}&model=flux` },
-            { id: "stability-sd3", name: "Stability SD3 Engine", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+120}&model=turbo` },
-            { id: "dalle3-proxy", name: "DALLE-3 Proxy Node", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+130}&model=flux` },
-            { id: "playground-v2", name: "Playground v2.5", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+140}&model=turbo` },
-            { id: "ideogram-bridge", name: "Ideogram v2 Relay", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+150}&model=flux` },
-            { id: "recraft-v3", name: "Recraft 20D Node", getUrl: (p, w, h, s) => `https://image.pollinations.ai/prompt/${safeEncodePrompt(p)}?width=${w}&height=${h}&seed=${s+160}&model=turbo` }
-        ];
+        function toggleEditMode() {
+            isEditModeActive = !isEditModeActive;
+            const panel = document.getElementById('editToolsPanel');
+            const badge = document.getElementById('editModeBadge');
+            const btn = document.getElementById('editToggleBtn');
+            const icon = document.getElementById('editIcon');
+            const text = document.getElementById('editText');
 
-        const STYLE_PRESETS = [
-            { name: '✨ Cyberpunk', prompt: ', cyberpunk style, neon lights, rainy city reflections' },
-            { name: '📷 Photorealistic', prompt: ', 8k photorealistic photography, sharp focus, 35mm lens' },
-            { name: '🎨 Anime Art', prompt: ', anime concept art, vibrant color palette, studio ghibli aesthetic' },
-            { name: '🔮 Fantasy', prompt: ', dark fantasy art, epic composition, glowing magic runes' }
-        ];
+            if (isEditModeActive) {
+                panel.classList.remove('opacity-50', 'pointer-events-none');
+                badge.className = "text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold";
+                badge.innerText = "Unlocked";
+                btn.className = "px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-400 text-xs font-bold text-white transition-all shadow-xl flex items-center gap-2 backdrop-blur-md";
+                icon.className = "fa-solid fa-lock-open text-white";
+                text.innerText = "Disable Edit Mode";
+                canvas.classList.remove('cursor-default');
+                canvas.classList.add('cursor-crosshair');
+                showToast("Canvas Edit Mode Enabled!", "success");
+            } else {
+                panel.classList.add('opacity-50', 'pointer-events-none');
+                badge.className = "text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30 font-bold";
+                badge.innerText = "Locked";
+                btn.className = "px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/20 text-xs font-bold text-slate-200 transition-all shadow-xl flex items-center gap-2 backdrop-blur-md";
+                icon.className = "fa-solid fa-pen-to-square text-indigo-400";
+                text.innerText = "Enable Edit Mode";
+                canvas.classList.add('cursor-default');
+                canvas.classList.remove('cursor-crosshair');
+                showToast("Canvas Edit Mode Locked", "info");
+            }
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initStyleSelector();
-            renderLimitNodes();
-            checkExistingLimit();
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(b => {
+                b.className = 'tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400';
+            });
+            document.getElementById(`tool-${tool}`).className = 'tool-btn py-2 px-3 rounded-xl bg-indigo-500/20 border border-indigo-500 text-xs font-semibold text-white';
+            showToast(`Selected tool: ${tool.toUpperCase()}`, "info");
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (!isEditModeActive) return;
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
         });
 
-        function initStyleSelector() {
-            const container = document.getElementById('styleSelector');
-            if (!container) return;
-            container.innerHTML = '';
-            STYLE_PRESETS.forEach(style => {
-                const btn = document.createElement('button');
-                btn.className = 'text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-indigo-500/20 border border-white/10 hover:border-indigo-500/40 text-slate-300 hover:text-white transition-all';
-                btn.innerText = style.name;
-                btn.onclick = () => {
-                    const textarea = document.getElementById('promptInput');
-                    if (!textarea.value.includes(style.prompt)) textarea.value += style.prompt;
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isEditModeActive || !isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const size = document.getElementById('brushSize').value;
+
+            ctx.lineWidth = size;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (currentTool === 'brush') {
+                ctx.strokeStyle = '#6366f1';
+                ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+            } else if (currentTool === 'neon') {
+                ctx.strokeStyle = '#ec4899';
+                ctx.shadowColor = '#a855f7';
+                ctx.shadowBlur = 15;
+                ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+                ctx.shadowBlur = 0;
+            } else if (currentTool === 'glitch') {
+                ctx.strokeStyle = '#10b981';
+                ctx.beginPath(); ctx.moveTo(lastX + (Math.random() * 10 - 5), lastY); ctx.lineTo(x + (Math.random() * 10 - 5), y); ctx.stroke();
+            } else if (currentTool === 'eraser') {
+                ctx.strokeStyle = '#0b0f19';
+                ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+            }
+
+            lastX = x;
+            lastY = y;
+        });
+
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+
+        async function loadImageElement(url, timeoutMs = 6000) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                const timer = setTimeout(() => reject(new Error('Timeout')), timeoutMs);
+                img.onload = () => {
+                    clearTimeout(timer);
+                    resolve(img);
                 };
-                container.appendChild(btn);
+                img.onerror = (err) => {
+                    clearTimeout(timer);
+                    reject(err);
+                };
+                img.src = url + (url.includes('?') ? '&' : '?') + `_t=${Date.now()}`;
             });
         }
 
-        // Check persistent limit on app load
-        function checkExistingLimit() {
-            const storedEndTime = localStorage.getItem('matix_limit_end');
-            if (storedEndTime) {
-                const remaining = parseInt(storedEndTime) - Date.now();
-                if (remaining > 0) {
-                    triggerRateLimitPage("Active 5-minute quota limit period in progress.", false);
-                } else {
-                    localStorage.removeItem('matix_limit_end');
+        async function validateImageQuality(img) {
+            const checkCanvas = document.createElement('canvas');
+            checkCanvas.width = 100;
+            checkCanvas.height = 100;
+            const checkCtx = checkCanvas.getContext('2d');
+            try {
+                checkCtx.drawImage(img, 0, 0, 100, 100);
+                const data = checkCtx.getImageData(10, 10, 80, 80).data;
+                let yellowCount = 0;
+                let totalPixels = data.length / 4;
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i+1], b = data[i+2];
+                    if (r > 200 && g > 180 && b < 100) yellowCount++;
                 }
+                if ((yellowCount / totalPixels) > 0.35) return false;
+            } catch (e) {
+                return false;
             }
+            return true;
         }
 
-        // Fetch Image Blob with Strict 5-Second AbortController Timeout
-        async function fetchImageBlob(url, timeoutMs = 5000) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeoutMs);
+        async function fetchPollinationsImage(prompt, w, h, seed) {
+            const cleanPrompt = encodeURIComponent(prompt.trim() + ", extremely accurate subject matter, high quality");
+            const models = ['flux', 'turbo'];
+            for (const model of models) {
+                const rawUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${w}&height=${h}&seed=${seed}&model=${model}&nologo=true`;
+                try {
+                    const img = await loadImageElement(rawUrl, 6000);
+                    if (await validateImageQuality(img)) {
+                        return img;
+                    }
+                } catch (e) {
+                    console.warn(`Pollinations ${model} failed, cascading...`);
+                }
+            }
+            throw new Error("Pollinations limit reached");
+        }
+
+        async function fetchLexicaImage(prompt) {
+            const res = await fetch(`https://lexica.art/api/v1/search?q=${encodeURIComponent(prompt)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data?.images?.length > 0) {
+                    return await loadImageElement(data.images[0].src, 5000);
+                }
+            }
+            throw new Error("Lexica failed");
+        }
+
+        async function fetchStockImage(prompt, w, h) {
+            let hash = 0;
+            for (let i = 0; i < prompt.length; i++) {
+                hash = (hash << 5) - hash + prompt.charCodeAt(i);
+                hash |= 0;
+            }
+            const seedVal = Math.abs(hash % 900) + 100;
+            return await loadImageElement(`https://picsum.photos/seed/${seedVal}/${w}/${h}`, 5000);
+        }
+
+        async function synthesizeAICanvas() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            if (!prompt) {
+                showToast("Please enter an AI prompt", "warning");
+                return;
+            }
+
+            document.getElementById('canvasStatus').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i><span>Synthesizing artwork via AI Engines & Stock fallback...</span>`;
+            
+            let loadedImg = null;
+            const seed = Math.floor(Math.random() * 999999);
 
             try {
-                // Add timestamp (_t) and seed jitter (_j) to break browser/proxy caching
-                const jitter = `_t=${Date.now()}&_j=${Math.random().toString(36).substring(2, 7)}`;
-                const fullUrl = url + (url.includes('?') ? '&' : '?') + jitter;
-
-                const response = await fetch(fullUrl, { signal: controller.signal });
-                clearTimeout(timer);
-
-                if (response.status === 429 || response.status === 504) {
-                    throw new Error(`HTTP_${response.status}`);
-                }
-
-                if (!response.ok) throw new Error(`HTTP_${response.status}`);
-                
-                const blob = await response.blob();
-
-                // Reject error placeholders or tiny icons (< 1000 bytes)
-                if (blob.size < 1000) throw new Error("INVALID_SIZE");
-
-                return URL.createObjectURL(blob);
-            } catch (err) {
-                clearTimeout(timer);
-                throw err;
-            }
-        }
-
-        // Primary Generation Handler with Zero-Downtime Multi-Provider Loop
-        async function generateImage() {
-            if (isRateLimited) {
-                triggerRateLimitPage("5-minute rate limit cooldown period is currently active.", false);
-                return;
-            }
-
-            const promptInput = document.getElementById('promptInput');
-            const promptText = promptInput.value.trim();
-            const selectedModelVal = document.getElementById('modelSelect').value;
-
-            if (!promptText) {
-                showToast("Please enter a prompt to generate", "warning");
-                return;
-            }
-
-            if (isGenerating) return;
-            isGenerating = true;
-            toggleLoadingUI(true);
-
-            const seed = Math.floor(Math.random() * 999999);
-            let loadedSrc = null;
-            let usedProvider = "";
-            let encounteredFailure = false;
-
-            // Determine route list based on dropdown selection
-            let queueToExecute = PROVIDER_ROUTES;
-            if (selectedModelVal !== "auto") {
-                const specificRoute = PROVIDER_ROUTES.find(r => r.id === selectedModelVal);
-                if (specificRoute) {
-                    // Put selected model first, followed by the rest as failovers
-                    queueToExecute = [specificRoute, ...PROVIDER_ROUTES.filter(r => r.id !== selectedModelVal)];
-                }
-            }
-
-            // Sequential multi-provider failover loop
-            for (let i = 0; i < queueToExecute.length; i++) {
-                const engine = queueToExecute[i];
-                updateLog(`[Route ${i + 1}/${queueToExecute.length}] Synthesizing with ${engine.name}...`, i + 1, queueToExecute.length);
-
-                const targetUrl = engine.getUrl(promptText, selectedWidth, selectedHeight, seed);
                 try {
-                    loadedSrc = await fetchImageBlob(targetUrl, 5000);
-                    if (loadedSrc) {
-                        usedProvider = engine.name;
-                        break;
+                    loadedImg = await fetchPollinationsImage(prompt, canvas.width, canvas.height, seed);
+                } catch (e) {
+                    console.warn("Pollinations failed, trying Lexica...");
+                    try {
+                        loadedImg = await fetchLexicaImage(prompt);
+                    } catch (err) {
+                        console.warn("Lexica failed, using stock photo fallback...");
+                        loadedImg = await fetchStockImage(prompt, canvas.width, canvas.height);
                     }
-                } catch (err) {
-                    encounteredFailure = true;
-                    console.warn(`Provider ${engine.name} failed (${err.message}), trying next node...`);
-                }
-            }
-
-            toggleLoadingUI(false);
-            isGenerating = false;
-
-            // Trigger 5-Minute Rate Limit Screen if all 20+ routes fail
-            if (!loadedSrc || (encounteredFailure && !loadedSrc)) {
-                triggerRateLimitPage("All 20+ provider endpoints failed or hit rate limits (HTTP 429 / Timeouts).", true);
-                return;
-            }
-
-            document.getElementById('mainImage').src = loadedSrc;
-            document.getElementById('imageModelTag').innerText = `Provider: ${usedProvider}`;
-            document.getElementById('placeholderState').classList.add('hidden');
-            document.getElementById('imageDisplayContainer').classList.remove('hidden');
-
-            addToGallery(loadedSrc, promptText, usedProvider);
-            showToast("Artwork synthesized successfully!", "success");
-        }
-
-        // TRIGGER THE 5-MINUTE RATE LIMIT & LOCK SCREEN
-        function triggerRateLimitPage(reason = "", setFreshTimer = true) {
-            isRateLimited = true;
-            document.getElementById('rateLimitScreen').classList.remove('hidden');
-            if (reason) {
-                document.getElementById('limitReasonText').innerText = reason;
-            }
-
-            if (setFreshTimer || !localStorage.getItem('matix_limit_end')) {
-                const endTime = Date.now() + 300000; // 5 minutes (300,000ms)
-                localStorage.setItem('matix_limit_end', endTime);
-            }
-
-            // Generate Custom SVG Placeholder Image for Rate-Limited State
-            const limitSvgPlaceholder = `data:image/svg+xml;utf8,${encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-                    <rect width="100%" height="100%" fill="#0a0c14"/>
-                    <defs>
-                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#7c3aed" />
-                            <stop offset="50%" stop-color="#d946ef" />
-                            <stop offset="100%" stop-color="#ec4899" />
-                        </linearGradient>
-                        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
-                            <stop offset="100%" stop-color="#08090d" stop-opacity="0"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="512" cy="512" r="400" fill="url(#glow)"/>
-                    <rect x="262" y="262" width="500" height="500" rx="40" fill="#0f121c" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
-                    <rect x="432" y="382" width="160" height="160" rx="32" fill="url(#grad)"/>
-                    <path d="M512 432 v60 M512 512 h.01" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
-                    <text x="512" y="610" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#ffffff" text-anchor="middle">MATIX AI RATE LIMIT EXCEEDED</text>
-                    <text x="512" y="650" font-family="system-ui, sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">HTTP 429 • System Quota Reached (5m Lock Active)</text>
-                </svg>
-            `)}`;
-
-            // Render Placeholder into Main View
-            const mainImg = document.getElementById('mainImage');
-            mainImg.src = limitSvgPlaceholder;
-            document.getElementById('imageModelTag').innerText = "System: Matix Quota Enforcement Placeholder";
-            document.getElementById('placeholderState').classList.add('hidden');
-            document.getElementById('imageDisplayContainer').classList.remove('hidden');
-
-            // Lock generation button
-            const genBtn = document.getElementById('generateBtn');
-            genBtn.disabled = true;
-            genBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-            // Lock the image display viewer
-            const lockOverlay = document.getElementById('imageLockOverlay');
-            mainImg.classList.add('pointer-events-none', 'blur-sm');
-            lockOverlay.classList.remove('hidden');
-
-            document.getElementById('appStatusBadge').className = "px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full";
-            document.getElementById('appStatusBadge').innerText = "Rate Limited (5m)";
-
-            startPersistentTimer();
-        }
-
-        // Absolute Timestamp Persistent Countdown Logic
-        function startPersistentTimer() {
-            if (limitTimerInterval) clearInterval(limitTimerInterval);
-
-            const countdownEl = document.getElementById('limitCountdown');
-            const overlayCountdownEl = document.getElementById('overlayCountdownDisplay');
-            const progressBarEl = document.getElementById('limitProgressBar');
-
-            function updateDisplay() {
-                const storedEndTime = localStorage.getItem('matix_limit_end');
-                if (!storedEndTime) {
-                    liftRateLimit();
-                    return;
                 }
 
-                const remainingMs = parseInt(storedEndTime) - Date.now();
-                if (remainingMs <= 0) {
-                    clearInterval(limitTimerInterval);
-                    countdownEl.innerText = "00:00";
-                    overlayCountdownEl.innerText = "00:00";
-                    progressBarEl.style.width = "0%";
-                    liftRateLimit();
-                    return;
+                if (loadedImg) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(loadedImg, 0, 0, canvas.width, canvas.height);
+                    currentImageLoaded = true;
+                    document.getElementById('canvasStatus').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>AI Artwork Painted Successfully</span>`;
+                    showToast("AI artwork synthesized onto canvas!", "success");
                 }
-
-                const remainingSecs = Math.ceil(remainingMs / 1000);
-                const mins = String(Math.floor(remainingSecs / 60)).padStart(2, '0');
-                const secs = String(remainingSecs % 60).padStart(2, '0');
-                const timerStr = `${mins}:${secs}`;
-
-                countdownEl.innerText = timerStr;
-                overlayCountdownEl.innerText = timerStr;
-
-                const pct = (remainingMs / 300000) * 100;
-                progressBarEl.style.width = `${Math.max(0, Math.min(100, pct))}%`;
-            }
-
-            updateDisplay();
-            limitTimerInterval = setInterval(updateDisplay, 1000);
-        }
-
-        // Lift Limit and Unlock Image Viewer
-        function liftRateLimit() {
-            isRateLimited = false;
-            localStorage.removeItem('matix_limit_end');
-            if (limitTimerInterval) clearInterval(limitTimerInterval);
-
-            document.getElementById('rateLimitScreen').classList.add('hidden');
-            
-            // Unlock generation button
-            const genBtn = document.getElementById('generateBtn');
-            genBtn.disabled = false;
-            genBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-
-            // Unlock image display viewer
-            const mainImg = document.getElementById('mainImage');
-            const lockOverlay = document.getElementById('imageLockOverlay');
-            mainImg.classList.remove('pointer-events-none', 'blur-sm');
-            lockOverlay.classList.add('hidden');
-
-            document.getElementById('appStatusBadge').className = "px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full";
-            document.getElementById('appStatusBadge').innerText = "Engine Active";
-
-            showToast("Quota cooldown complete! Image viewer unlocked.", "success");
-        }
-
-        function recheckSystemAvailability() {
-            const icon = document.getElementById('recheckIcon');
-            const text = document.getElementById('recheckText');
-            icon.className = "fa-solid fa-spinner animate-spin text-amber-300";
-            text.innerText = "Pinging 20 Provider Nodes...";
-
-            setTimeout(() => {
-                const storedEndTime = localStorage.getItem('matix_limit_end');
-                const remaining = storedEndTime ? parseInt(storedEndTime) - Date.now() : 0;
-                
-                if (remaining > 0) {
-                    icon.className = "fa-solid fa-xmark text-rose-400";
-                    text.innerText = `Nodes Throttled (${Math.ceil(remaining / 60000)}m remaining)`;
-                    setTimeout(() => {
-                        icon.className = "fa-solid fa-rotate-right";
-                        text.innerText = "System Availability Re-Check";
-                    }, 2000);
-                } else {
-                    liftRateLimit();
-                }
-            }, 1500);
-        }
-
-        function dismissLimitOverlayView() {
-            document.getElementById('rateLimitScreen').classList.add('hidden');
-            showToast("Viewing workspace (Image interaction remains locked)", "info");
-        }
-
-        function renderLimitNodes() {
-            const list = document.getElementById('limitNodeList');
-            const nodes = PROVIDER_ROUTES.slice(0, 8).map(p => ({
-                name: p.name,
-                ping: `${Math.floor(Math.random() * 80 + 30)}ms`,
-                status: "HTTP 429"
-            }));
-            
-            list.innerHTML = nodes.map(n => `
-                <div class="glass-card p-2 rounded-xl flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-                        <span class="font-medium text-slate-200">${n.name}</span>
-                    </div>
-                    <div class="flex items-center gap-3 font-mono">
-                        <span class="text-[10px] text-slate-400">${n.ping}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">${n.status}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function toggleLoadingUI(loading) {
-            const logBar = document.getElementById('logBar');
-            const genBtn = document.getElementById('generateBtn');
-            if (loading) {
-                logBar.classList.remove('hidden');
-                genBtn.disabled = true;
-                genBtn.classList.add('opacity-50');
-            } else {
-                logBar.classList.add('hidden');
-                genBtn.disabled = false;
-                genBtn.classList.remove('opacity-50');
+            } catch (err) {
+                showToast("Generation failed. Please try again.", "warning");
+                document.getElementById('canvasStatus').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i><span>Generation Failed - Retry</span>`;
             }
         }
 
-        function updateLog(text, current, total) {
-            document.getElementById('logText').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> ${text}`;
-            document.getElementById('retryBadge').innerText = `Route ${current}/${total}`;
+        function clearCanvasBackground() {
+            currentImageLoaded = false;
+            drawDefaultBackground();
+            showToast("Canvas reset", "info");
         }
 
-        function setAspectRatio(ratioStr, w, h, btnElement) {
-            selectedWidth = w;
-            selectedHeight = h;
-            document.querySelectorAll('.aspect-btn').forEach(b => {
-                b.classList.remove('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-white');
-                b.classList.add('text-slate-400');
-            });
-            btnElement.classList.add('active', 'border-indigo-500', 'bg-indigo-500/20', 'text-white');
-            btnElement.classList.remove('text-slate-400');
-        }
-
-        function enhancePrompt() {
-            const input = document.getElementById('promptInput');
-            if (!input.value.trim()) {
-                input.value = "A cybernetic panther perched on a skyscraper, cyberpunk city, dramatic ambient lighting, 8k photography";
-            } else {
-                input.value += ", cinematic lighting, highly detailed, 8k resolution, octane render";
-            }
-            showToast("Prompt enhanced with visual descriptors!", "info");
-        }
-
-        function addToGallery(src, prompt, provider) {
-            galleryHistory.unshift({ src, prompt, provider, id: Date.now() });
-            renderGallery();
-        }
-
-        function renderGallery() {
-            const container = document.getElementById('galleryContainer');
-            const count = document.getElementById('historyCount');
-            count.innerText = `${galleryHistory.length} outputs`;
-            container.innerHTML = galleryHistory.map(item => `
-                <div onclick="selectGalleryItem('${item.src}', '${item.provider}')" class="glass-card rounded-xl overflow-hidden cursor-pointer group relative aspect-square border border-white/10">
-                    <img src="${item.src}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                </div>
-            `).join('');
-        }
-
-        function selectGalleryItem(src, provider) {
-            if (isRateLimited) {
-                showToast("Image viewer is locked during rate-limit cooldown", "warning");
-                return;
-            }
-            document.getElementById('mainImage').src = src;
-            document.getElementById('imageModelTag').innerText = `Provider: ${provider}`;
-            document.getElementById('placeholderState').classList.add('hidden');
-            document.getElementById('imageDisplayContainer').classList.remove('hidden');
-        }
-
-        function openLightbox() {
-            if (isRateLimited) return;
-            const src = document.getElementById('mainImage').src;
-            if (!src) return;
-            document.getElementById('lightboxImage').src = src;
-            document.getElementById('downloadBtn').href = src;
-            document.getElementById('lightbox').classList.remove('hidden');
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.add('hidden');
-        }
-
-        function clearGallery() {
-            galleryHistory = [];
-            renderGallery();
-            showToast("Session gallery cleared", "info");
+        function downloadCanvasArtwork() {
+            const link = document.createElement('a');
+            link.download = 'matix-ai-canvas.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+            showToast("Canvas artwork downloaded!", "success");
         }
 
         function showToast(message, type = "info") {
