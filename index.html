@@ -1,19 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mei AI</title>
-    
-    <style>
-        body { margin: 0; padding: 0; background-color: #131314; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; height: 100vh; width: 100vw; display: flex; overflow: hidden; }
-    </style>
+    <link rel="icon" type="image/png" sizes="32x32" href=.mei.html>
 
-    <!-- Tailwind CSS -->
+    <!-- CSS Frameworks & Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -55,7 +49,7 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
+
         .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; position: relative; }
         .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
         .markdown-body pre code { background: transparent; padding: 0; color: inherit; }
@@ -83,7 +77,7 @@
         html:not(.dark) .markdown-body pre { background: #f6f8fa; color: #24292e; border-color: #e1e4e8; }
         html:not(.dark) .markdown-body code { background: #f0f3f6; color: #d73a49; }
         html:not(.dark) .markdown-body p, html:not(.dark) .markdown-body ul, html:not(.dark) .markdown-body ol { color: #1f2937; }
-        
+
         #sidebar { transition: transform 0.3s ease; }
         @media (max-width: 768px) {
             #sidebar { transform: translateX(-100%); position: fixed; z-index: 40; height: 100%; top: 0; left: 0; }
@@ -98,14 +92,17 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 h-full z-30">
-        <div class="p-4 flex items-center justify-between">
-            <button id="newChatBtn" type="button" class="w-full flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-full shadow-sm transition text-sm font-medium border border-gray-200 dark:border-gray-700/50 cursor-pointer">
+        <div class="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50">
+            <button id="newChatBtn" type="button" class="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-full shadow-sm transition text-sm font-medium border border-gray-200 dark:border-gray-700/50 cursor-pointer">
                 <i class="fa-solid fa-plus text-blue-500 dark:text-blue-400"></i> New chat
+            </button>
+            <button id="sidebarCloseMobileBtn" type="button" class="lg:hidden ml-2 p-2 text-gray-400 hover:text-gray-200 cursor-pointer" title="Back to workspace">
+                <i class="fa-solid fa-chevron-left text-lg"></i>
             </button>
         </div>
         
         <!-- Navigation Links -->
-        <div class="px-4 pb-2 space-y-1">
+        <div class="px-4 py-3 space-y-1">
             <button id="sidebarExploreBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
                 <i class="fa-solid fa-compass text-purple-400"></i> Explore Menu
             </button>
@@ -118,19 +115,25 @@
             <a href="wbots.html" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
                 <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots
             </a>
+            <a href="dumbo.html" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
+                <i class="fa-solid fa-face-smile text-amber-400"></i> Dumbo
+            </a>
+            <a href="syntax.html" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
+                <i class="fa-solid fa-code text-cyan-400"></i> Syntax
+            </a>
             <a href="about.html" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition">
                 <i class="fa-solid fa-circle-info text-pink-400"></i> About
             </a>
         </div>
 
         <div class="flex-1 overflow-y-auto p-3">
-            <div class="text-xs font-semibold text-gray-400 mb-2 px-2">Recent Chats</div>
+            <div class="text-xs font-semibold text-gray-400 mb-2 px-2 uppercase tracking-wider">Recent Chats</div>
             <ul id="historyList" class="space-y-1"></ul>
         </div>
 
         <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
             <button id="settingsOpenBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
-                <i class="fa-solid fa-cog"></i> Settings & API Keys
+                <i class="fa-solid fa-cog text-gray-400"></i> Settings & API Keys
             </button>
         </div>
     </aside>
@@ -140,9 +143,10 @@
         <!-- Top Header Navigation -->
         <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
             <div class="flex items-center gap-3">
-                <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden cursor-pointer" title="Open menu">
+                <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden cursor-pointer" title="Toggle Navigation Sidebar">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
+
                 <div class="flex items-center gap-2.5">
                     <div class="relative flex items-center justify-center">
                         <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
@@ -150,40 +154,55 @@
                     </div>
                     <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                 </div>
+
                 <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
-                    Free Keyless Open Gateway (22+ Channels)
+                    Auto (Smart Routing)
                 </span>
             </div>
             
-            <div class="flex items-center gap-2">
-                <button id="headerImageGenBtn" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-pink-700 dark:text-pink-300 bg-pink-100 hover:bg-pink-200 dark:bg-pink-950/60 dark:hover:bg-pink-900/80 border border-pink-200 dark:border-pink-800/50 transition cursor-pointer" title="Generate Images">
-                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Image AI
-                </button>
+            <div class="flex items-center gap-2 overflow-x-auto">
                 <button id="headerExploreBtn" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] transition cursor-pointer" title="Explore Tools">
                     <i class="fa-solid fa-compass text-purple-400"></i> Explore
                 </button>
-                <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center cursor-pointer" title="Clear current chat">
+                <button id="headerImageGenBtn" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-pink-700 dark:text-pink-300 bg-pink-100 hover:bg-pink-200 dark:bg-pink-950/60 dark:hover:bg-pink-900/80 border border-pink-200 dark:border-pink-800/50 transition cursor-pointer" title="Generate Images">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Image AI
+                </button>
+                <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-10 h-10 rounded-full transition flex items-center justify-center cursor-pointer" title="Clear current chat content">
                     <i class="fa-solid fa-trash-can text-lg"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Explore Mini Scroller Bar -->
-        <div id="exploreMiniBar" class="hidden bg-white/95 dark:bg-[#18181a]/95 border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 z-20 transition-all duration-300 backdrop-blur-md">
-            <div class="max-w-4xl mx-auto flex items-center gap-3 overflow-x-auto py-0.5">
-                <span class="text-xs font-semibold text-gray-400 flex-shrink-0 uppercase tracking-wider"><i class="fa-solid fa-compass mr-1 text-purple-400"></i> Quick Navigation:</span>
-                <button id="miniBarImageGenBtn" type="button" class="flex items-center gap-2 px-3.5 py-1.5 bg-pink-50 hover:bg-pink-100 dark:bg-pink-950/40 dark:hover:bg-pink-900/60 text-pink-800 dark:text-pink-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-pink-200 dark:border-pink-800/50 cursor-pointer">
-                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Pollinations Image Generator
+        <!-- Collapsible Explore Mini Scroller Bar -->
+        <div id="exploreMiniBar" class="hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden bg-white/95 dark:bg-[#18181a]/95 border-b border-gray-200 dark:border-gray-800 z-20 backdrop-blur-md">
+            <div class="max-w-4xl mx-auto flex items-center justify-between px-4 py-2.5">
+                <div class="flex items-center gap-3 overflow-x-auto py-0.5">
+                    <span class="text-xs font-semibold text-gray-400 flex-shrink-0 uppercase tracking-wider">
+                        <i class="fa-solid fa-compass mr-1 text-purple-400"></i> Quick Navigation:
+                    </span>
+                    <button id="miniBarImageGenBtn" type="button" class="flex items-center gap-2 px-3.5 py-1.5 bg-pink-50 hover:bg-pink-100 dark:bg-pink-950/40 dark:hover:bg-pink-900/60 text-pink-800 dark:text-pink-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-pink-200 dark:border-pink-800/50 cursor-pointer">
+                        <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Pollinations Image AI
+                    </button>
+                    <a href="matix.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
+                        <i class="fa-solid fa-network-wired text-emerald-400"></i> Matix
+                    </a>
+                    <a href="wbots.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
+                        <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots
+                    </a>
+                    <a href="dumbo.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
+                        <i class="fa-solid fa-face-smile text-amber-400"></i> Dumbo
+                    </a>
+                    <a href="syntax.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
+                        <i class="fa-solid fa-code text-cyan-400"></i> Syntax
+                    </a>
+                    <a href="about.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
+                        <i class="fa-solid fa-circle-info text-pink-400"></i> About Mei AI
+                    </a>
+                </div>
+                
+                <button id="closeExploreBarBtn" type="button" class="ml-2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition flex-shrink-0 cursor-pointer" title="Collapse Menu">
+                    <i class="fa-solid fa-chevron-up text-xs"></i>
                 </button>
-                <a href="matix.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-emerald-200 dark:border-emerald-800/50">
-                    <i class="fa-solid fa-network-wired text-emerald-400"></i> Matix
-                </a>
-                <a href="wbots.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
-                    <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots Explorer
-                </a>
-                <a href="about.html" class="flex items-center gap-2 px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium transition flex-shrink-0 border border-gray-200 dark:border-gray-700/50">
-                    <i class="fa-solid fa-circle-info text-pink-400"></i> About Mei AI
-                </a>
             </div>
         </div>
 
@@ -195,12 +214,24 @@
                     <div class="relative w-5 h-14 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
                 </div>
                 <h2 class="text-3xl font-medium mb-3 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Equipped with 22+ auto-rotating open-source channels, file attachments, and AI image generation.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Equipped with custom reasoning models, file attachments, and AI image generation.</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg mb-6">
+                    <button type="button" onclick="sendSuggestedPrompt('Help me brainstorm ideas for an interactive web application.')" class="p-3 bg-white dark:bg-[#1e1e20] hover:bg-gray-50 dark:hover:bg-[#282a2c] border border-gray-200 dark:border-gray-800 rounded-xl text-left transition shadow-sm text-xs text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                        <span>Brainstorm Project Ideas</span>
+                    </button>
+                    <button type="button" onclick="sendSuggestedPrompt('Write a clean JavaScript utility function for debouncing user input.')" class="p-3 bg-white dark:bg-[#1e1e20] hover:bg-gray-50 dark:hover:bg-[#282a2c] border border-gray-200 dark:border-gray-800 rounded-xl text-left transition shadow-sm text-xs text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-code text-blue-400"></i>
+                        <span>Write Code Utility</span>
+                    </button>
+                </div>
+
                 <button id="emptyStateImgBtn" type="button" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-lg transition transform hover:scale-105 cursor-pointer">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Open Image Generator Studio
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Open Image AI Studio
                 </button>
             </div>
-            <div id="messagesList" class="space-y-4"></div>
+            <div id="messagesList" class="space-y-4 max-w-4xl mx-auto"></div>
         </div>
 
         <!-- Sticky Bottom Input Area -->
@@ -217,7 +248,7 @@
                         <i class="fa-solid fa-plus"></i>
                     </button>
 
-                    <!-- Image AI Button Right Beside the + Button -->
+                    <!-- Image AI Button -->
                     <button id="imageModalBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate AI Image Studio">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                     </button>
@@ -226,26 +257,29 @@
                         id="messageInput" 
                         rows="1" 
                         placeholder="Message Mei or type /image prompt..."
-                        class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400"></textarea>
+                        class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
 
                     <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
             </div>
-            <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-3">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image <prompt></code> to make images!</p>
+            <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image &lt;prompt&gt;</code> to create images</p>
         </div>
     </main>
 
-    <!-- Pollinations Image Generation Modal Studio -->
+    <!-- Pollinations Image AI Studio Modal -->
     <div id="imageGenModal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center backdrop-blur-md">
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-xl rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4 flex flex-col max-h-[90vh]">
             <div class="p-5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
                 <div class="flex items-center gap-2">
+                    <button id="imageModalBackBtn" type="button" class="p-1 text-gray-400 hover:text-gray-200 mr-1 cursor-pointer" title="Back to Chat">
+                        <i class="fa-solid fa-arrow-left text-sm"></i>
+                    </button>
                     <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-lg"></i>
                     <h3 class="text-lg font-semibold">Pollinations AI Image Studio</h3>
                 </div>
-                <button id="closeImageGenBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button id="closeImageGenBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" title="Close"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="p-6 space-y-4 overflow-y-auto flex-1">
@@ -275,7 +309,7 @@
 
                 <!-- Preview Area -->
                 <div id="imgPreviewWrapper" class="hidden min-h-[220px] rounded-xl border border-gray-200 dark:border-gray-700/80 bg-gray-900/40 flex items-center justify-center relative overflow-hidden p-2">
-                    <img id="imgPreview" class="max-h-[320px] rounded-lg object-contain shadow-lg hidden">
+                    <img id="imgPreview" class="max-h-[320px] rounded-lg object-contain shadow-lg hidden" alt="Generated Preview">
                     <div id="imgSpinner" class="hidden flex flex-col items-center gap-3 text-pink-400 py-8">
                         <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
                         <span class="text-xs font-medium">Synthesizing image with Pollinations AI...</span>
@@ -288,6 +322,9 @@
                     <i class="fa-solid fa-share mr-1"></i> Post to Chat
                 </button>
                 <div class="flex gap-2 ml-auto">
+                    <button id="imageStudioBackFooterBtn" type="button" class="px-4 py-2.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#282a2c] rounded-xl transition cursor-pointer">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Back
+                    </button>
                     <button id="generateImgBtn" type="button" class="px-5 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition cursor-pointer flex items-center gap-2">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Image
                     </button>
@@ -296,12 +333,17 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Settings & API Keys Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4">
             <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Settings & API Configurations</h3>
-                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <div class="flex items-center gap-2">
+                    <button id="settingsBackBtn" type="button" class="p-1 text-gray-400 hover:text-gray-200 mr-1 cursor-pointer" title="Back to Chat">
+                        <i class="fa-solid fa-arrow-left text-sm"></i>
+                    </button>
+                    <h3 class="text-lg font-semibold">Settings & API Configurations</h3>
+                </div>
+                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" title="Close"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
@@ -320,9 +362,12 @@
                 <div>
                     <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Model Engine</label>
                     <select id="modelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
-                        <option value="auto">Auto (22+ Keyless Open-Source Channels)</option>
-                        <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Key Required)</option>
-                        <option value="openrouter-auto">OpenRouter Key (DeepSeek / Claude)</option>
+                        <option value="auto">Auto (Smart Routing)</option>
+                        <option value="default">Default</option>
+                        <option value="flash">Flash (Fast Response)</option>
+                        <option value="lite">Lite (Lightweight)</option>
+                        <option value="pro">Pro (High Performance)</option>
+                        <option value="think-deeper">Think Deeper (Extended Reasoning)</option>
                     </select>
                 </div>
 
@@ -339,7 +384,10 @@
                 </div>
             </div>
 
-            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-end">
+            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-between items-center">
+                <button id="settingsBackFooterBtn" type="button" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#282a2c] rounded-xl transition cursor-pointer">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Chat
+                </button>
                 <button id="saveSettingsBtn" type="button" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">Save & Done</button>
             </div>
         </div>
@@ -347,7 +395,16 @@
 
     <!-- Application JavaScript -->
     <script>
-        const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity.";
+        const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity. Be concise, precise, helpful, and polite.";
+
+        const MODEL_LABELS = {
+            'auto': 'Auto (Smart Routing)',
+            'default': 'Default Engine',
+            'flash': 'Flash (Fast Response)',
+            'lite': 'Lite (Lightweight)',
+            'pro': 'Pro (High Performance)',
+            'think-deeper': 'Think Deeper (Extended Reasoning)'
+        };
 
         let appState = {
             chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
@@ -360,7 +417,6 @@
         };
 
         let els = {};
-        let isGenerating = false;
         let activeGeneratedImgUrl = '';
         let attachedFiles = [];
 
@@ -375,6 +431,7 @@
             els = {
                 sidebar: document.getElementById('sidebar'),
                 overlay: document.getElementById('overlay'),
+                sidebarCloseMobileBtn: document.getElementById('sidebarCloseMobileBtn'),
                 historyList: document.getElementById('historyList'),
                 chatContainer: document.getElementById('chatContainer'),
                 emptyState: document.getElementById('emptyState'),
@@ -384,6 +441,11 @@
                 attachBtn: document.getElementById('attachBtn'),
                 fileInput: document.getElementById('fileInput'),
                 attachmentPreview: document.getElementById('attachmentPreview'),
+                headerExploreBtn: document.getElementById('headerExploreBtn'),
+                sidebarExploreBtn: document.getElementById('sidebarExploreBtn'),
+                exploreMiniBar: document.getElementById('exploreMiniBar'),
+                closeExploreBarBtn: document.getElementById('closeExploreBarBtn'),
+                miniBarImageGenBtn: document.getElementById('miniBarImageGenBtn'),
                 settingsModal: document.getElementById('settingsModal'),
                 modelSelect: document.getElementById('modelSelect'),
                 geminiApiKeyInput: document.getElementById('geminiApiKeyInput'),
@@ -393,19 +455,19 @@
                 themeLightBtn: document.getElementById('themeLightBtn'),
                 themeDarkBtn: document.getElementById('themeDarkBtn'),
                 closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+                settingsBackBtn: document.getElementById('settingsBackBtn'),
+                settingsBackFooterBtn: document.getElementById('settingsBackFooterBtn'),
                 saveSettingsBtn: document.getElementById('saveSettingsBtn'),
                 newChatBtn: document.getElementById('newChatBtn'),
                 settingsOpenBtn: document.getElementById('settingsOpenBtn'),
                 clearChatBtn: document.getElementById('clearChatBtn'),
                 sidebarToggleBtn: document.getElementById('sidebarToggleBtn'),
-                headerExploreBtn: document.getElementById('headerExploreBtn'),
-                sidebarExploreBtn: document.getElementById('sidebarExploreBtn'),
-                exploreMiniBar: document.getElementById('exploreMiniBar'),
                 imageGenModal: document.getElementById('imageGenModal'),
                 closeImageGenBtn: document.getElementById('closeImageGenBtn'),
+                imageModalBackBtn: document.getElementById('imageModalBackBtn'),
+                imageStudioBackFooterBtn: document.getElementById('imageStudioBackFooterBtn'),
                 imageGenOpenBtn: document.getElementById('imageGenOpenBtn'),
                 headerImageGenBtn: document.getElementById('headerImageGenBtn'),
-                miniBarImageGenBtn: document.getElementById('miniBarImageGenBtn'),
                 imageModalBtn: document.getElementById('imageModalBtn'),
                 emptyStateImgBtn: document.getElementById('emptyStateImgBtn'),
                 imgPromptInput: document.getElementById('imgPromptInput'),
@@ -419,42 +481,40 @@
             };
         }
 
-        function toggleSidebar(e) {
-            if (e) e.stopPropagation();
-            if (els.sidebar) els.sidebar.classList.toggle('open');
-            if (els.overlay && window.innerWidth < 1024) els.overlay.classList.toggle('hidden');
+        // Standard Text Execution Engine
+        async function fetchAIResponse(userPrompt) {
+            let contextPrompt = userPrompt;
+            if (attachedFiles.length > 0) {
+                const attachmentsText = attachedFiles.map(f => `[File: ${f.name}]\n${f.content}`).join('\n\n');
+                contextPrompt = `${attachmentsText}\n\nUser Query:\n${userPrompt}`;
+            }
+
+            // Adjust system instruction based on model selection
+            let systemInst = SYSTEM_PROMPT;
+            if (appState.model === 'think-deeper') {
+                systemInst += " Think through the problem step-by-step and provide detailed reasoning.";
+            } else if (appState.model === 'lite' || appState.model === 'flash') {
+                systemInst += " Be as concise and fast as possible.";
+            }
+
+            const url = `https://text.pollinations.ai/${encodeURIComponent(contextPrompt)}?system=${encodeURIComponent(systemInst)}`;
+            
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP Communication Error ${res.status}`);
+            return await res.text();
         }
 
-        function toggleExploreBar(e) {
-            if (e) e.stopPropagation();
-            if (els.exploreMiniBar) els.exploreMiniBar.classList.toggle('hidden');
+        // Image Generation Synthesis Engine
+        async function generateImage(prompt, modelType, ratio) {
+            const [width, height] = ratio.split('x');
+            const encodedPrompt = encodeURIComponent(prompt);
+            const seed = Math.floor(Math.random() * 1000000);
+
+            return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&model=${modelType}&nologo=true`;
         }
 
-        function openSettings(e) {
-            if (e) e.stopPropagation();
-            if (els.settingsModal) els.settingsModal.classList.remove('hidden');
-            if (els.modelSelect) els.modelSelect.value = appState.model;
-            if (els.geminiApiKeyInput) els.geminiApiKeyInput.value = appState.geminiApiKey;
-            if (els.openrouterApiKeyInput) els.openrouterApiKeyInput.value = appState.openrouterApiKey;
-            if (els.openrouterModelInput) els.openrouterModelInput.value = appState.openrouterModel;
-        }
-
-        function closeSettings(e) {
-            if (e) e.stopPropagation();
-            if (els.settingsModal) els.settingsModal.classList.add('hidden');
-        }
-
-        function openImageStudio(e) {
-            if (e) e.stopPropagation();
-            if (els.imageGenModal) els.imageGenModal.classList.remove('hidden');
-        }
-
-        function closeImageStudio(e) {
-            if (e) e.stopPropagation();
-            if (els.imageGenModal) els.imageGenModal.classList.add('hidden');
-        }
-
-        function setTheme(theme) {
+        // UI & Theme Management
+        function applyTheme(theme) {
             appState.theme = theme;
             localStorage.setItem('ai_theme', theme);
             if (theme === 'dark') {
@@ -464,18 +524,48 @@
             }
         }
 
+        function updateModelBadge() {
+            if (els.activeModelBadge) {
+                els.activeModelBadge.textContent = MODEL_LABELS[appState.model] || 'Auto (Smart Routing)';
+            }
+        }
+
+        function toggleExploreBar(e) {
+            if (e) e.stopPropagation();
+            const bar = els.exploreMiniBar;
+            if (!bar) return;
+
+            if (bar.classList.contains('hidden')) {
+                bar.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    bar.classList.remove('max-h-0', 'opacity-0');
+                    bar.classList.add('max-h-24', 'opacity-100');
+                });
+            } else {
+                bar.classList.remove('max-h-24', 'opacity-100');
+                bar.classList.add('max-h-0', 'opacity-0');
+                setTimeout(() => {
+                    bar.classList.add('hidden');
+                }, 300);
+            }
+        }
+
         function createNewChat() {
             const newChat = {
                 id: 'chat_' + Date.now(),
-                title: 'New conversation',
+                title: 'New Conversation',
+                timestamp: Date.now(),
                 messages: []
             };
             appState.chats.unshift(newChat);
             appState.currentChatId = newChat.id;
             saveChats();
             renderHistory();
-            renderCurrentChat();
-            if (els.sidebar && window.innerWidth < 1024) toggleSidebar();
+            renderMessages();
+        }
+
+        function getCurrentChat() {
+            return appState.chats.find(c => c.id === appState.currentChatId);
         }
 
         function saveChats() {
@@ -487,404 +577,356 @@
             els.historyList.innerHTML = '';
             appState.chats.forEach(chat => {
                 const li = document.createElement('li');
-                li.className = `group flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition ${chat.id === appState.currentChatId ? 'bg-gray-100 dark:bg-[#282a2c] font-medium text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#282a2c]/60'}`;
+                const isActive = chat.id === appState.currentChatId;
+                li.className = `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition ${isActive ? 'bg-blue-50 dark:bg-[#282a2c] text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#282a2c]'}`;
                 
-                const span = document.createElement('span');
-                span.className = 'truncate flex-1';
-                span.textContent = chat.title;
-                span.addEventListener('click', () => {
+                li.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fa-regular fa-message flex-shrink-0"></i>
+                        <span class="truncate">${chat.title}</span>
+                    </div>
+                    <button type="button" class="delete-chat-btn text-gray-400 hover:text-red-500 p-1 rounded cursor-pointer" title="Delete conversation">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+
+                li.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-chat-btn')) {
+                        e.stopPropagation();
+                        appState.chats = appState.chats.filter(c => c.id !== chat.id);
+                        if (appState.currentChatId === chat.id) {
+                            appState.currentChatId = appState.chats.length > 0 ? appState.chats[0].id : null;
+                        }
+                        saveChats();
+                        renderHistory();
+                        renderMessages();
+                        return;
+                    }
                     appState.currentChatId = chat.id;
                     renderHistory();
-                    renderCurrentChat();
-                    if (window.innerWidth < 1024) toggleSidebar();
+                    renderMessages();
+                    if (window.innerWidth < 1024) closeSidebarMobile();
                 });
 
-                const delBtn = document.createElement('button');
-                delBtn.className = 'opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition';
-                delBtn.innerHTML = '<i class="fa-solid fa-trash-can text-xs"></i>';
-                delBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    appState.chats = appState.chats.filter(c => c.id !== chat.id);
-                    if (appState.currentChatId === chat.id) {
-                        appState.currentChatId = appState.chats.length > 0 ? appState.chats[0].id : null;
-                    }
-                    saveChats();
-                    renderHistory();
-                    renderCurrentChat();
-                });
-
-                li.appendChild(span);
-                li.appendChild(delBtn);
                 els.historyList.appendChild(li);
             });
         }
 
-        function getCurrentChat() {
-            if (!appState.currentChatId && appState.chats.length > 0) {
-                appState.currentChatId = appState.chats[0].id;
-            }
-            return appState.chats.find(c => c.id === appState.currentChatId);
-        }
-
-        function renderCurrentChat() {
-            if (!els.messagesList || !els.emptyState) return;
-            els.messagesList.innerHTML = '';
+        function renderMessages() {
             const chat = getCurrentChat();
-
             if (!chat || chat.messages.length === 0) {
                 els.emptyState.classList.remove('hidden');
+                els.messagesList.innerHTML = '';
                 return;
             }
 
             els.emptyState.classList.add('hidden');
-            chat.messages.forEach(msg => appendMessageNode(msg.role, msg.content, msg.files));
-            scrollToBottom();
-        }
+            els.messagesList.innerHTML = '';
 
-        function scrollToBottom() {
-            if (els.chatContainer) {
-                els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
-            }
-        }
+            chat.messages.forEach(msg => {
+                const isUser = msg.role === 'user';
+                const div = document.createElement('div');
+                div.className = `flex gap-3 ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
 
-        function appendMessageNode(role, content, files = []) {
-            if (!els.messagesList) return;
-            els.emptyState.classList.add('hidden');
+                if (isUser) {
+                    div.innerHTML = `
+                        <div class="max-w-[85%] bg-blue-600 text-white rounded-2xl px-4 py-3 text-sm shadow-sm">
+                            ${msg.content.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                } else {
+                    const parsedContent = parseMarkdown(msg.content);
+                    div.innerHTML = `
+                        <div class="flex gap-3 max-w-[90%]">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 text-white text-xs font-bold shadow-md">
+                                Mei
+                            </div>
+                            <div class="markdown-body bg-white dark:bg-gemini-card text-gray-800 dark:text-gray-100 p-4 rounded-2xl text-sm border border-gray-200 dark:border-gray-700/60 shadow-sm flex-1 overflow-hidden">
+                                ${parsedContent}
+                            </div>
+                        </div>
+                    `;
+                }
+                els.messagesList.appendChild(div);
+            });
 
-            const wrapper = document.createElement('div');
-            wrapper.className = `message-bubble-wrapper flex gap-4 p-4 lg:p-6 mb-2 rounded-2xl ${role === 'user' ? 'bg-gray-50 dark:bg-gemini-userBubble/40 max-w-3xl mx-auto border border-gray-200/60 dark:border-gray-800/40' : 'max-w-3xl mx-auto'}`;
-
-            const avatar = document.createElement('div');
-            avatar.className = 'flex-shrink-0';
-            if (role === 'user') {
-                avatar.innerHTML = `<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold"><i class="fa-solid fa-user"></i></div>`;
-            } else {
-                avatar.innerHTML = `<div class="relative w-8 h-8 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] flex items-center justify-center text-white shadow-md"><div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] to-[#ec4899] blur-[2px] animate-bibbybit-glow"></div><div class="relative w-2.5 h-5 rounded-full bg-white shadow"></div></div>`;
-            }
-
-            const contentArea = document.createElement('div');
-            contentArea.className = 'flex-1 overflow-hidden';
-
-            if (files && files.length > 0) {
-                const fileContainer = document.createElement('div');
-                fileContainer.className = 'flex flex-wrap gap-2 mb-3';
-                files.forEach(f => {
-                    if (f.type && f.type.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = f.data;
-                        img.className = 'w-24 h-24 object-cover rounded-lg border border-gray-700';
-                        fileContainer.appendChild(img);
-                    } else {
-                        const badge = document.createElement('div');
-                        badge.className = 'px-3 py-1 bg-gray-200 dark:bg-gray-800 rounded-lg text-xs font-mono flex items-center gap-1.5';
-                        badge.innerHTML = `<i class="fa-solid fa-file-lines text-blue-400"></i> ${f.name}`;
-                        fileContainer.appendChild(badge);
-                    }
-                });
-                contentArea.appendChild(fileContainer);
-            }
-
-            const markdownBody = document.createElement('div');
-            markdownBody.className = 'markdown-body text-sm leading-relaxed';
-            if (role === 'user') {
-                markdownBody.textContent = content;
-            } else {
-                markdownBody.innerHTML = parseMarkdown(content);
-                markdownBody.querySelectorAll('pre').forEach(pre => {
-                    const btn = document.createElement('button');
-                    btn.className = 'code-copy-btn';
-                    btn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy';
-                    btn.addEventListener('click', () => {
-                        const code = pre.querySelector('code');
-                        navigator.clipboard.writeText(code ? code.innerText : pre.innerText);
-                        btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
-                        setTimeout(() => btn.innerHTML = '<i class="fa-solid fa-copy mr-1"></i> Copy', 2000);
+            // Attach Copy Event Listeners to rendered code blocks
+            document.querySelectorAll('.markdown-body pre').forEach(pre => {
+                if (!pre.querySelector('.code-copy-btn')) {
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'code-copy-btn';
+                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+                    copyBtn.addEventListener('click', () => {
+                        const code = pre.querySelector('code')?.innerText || pre.innerText;
+                        navigator.clipboard.writeText(code);
+                        copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-400"></i> Copied!';
+                        setTimeout(() => copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 2000);
                     });
-                    pre.appendChild(btn);
-                });
-            }
+                    pre.appendChild(copyBtn);
+                }
+            });
 
-            contentArea.appendChild(markdownBody);
-            wrapper.appendChild(avatar);
-            wrapper.appendChild(contentArea);
-            els.messagesList.appendChild(wrapper);
-            scrollToBottom();
-            return markdownBody;
+            els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
         }
 
         async function handleSendMessage() {
-            const text = els.messageInput ? els.messageInput.value.trim() : '';
-            if ((!text && attachedFiles.length === 0) || isGenerating) return;
+            const text = els.messageInput.value.trim();
+            if (!text && attachedFiles.length === 0) return;
 
+            if (!appState.currentChatId) createNewChat();
+            const chat = getCurrentChat();
+
+            // Set Title from first prompt
+            if (chat.messages.length === 0) {
+                chat.title = text.slice(0, 30) || 'Attached Context Chat';
+            }
+
+            // Command interceptor for /image
             if (text.startsWith('/image ')) {
                 const prompt = text.replace('/image ', '').trim();
-                if (els.imgPromptInput) els.imgPromptInput.value = prompt;
+                els.messageInput.value = '';
+                els.imgPromptInput.value = prompt;
                 openImageStudio();
-                if (els.messageInput) {
-                    els.messageInput.value = '';
-                    els.messageInput.style.height = 'auto';
-                }
                 return;
             }
 
-            if (!appState.currentChatId) {
-                createNewChat();
-            }
+            // User Message
+            chat.messages.push({ role: 'user', content: text });
+            els.messageInput.value = '';
+            els.messageInput.style.height = 'auto';
+            saveChats();
+            renderMessages();
 
-            const chat = getCurrentChat();
-            const userMsg = { role: 'user', content: text, files: [...attachedFiles] };
-            chat.messages.push(userMsg);
-            if (chat.title === 'New conversation' && text) {
-                chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
+            // Clear attachments after sending
+            attachedFiles = [];
+            renderAttachmentPreviews();
+
+            // AI Response Spinner Placeholder
+            const loadingMsgIndex = chat.messages.length;
+            chat.messages.push({ role: 'assistant', content: 'Processing prompt context...' });
+            renderMessages();
+
+            try {
+                const aiResponse = await fetchAIResponse(text);
+                chat.messages[loadingMsgIndex].content = aiResponse;
+            } catch (err) {
+                chat.messages[loadingMsgIndex].content = `⚠️ **System Error:** ${err.message}\n\nPlease check your network connection or model settings.`;
             }
 
             saveChats();
             renderHistory();
-            renderCurrentChat();
+            renderMessages();
+        }
 
-            const currentFiles = [...attachedFiles];
-            attachedFiles = [];
-            if (els.attachmentPreview) {
-                els.attachmentPreview.innerHTML = '';
+        function renderAttachmentPreviews() {
+            if (!els.attachmentPreview) return;
+            if (attachedFiles.length === 0) {
                 els.attachmentPreview.classList.add('hidden');
+                els.attachmentPreview.innerHTML = '';
+                return;
             }
-            if (els.messageInput) {
-                els.messageInput.value = '';
-                els.messageInput.style.height = 'auto';
-            }
+            els.attachmentPreview.classList.remove('hidden');
+            els.attachmentPreview.innerHTML = '';
 
-            isGenerating = true;
-            if (els.sendBtn) els.sendBtn.disabled = true;
-
-            const assistantMsgNode = appendMessageNode('assistant', 'Thinking...');
-            let fullAssistantResponse = '';
-
-            try {
-                fullAssistantResponse = await queryMultiApi(chat.messages.slice(0, -1), text, currentFiles);
-            } catch (err) {
-                fullAssistantResponse = '⚠️ Error: ' + err.message;
-            }
-
-            assistantMsgNode.innerHTML = parseMarkdown(fullAssistantResponse);
-            chat.messages.push({ role: 'assistant', content: fullAssistantResponse, files: [] });
-            saveChats();
-
-            isGenerating = false;
-            if (els.sendBtn) els.sendBtn.disabled = false;
-            renderCurrentChat();
-        }
-
-        async function queryMultiApi(history, prompt, files) {
-            let apiMessages = [
-                { role: 'system', content: SYSTEM_PROMPT },
-                ...history.map(m => ({ role: m.role, content: m.content }))
-            ];
-
-            let userContent = prompt;
-            if (files && files.length > 0) {
-                const fileDescriptions = files.map(f => `[Attached File: ${f.name}]`).join('\n');
-                userContent = fileDescriptions + '\n\n' + prompt;
-            }
-            apiMessages.push({ role: 'user', content: userContent });
-
-            if (appState.model === 'auto' || !appState.model) {
-                const res = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: apiMessages,
-                        model: 'openai',
-                        seed: Math.floor(Math.random() * 1000000)
-                    })
+            attachedFiles.forEach((file, idx) => {
+                const tag = document.createElement('div');
+                tag.className = 'flex items-center gap-1.5 px-3 py-1 bg-gray-100 dark:bg-[#282a2c] text-xs rounded-full border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300';
+                tag.innerHTML = `
+                    <i class="fa-solid fa-paperclip text-blue-400"></i>
+                    <span class="truncate max-w-[120px]">${file.name}</span>
+                    <button type="button" class="hover:text-red-400 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                tag.querySelector('button').addEventListener('click', () => {
+                    attachedFiles.splice(idx, 1);
+                    renderAttachmentPreviews();
                 });
-
-                if (!res.ok) {
-                    throw new Error(`HTTP Error ${res.status}: Open-source gateway temporary error.`);
-                }
-
-                return await res.text();
-            }
-
-            if (appState.model.includes('gemini') && appState.geminiApiKey) {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${appState.geminiApiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: apiMessages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })) })
-                });
-                if (res.status === 401) throw new Error('401 Unauthorized: Invalid Gemini API key.');
-                if (res.status === 402) throw new Error('402 Payment Required: Gemini account credits depleted.');
-                const data = await res.json();
-                return data.candidates[0].content.parts[0].text;
-            }
-
-            if (appState.model.includes('openrouter') || appState.openrouterApiKey) {
-                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${appState.openrouterApiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: appState.openrouterModel || 'deepseek/deepseek-chat',
-                        messages: apiMessages
-                    })
-                });
-                if (res.status === 401) throw new Error('401 Unauthorized: Invalid OpenRouter key.');
-                if (res.status === 402) throw new Error('402 Payment Required: OpenRouter account credits depleted.');
-                const data = await res.json();
-                return data.choices[0].message.content;
-            }
-
-            const fallbackRes = await fetch('https://text.pollinations.ai/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: apiMessages })
+                els.attachmentPreview.appendChild(tag);
             });
-            return await fallbackRes.text();
         }
 
-        async function generatePollinationsImage() {
-            const prompt = els.imgPromptInput ? els.imgPromptInput.value.trim() : '';
-            if (!prompt) return;
-
-            if (els.imgSpinner) els.imgSpinner.classList.remove('hidden');
-            if (els.imgPreview) els.imgPreview.classList.add('hidden');
-            if (els.imgPreviewWrapper) els.imgPreviewWrapper.classList.remove('hidden');
-            if (els.sendImgToChatBtn) els.sendImgToChatBtn.classList.add('hidden');
-
-            const model = els.imgModelSelect ? els.imgModelSelect.value : 'flux';
-            const ratio = els.imgRatioSelect ? els.imgRatioSelect.value.split('x') : [1024, 1024];
-            const width = ratio[0];
-            const height = ratio[1];
-
-            const encodedPrompt = encodeURIComponent(prompt);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=${model}&nologo=true`;
-
-            const imgObj = new Image();
-            imgObj.src = imageUrl;
-            imgObj.onload = () => {
-                if (els.imgSpinner) els.imgSpinner.classList.add('hidden');
-                if (els.imgPreview) {
-                    els.imgPreview.src = imageUrl;
-                    els.imgPreview.classList.remove('hidden');
-                }
-                if (els.sendImgToChatBtn) els.sendImgToChatBtn.classList.remove('hidden');
-                activeGeneratedImgUrl = imageUrl;
-            };
-            imgObj.onerror = () => {
-                if (els.imgSpinner) els.imgSpinner.classList.add('hidden');
-                alert('Failed to synthesize image.');
-            };
+        function sendSuggestedPrompt(promptText) {
+            if (els.messageInput) {
+                els.messageInput.value = promptText;
+                handleSendMessage();
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function openImageStudio() {
+            if (els.imageGenModal) els.imageGenModal.classList.remove('hidden');
+        }
+
+        function closeImageStudio() {
+            if (els.imageGenModal) els.imageGenModal.classList.add('hidden');
+        }
+
+        function openSettings() {
+            if (els.settingsModal) els.settingsModal.classList.remove('hidden');
+            if (els.modelSelect) els.modelSelect.value = appState.model;
+            if (els.geminiApiKeyInput) els.geminiApiKeyInput.value = appState.geminiApiKey;
+            if (els.openrouterApiKeyInput) els.openrouterApiKeyInput.value = appState.openrouterApiKey;
+            if (els.openrouterModelInput) els.openrouterModelInput.value = appState.openrouterModel;
+        }
+
+        function closeSettings() {
+            if (els.settingsModal) els.settingsModal.classList.add('hidden');
+        }
+
+        function closeSidebarMobile() {
+            if (els.sidebar) els.sidebar.classList.remove('open');
+            if (els.overlay) els.overlay.classList.add('hidden');
+        }
+
+        // Initialize UI Events
+        window.addEventListener('DOMContentLoaded', () => {
             cacheElements();
-            setTheme(appState.theme);
+            applyTheme(appState.theme);
+            updateModelBadge();
 
             if (appState.chats.length === 0) {
                 createNewChat();
             } else {
                 appState.currentChatId = appState.chats[0].id;
                 renderHistory();
-                renderCurrentChat();
+                renderMessages();
             }
 
-            if (els.sidebarToggleBtn) els.sidebarToggleBtn.addEventListener('click', toggleSidebar);
-            if (els.overlay) els.overlay.addEventListener('click', toggleSidebar);
-            if (els.settingsOpenBtn) els.settingsOpenBtn.addEventListener('click', openSettings);
-            if (els.closeSettingsBtn) els.closeSettingsBtn.addEventListener('click', closeSettings);
-            if (els.themeLightBtn) els.themeLightBtn.addEventListener('click', () => setTheme('light'));
-            if (els.themeDarkBtn) els.themeDarkBtn.addEventListener('click', () => setTheme('dark'));
-            
-            if (els.headerExploreBtn) els.headerExploreBtn.addEventListener('click', toggleExploreBar);
-            if (els.sidebarExploreBtn) els.sidebarExploreBtn.addEventListener('click', toggleExploreBar);
+            // Input Resizing & Keyboard Listener
+            els.messageInput.addEventListener('input', () => {
+                els.messageInput.style.height = 'auto';
+                els.messageInput.style.height = (els.messageInput.scrollHeight) + 'px';
+            });
 
-            if (els.imageGenOpenBtn) els.imageGenOpenBtn.addEventListener('click', openImageStudio);
-            if (els.headerImageGenBtn) els.headerImageGenBtn.addEventListener('click', openImageStudio);
-            if (els.miniBarImageGenBtn) els.miniBarImageGenBtn.addEventListener('click', openImageStudio);
-            if (els.imageModalBtn) els.imageModalBtn.addEventListener('click', openImageStudio);
-            if (els.emptyStateImgBtn) els.emptyStateImgBtn.addEventListener('click', openImageStudio);
-            if (els.closeImageGenBtn) els.closeImageGenBtn.addEventListener('click', closeImageStudio);
-            if (els.generateImgBtn) els.generateImgBtn.addEventListener('click', generatePollinationsImage);
-
-            if (els.newChatBtn) els.newChatBtn.addEventListener('click', createNewChat);
-            if (els.clearChatBtn) els.clearChatBtn.addEventListener('click', () => {
-                const chat = getCurrentChat();
-                if (chat) {
-                    chat.messages = [];
-                    chat.title = 'New conversation';
-                    saveChats();
-                    renderHistory();
-                    renderCurrentChat();
+            els.messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
                 }
             });
 
-            if (els.sendImgToChatBtn) {
-                els.sendImgToChatBtn.addEventListener('click', () => {
-                    if (!activeGeneratedImgUrl) return;
-                    if (!appState.currentChatId) createNewChat();
-                    const chat = getCurrentChat();
-                    const content = `![Generated Image](${activeGeneratedImgUrl})`;
-                    chat.messages.push({ role: 'assistant', content: content, files: [] });
-                    saveChats();
-                    renderCurrentChat();
-                    closeImageStudio();
-                });
-            }
+            els.sendBtn.addEventListener('click', handleSendMessage);
+            els.newChatBtn.addEventListener('click', createNewChat);
 
-            if (els.attachBtn && els.fileInput) {
-                els.attachBtn.addEventListener('click', () => els.fileInput.click());
-                els.fileInput.addEventListener('change', (e) => {
-                    const files = Array.from(e.target.files);
-                    files.forEach(file => {
-                        const reader = new FileReader();
-                        reader.onload = function(evt) {
-                            attachedFiles.push({ name: file.name, type: file.type, data: evt.target.result });
-                            if (els.attachmentPreview) {
-                                els.attachmentPreview.classList.remove('hidden');
-                                const badge = document.createElement('div');
-                                badge.className = 'px-3 py-1 bg-gray-100 dark:bg-[#282a2c] border border-gray-700 rounded-lg text-xs flex items-center gap-2';
-                                badge.innerHTML = `<i class="fa-solid fa-file text-blue-400"></i> <span class="truncate max-w-[120px]">${file.name}</span>`;
-                                els.attachmentPreview.appendChild(badge);
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    });
-                });
-            }
+            // Explore Mini Bar Toggles & Collapse Button
+            if (els.headerExploreBtn) els.headerExploreBtn.addEventListener('click', toggleExploreBar);
+            if (els.sidebarExploreBtn) els.sidebarExploreBtn.addEventListener('click', toggleExploreBar);
+            if (els.closeExploreBarBtn) els.closeExploreBarBtn.addEventListener('click', toggleExploreBar);
 
-            if (els.saveSettingsBtn) {
-                els.saveSettingsBtn.addEventListener('click', () => {
-                    appState.model = els.modelSelect ? els.modelSelect.value : 'auto';
-                    appState.geminiApiKey = els.geminiApiKeyInput ? els.geminiApiKeyInput.value.trim() : '';
-                    appState.openrouterApiKey = els.openrouterApiKeyInput ? els.openrouterApiKeyInput.value.trim() : '';
-                    appState.openrouterModel = els.openrouterModelInput ? els.openrouterModelInput.value.trim() : 'deepseek/deepseek-chat';
+            // Sidebar Controls & Overlay Back Navigation
+            els.sidebarToggleBtn.addEventListener('click', () => {
+                els.sidebar.classList.toggle('open');
+                if (window.innerWidth < 1024) els.overlay.classList.toggle('hidden');
+            });
 
+            els.overlay.addEventListener('click', closeSidebarMobile);
+            els.sidebarCloseMobileBtn.addEventListener('click', closeSidebarMobile);
+
+            // Settings Modal & Back Navigation
+            els.settingsOpenBtn.addEventListener('click', openSettings);
+            els.closeSettingsBtn.addEventListener('click', closeSettings);
+            els.settingsBackBtn.addEventListener('click', closeSettings);
+            els.settingsBackFooterBtn.addEventListener('click', closeSettings);
+
+            els.saveSettingsBtn.addEventListener('click', () => {
+                if (els.modelSelect) {
+                    appState.model = els.modelSelect.value;
                     localStorage.setItem('ai_model', appState.model);
+                    updateModelBadge();
+                }
+
+                if (els.geminiApiKeyInput) {
+                    appState.geminiApiKey = els.geminiApiKeyInput.value.trim();
                     localStorage.setItem('gemini_api_key', appState.geminiApiKey);
+                }
+
+                if (els.openrouterApiKeyInput) {
+                    appState.openrouterApiKey = els.openrouterApiKeyInput.value.trim();
                     localStorage.setItem('openrouter_api_key', appState.openrouterApiKey);
+                }
+
+                if (els.openrouterModelInput) {
+                    appState.openrouterModel = els.openrouterModelInput.value.trim();
                     localStorage.setItem('openrouter_model', appState.openrouterModel);
+                }
 
-                    if (els.activeModelBadge) {
-                        els.activeModelBadge.textContent = appState.model === 'auto' ? 'Free Keyless Open Gateway' : appState.model;
-                    }
-                    closeSettings();
-                });
-            }
+                closeSettings();
+            });
 
-            if (els.messageInput && els.sendBtn) {
-                els.messageInput.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
+            els.themeLightBtn.addEventListener('click', () => applyTheme('light'));
+            els.themeDarkBtn.addEventListener('click', () => applyTheme('dark'));
+
+            // File Attachment Handler
+            els.attachBtn.addEventListener('click', () => els.fileInput.click());
+            els.fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        attachedFiles.push({ name: file.name, content: event.target.result });
+                        renderAttachmentPreviews();
+                    };
+                    reader.readAsText(file);
                 });
-                els.messageInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }
+            });
+
+            // Image Studio & Back Navigation
+            els.headerImageGenBtn.addEventListener('click', openImageStudio);
+            els.imageGenOpenBtn.addEventListener('click', openImageStudio);
+            if (els.miniBarImageGenBtn) els.miniBarImageGenBtn.addEventListener('click', openImageStudio);
+            els.imageModalBtn.addEventListener('click', openImageStudio);
+            els.emptyStateImgBtn.addEventListener('click', openImageStudio);
+            
+            els.closeImageGenBtn.addEventListener('click', closeImageStudio);
+            els.imageModalBackBtn.addEventListener('click', closeImageStudio);
+            els.imageStudioBackFooterBtn.addEventListener('click', closeImageStudio);
+
+            els.generateImgBtn.addEventListener('click', async () => {
+                const prompt = els.imgPromptInput.value.trim();
+                if (!prompt) return;
+
+                els.imgPreviewWrapper.classList.remove('hidden');
+                els.imgPreview.classList.add('hidden');
+                els.imgSpinner.classList.remove('hidden');
+                els.sendImgToChatBtn.classList.add('hidden');
+
+                try {
+                    const imgUrl = await generateImage(prompt, els.imgModelSelect.value, els.imgRatioSelect.value);
+                    activeGeneratedImgUrl = imgUrl;
+
+                    els.imgPreview.src = imgUrl;
+                    els.imgPreview.onload = () => {
+                        els.imgSpinner.classList.add('hidden');
+                        els.imgPreview.classList.remove('hidden');
+                        els.sendImgToChatBtn.classList.remove('hidden');
+                    };
+                } catch (err) {
+                    alert("Image generation failed: " + err.message);
+                    els.imgSpinner.classList.add('hidden');
+                }
+            });
+
+            els.sendImgToChatBtn.addEventListener('click', () => {
+                if (!activeGeneratedImgUrl) return;
+                if (!appState.currentChatId) createNewChat();
+                const chat = getCurrentChat();
+
+                chat.messages.push({
+                    role: 'assistant',
+                    content: `![Generated Image Artwork](${activeGeneratedImgUrl})`
                 });
-                els.sendBtn.addEventListener('click', handleSendMessage);
-            }
+
+                saveChats();
+                renderMessages();
+                closeImageStudio();
+            });
+
+            els.clearChatBtn.addEventListener('click', () => {
+                const chat = getCurrentChat();
+                if (chat) {
+                    chat.messages = [];
+                    saveChats();
+                    renderMessages();
+                }
+            });
         });
     </script>
 </body>
