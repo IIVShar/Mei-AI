@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full dark">
 <head>
-      <link rel="icon" type="image/png" sizes="32x32" href="./syntax.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syntax - AI Coding Assistant</title>
+    <title>Syntax AI Coding Assistant</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,27 +27,39 @@
             }
         }
     </script>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter & Fira Code -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
         code, pre { font-family: 'Fira Code', monospace; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); }
+        
+        /* Light Mode Custom Styling Override */
+        html.light body { background-color: #f8fafc; color: #0f172a; }
+        html.light aside { background-color: rgba(255, 255, 255, 0.95) !important; border-color: #e2e8f0 !important; }
+        html.light header { background-color: rgba(255, 255, 255, 0.85) !important; border-color: #e2e8f0 !important; }
+        html.light main { background-color: #f8fafc !important; }
+        html.light .bg-slate-900 { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+        html.light .bg-slate-950 { background-color: #f8fafc !important; border-color: #e2e8f0 !important; }
+        html.light .text-white { color: #0f172a !important; }
+        html.light .text-slate-100 { color: #0f172a !important; }
+        html.light .text-slate-200 { color: #1e293b !important; }
+        html.light .text-slate-300 { color: #334155 !important; }
+        html.light .text-slate-400 { color: #64748b !important; }
+        html.light .border-slate-800 { border-color: #e2e8f0 !important; }
+        html.light .border-slate-700 { border-color: #cbd5e1 !important; }
     </style>
 </head>
-<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-syntax-500 selection:text-white transition-colors duration-300">
+<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-syntax-500 selection:text-white">
 
     <!-- SIDEBAR -->
     <aside id="sidebar" class="w-72 bg-slate-900/90 backdrop-blur-xl border-r border-slate-800/80 flex flex-col z-20 transition-all duration-300 -translate-x-full md:translate-x-0 absolute md:relative h-full shadow-2xl">
-        <!-- Logo & Brand -->
         <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <!-- Simple Logo SVG -->
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-syntax-500/30 text-white font-bold ring-2 ring-syntax-500/20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
@@ -56,7 +67,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-syntax-400 bg-clip-text text-transparent">Syntax</h1>
-                    <p class="text-[11px] text-slate-400 font-medium tracking-wide">AI Coding Assistant</p>
+                    <p class="text-[11px] text-slate-400 font-medium tracking-wide">AI Coding Workspace</p>
                 </div>
             </div>
             <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1 rounded-lg">
@@ -64,7 +75,6 @@
             </button>
         </div>
 
-        <!-- New Chat Button -->
         <div class="p-4">
             <button onclick="startNewChat()" class="w-full bg-syntax-600 hover:bg-syntax-500 active:scale-[0.98] text-white font-medium py-2.5 px-4 rounded-xl shadow-lg shadow-syntax-600/30 flex items-center justify-center space-x-2 transition-all duration-200 border border-syntax-500/30">
                 <i class="fa-solid fa-plus text-xs"></i>
@@ -72,24 +82,10 @@
             </button>
         </div>
 
-        <!-- Chat History List -->
         <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1.5" id="chat-history-list">
             <div class="text-[10px] font-bold text-slate-400 px-3 py-2 uppercase tracking-wider">Recent Sessions</div>
-            <div onclick="loadChat(0)" class="group flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-800/60 text-slate-200 text-sm font-medium cursor-pointer border border-slate-700/60 shadow-sm transition hover:bg-slate-800">
-                <div class="flex items-center space-x-2.5 truncate">
-                    <i class="fa-regular fa-message text-syntax-400 text-xs"></i>
-                    <span class="truncate">React Debounce Custom Hook</span>
-                </div>
-            </div>
-            <div onclick="loadChat(1)" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 text-sm font-medium cursor-pointer transition border border-transparent hover:border-slate-800">
-                <div class="flex items-center space-x-2.5 truncate">
-                    <i class="fa-regular fa-message text-slate-500 text-xs"></i>
-                    <span class="truncate">Python Async Web Scraper</span>
-                </div>
-            </div>
         </div>
 
-        <!-- Footer / Settings Trigger -->
         <div class="p-4 border-t border-slate-800/85">
             <button onclick="openSettings()" class="flex items-center space-x-3 text-slate-400 hover:text-slate-200 transition py-2 px-3 rounded-xl hover:bg-slate-800/60 w-full border border-transparent hover:border-slate-700/50">
                 <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 shadow-sm">
@@ -105,7 +101,6 @@
 
     <!-- MAIN CHAT AREA -->
     <main class="flex-1 flex flex-col h-full bg-slate-950 relative overflow-hidden">
-        <!-- Top Navigation Bar -->
         <header class="h-16 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md px-4 flex items-center justify-between z-10 shadow-sm">
             <div class="flex items-center space-x-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/50 border border-slate-700/50">
@@ -126,47 +121,42 @@
             </div>
         </header>
 
-        <!-- Message Feed & Welcome Screen -->
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 max-w-4xl mx-auto w-full">
-            <!-- Welcome State -->
             <div id="welcome-state" class="h-full flex flex-col items-center justify-center text-center py-12 px-4">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center shadow-2xl shadow-syntax-600/30 text-white mb-6 ring-4 ring-syntax-500/10">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                     </svg>
                 </div>
-                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2">Hello, I am Syntax.</h2>
-                <p class="text-slate-400 max-w-md text-sm mb-8 leading-relaxed">Your specialized AI coding assistant. Ask me for architecture advice, debug complex issues, or generate robust, tested code instantly.</p>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-2">Syntax Workspace</h2>
+                <p class="text-slate-400 max-w-md text-sm mb-8 leading-relaxed">Your intelligent coding assistant. Ask architectural questions, debug errors, or request code snippets.</p>
                 
-                <!-- Quick Suggestion Pills -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl text-left">
-                    <button onclick="sendQuickPrompt('Write a secure JWT authentication middleware in Node.js')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
-                        <span class="truncate pr-2">Node.js JWT Middleware</span>
+                    <button onclick="sendQuickPrompt('Write a Luau script for Roblox Studio data persistence')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">Roblox Luau DataStore</span>
                         <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
                     </button>
-                    <button onclick="sendQuickPrompt('Create a responsive card grid with Tailwind CSS')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
-                        <span class="truncate pr-2">Tailwind CSS Card Grid</span>
+                    <button onclick="sendQuickPrompt('Explain how glassmorphism layouts work in Tailwind CSS')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">Tailwind Glassmorphism</span>
                         <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
                     </button>
-                    <button onclick="sendQuickPrompt('Explain React useEffect cleanup function with an example')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                    <button onclick="sendQuickPrompt('Write a FastAPI Pydantic schema validation endpoint')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
+                        <span class="truncate pr-2">FastAPI Schema Route</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
+                    </button>
+                    <button onclick="sendQuickPrompt('How do I prevent memory leaks in React useEffect?')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
                         <span class="truncate pr-2">React useEffect Cleanup</span>
-                        <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
-                    </button>
-                    <button onclick="sendQuickPrompt('Write a Python script to scrape top Hacker News headlines')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-syntax-500/60 hover:bg-slate-900 transition text-sm text-slate-300 flex items-center justify-between group shadow-lg">
-                        <span class="truncate pr-2">Python Web Scraper</span>
                         <i class="fa-solid fa-arrow-right text-xs text-slate-600 group-hover:text-syntax-400 transition shrink-0"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Messages List -->
             <div id="messages-list" class="space-y-6 hidden"></div>
         </div>
 
-        <!-- Input Bar -->
         <div class="p-4 bg-slate-950 border-t border-slate-800/85 max-w-4xl mx-auto w-full">
             <div class="relative bg-slate-900/95 border border-slate-700/80 rounded-2xl shadow-2xl focus-within:border-syntax-500 focus-within:ring-2 focus-within:ring-syntax-500/20 transition">
-                <textarea id="user-input" rows="1" placeholder="Ask Syntax anything about code..." class="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm px-4 py-3.5 pr-24 focus:outline-none resize-none max-h-36" onkeydown="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+                <textarea id="user-input" rows="1" placeholder="Ask Syntax anything..." class="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm px-4 py-3.5 pr-24 focus:outline-none resize-none max-h-36" onkeydown="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
                 <div class="absolute right-2.5 bottom-2.5 flex items-center space-x-1.5">
                     <button id="send-btn" onclick="sendMessage()" class="bg-syntax-600 hover:bg-syntax-500 text-white w-9 h-9 rounded-xl flex items-center justify-center transition shadow-lg shadow-syntax-600/30 border border-syntax-400/30">
                         <i class="fa-solid fa-paper-plane text-xs"></i>
@@ -174,14 +164,14 @@
                 </div>
             </div>
             <div class="text-center mt-2">
-                <p class="text-[11px] text-slate-400">Syntax can make mistakes. Verify critical code and credentials.</p>
+                <p class="text-[11px] text-slate-400">Syntax Workspace • Powered by Endpoint Fallback Pipelines</p>
             </div>
         </div>
     </main>
 
     <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-bold text-white flex items-center space-x-2.5">
                     <div class="w-7 h-7 rounded-lg bg-syntax-600/20 flex items-center justify-center text-syntax-400">
@@ -194,41 +184,53 @@
                 </button>
             </div>
 
-            <div class="space-y-6">
-                <!-- Theme Mode Toggle -->
+            <div class="space-y-5">
                 <div>
-                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">Appearance Theme</label>
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">Appearance Theme</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setTheme('dark')" id="theme-dark-btn" class="flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm">
+                        <button onclick="setTheme('dark')" id="theme-dark-btn" class="flex items-center justify-center space-x-2 p-3 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm">
                             <i class="fa-solid fa-moon text-syntax-400"></i>
                             <span>Dark Mode</span>
                         </button>
-                        <button onclick="setTheme('light')" id="theme-light-btn" class="flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm">
+                        <button onclick="setTheme('light')" id="theme-light-btn" class="flex items-center justify-center space-x-2 p-3 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm">
                             <i class="fa-solid fa-sun text-amber-400"></i>
                             <span>Light Mode</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Model Selection (Syntax Family) -->
                 <div>
-                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">Syntax Model Family</label>
-                    <div class="space-y-2.5">
-                        <div onclick="selectModel('Syntax-Pro v3')" class="model-option flex items-center justify-between p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 cursor-pointer transition shadow-sm" data-model="Syntax-Pro v3">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">Direct Endpoint Keys</label>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-[11px] text-slate-400 block mb-1">Gemini / Google AI Studio Key</span>
+                            <input type="password" id="gemini-api-key" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:border-syntax-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <span class="text-[11px] text-slate-400 block mb-1">OpenRouter Key</span>
+                            <input type="password" id="openrouter-api-key" placeholder="sk-or-v1-..." class="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:border-syntax-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">Syntax Model Family</label>
+                    <div class="space-y-2">
+                        <div onclick="selectModel('Syntax-Pro v3')" class="model-option flex items-center justify-between p-3 rounded-2xl border border-syntax-500 bg-syntax-600/15 cursor-pointer transition shadow-sm" data-model="Syntax-Pro v3">
                             <div>
                                 <div class="text-sm font-semibold text-white">Syntax-Pro v3</div>
-                                <div class="text-xs text-slate-400">Advanced reasoning & architecture generation</div>
+                                <div class="text-xs text-slate-400">Advanced reasoning & architecture focus</div>
                             </div>
                             <i class="fa-solid fa-circle-check text-syntax-400 text-sm"></i>
                         </div>
-                        <div onclick="selectModel('Syntax-Flash v2')" class="model-option flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700" data-model="Syntax-Flash v2">
+                        <div onclick="selectModel('Syntax-Flash v2')" class="model-option flex items-center justify-between p-3 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700" data-model="Syntax-Flash v2">
                             <div>
                                 <div class="text-sm font-semibold text-white">Syntax-Flash v2</div>
-                                <div class="text-xs text-slate-400">Lightning-fast snippets & refactoring</div>
+                                <div class="text-xs text-slate-400">Fast snippets & low latency responses</div>
                             </div>
                             <i class="fa-regular fa-circle text-slate-600 text-sm"></i>
                         </div>
-                        <div onclick="selectModel('Syntax-Coder Ultra')" class="model-option flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700" data-model="Syntax-Coder Ultra">
+                        <div onclick="selectModel('Syntax-Coder Ultra')" class="model-option flex items-center justify-between p-3 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700" data-model="Syntax-Coder Ultra">
                             <div>
                                 <div class="text-sm font-semibold text-white">Syntax-Coder Ultra</div>
                                 <div class="text-xs text-slate-400">Deep debugging & full-stack context</div>
@@ -239,8 +241,8 @@
                 </div>
             </div>
 
-            <div class="mt-8 pt-4 border-t border-slate-800 flex justify-end">
-                <button onclick="closeSettings()" class="bg-syntax-600 hover:bg-syntax-500 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-syntax-600/30">Save Preferences</button>
+            <div class="mt-6 pt-4 border-t border-slate-800 flex justify-end">
+                <button onclick="saveSettings()" class="bg-syntax-600 hover:bg-syntax-500 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-syntax-600/30">Save Preferences</button>
             </div>
         </div>
     </div>
@@ -257,32 +259,24 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div class="space-y-2 max-h-64 overflow-y-auto">
-                <div onclick="loadChat(0); closeChatHistoryModal();" class="p-3 rounded-2xl bg-slate-800/60 text-slate-200 text-sm font-medium cursor-pointer border border-slate-700/50">
-                    React Debounce Custom Hook
-                </div>
-                <div onclick="loadChat(1); closeChatHistoryModal();" class="p-3 rounded-2xl hover:bg-slate-800/40 text-slate-400 text-sm font-medium cursor-pointer transition">
-                    Python Async Web Scraper
-                </div>
-            </div>
+            <div id="mobile-history-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT APP LOGIC -->
+    <!-- JAVASCRIPT APPLICATION ENGINE -->
     <script>
         let currentModel = 'Syntax-Pro v3';
         let currentTheme = 'dark';
-        let messages = [];
+        let sessions = [];
+        let activeSessionId = null;
 
-        // Define loadChat globally so onclick handlers can reference it immediately
-        window.loadChat = function(index) {
-            startNewChat();
-            if (index === 0) {
-                appendMessage('user', 'Create a React custom hook for handling debounce with TypeScript.');
-                appendMessage('assistant', 'Hello! I am Syntax, your specialized coding assistant. Here is a clean, robust TypeScript custom hook for debouncing values in React:\n\n```typescript:useDebounce.ts\nimport { useState, useEffect } from \'react\';\n\nexport function useDebounce<T>(value: T, delay: number): T {\n  const [debouncedValue, setDebouncedValue] = useState<T>(value);\n\n  useEffect(() => {\n    const handler = setTimeout(() => {\n      setDebouncedValue(value);\n    }, delay);\n\n    return () => {\n      clearTimeout(handler);\n    };\n  }, [value, delay]);\n\n  return debouncedValue;\n}\n```\n\n### Usage Example:\n```tsx:SearchComponent.tsx\nimport React, { useState } from \'react\';\nimport { useDebounce } from \'./useDebounce\';\n\nexport default function SearchComponent() {\n  const [searchTerm, setSearchTerm] = useState(\'\');\n  const debouncedSearch = useDebounce(searchTerm, 300);\n\n  return (\n    <div className="p-4">\n      <input\n        type="text"\n        value={searchTerm}\n        onChange={(e) => setSearchTerm(e.target.value)}\n        placeholder="Search..."\n        className="border px-3 py-2 rounded-xl w-full"\n      />\n      <p className="text-sm mt-2 text-slate-400">Debounced: {debouncedSearch}</p>\n    </div>\n  );\n}\n```');
+        window.onload = function() {
+            loadTheme();
+            loadSessions();
+            if (sessions.length === 0) {
+                startNewChat();
             } else {
-                appendMessage('user', 'Write a Python script to scrape top Hacker News headlines.');
-                appendMessage('assistant', 'I am Syntax, ready to assist with your Python development! Here is a lightweight script using `requests` and `BeautifulSoup` to scrape top Hacker News stories:\n\n```python:scraper.py\nimport requests\nfrom bs4 import BeautifulSoup\n\ndef get_hn_headlines():\n    url = "https://news.ycombinator.com/"\n    response = requests.get(url)\n    \n    if response.status_code != 200:\n        print("Failed to fetch page")\n        return\n\n    soup = BeautifulSoup(response.text, \'html.parser\')\n    stories = soup.select(\'.titleline > a\')\n\n    for idx, story in enumerate(stories[:10], 1):\n        print(f"{idx}. {story.text}")\n        print(f"   URL: {story[\'href\']}\\n")\n\nif __name__ == "__main__":\n    get_hn_headlines()\n```');
+                switchSession(sessions[0].id);
             }
         };
 
@@ -293,10 +287,143 @@
 
         function openSettings() {
             document.getElementById('settings-modal').classList.remove('hidden');
+            const gKey = localStorage.getItem('syntax_gemini_key') || '';
+            const oKey = localStorage.getItem('syntax_openrouter_key') || '';
+            if (document.getElementById('gemini-api-key')) document.getElementById('gemini-api-key').value = gKey;
+            if (document.getElementById('openrouter-api-key')) document.getElementById('openrouter-api-key').value = oKey;
         }
 
         function closeSettings() {
             document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function saveSettings() {
+            const gKey = document.getElementById('gemini-api-key').value.trim();
+            const oKey = document.getElementById('openrouter-api-key').value.trim();
+            localStorage.setItem('syntax_gemini_key', gKey);
+            localStorage.setItem('syntax_openrouter_key', oKey);
+            closeSettings();
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            const htmlEl = document.documentElement;
+            const darkBtn = document.getElementById('theme-dark-btn');
+            const lightBtn = document.getElementById('theme-light-btn');
+
+            if (theme === 'light') {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                if (darkBtn) { darkBtn.className = "flex items-center justify-center space-x-2 p-3 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm"; }
+                if (lightBtn) { lightBtn.className = "flex items-center justify-center space-x-2 p-3 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm"; }
+            } else {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+                if (darkBtn) { darkBtn.className = "flex items-center justify-center space-x-2 p-3 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm"; }
+                if (lightBtn) { lightBtn.className = "flex items-center justify-center space-x-2 p-3 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm"; }
+            }
+            localStorage.setItem('syntax_theme', theme);
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('syntax_theme') || 'dark';
+            setTheme(saved);
+        }
+
+        function selectModel(modelName) {
+            currentModel = modelName;
+            document.getElementById('current-model-label').innerText = modelName;
+            document.getElementById('header-model-badge').innerText = modelName;
+
+            document.querySelectorAll('.model-option').forEach(el => {
+                if (el.getAttribute('data-model') === modelName) {
+                    el.className = "model-option flex items-center justify-between p-3 rounded-2xl border border-syntax-500 bg-syntax-600/15 cursor-pointer transition shadow-sm";
+                    el.querySelector('i').className = "fa-solid fa-circle-check text-syntax-400 text-sm";
+                } else {
+                    el.className = "model-option flex items-center justify-between p-3 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700";
+                    el.querySelector('i').className = "fa-regular fa-circle text-slate-600 text-sm";
+                }
+            });
+        }
+
+        function startNewChat() {
+            const newId = 'session_' + Date.now();
+            const newSession = {
+                id: newId,
+                title: 'New Chat',
+                messages: []
+            };
+            sessions.unshift(newSession);
+            activeSessionId = newId;
+            saveSessionsToStorage();
+            renderHistoryUI();
+            resetChatView();
+        }
+
+        function switchSession(sessionId) {
+            activeSessionId = sessionId;
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+
+            const messagesList = document.getElementById('messages-list');
+            messagesList.innerHTML = '';
+
+            if (session.messages.length === 0) {
+                showWelcomeState();
+            } else {
+                hideWelcomeState();
+                session.messages.forEach(m => {
+                    if (m.role === 'user') {
+                        appendUserMessageToUI(m.content);
+                    } else {
+                        appendAssistantMessageToUI(m.content);
+                    }
+                });
+            }
+            renderHistoryUI();
+        }
+
+        function deleteSession(sessionId, event) {
+            event.stopPropagation();
+            sessions = sessions.filter(s => s.id !== sessionId);
+            saveSessionsToStorage();
+            if (activeSessionId === sessionId) {
+                if (sessions.length > 0) {
+                    switchSession(sessions[0].id);
+                } else {
+                    startNewChat();
+                }
+            } else {
+                renderHistoryUI();
+            }
+        }
+
+        function renderHistoryUI() {
+            const listEl = document.getElementById('chat-history-list');
+            const mobileListEl = document.getElementById('mobile-history-list');
+            
+            let html = '<div class="text-[10px] font-bold text-slate-400 px-3 py-2 uppercase tracking-wider">Recent Sessions</div>';
+            
+            sessions.forEach(s => {
+                const isActive = s.id === activeSessionId;
+                const activeClass = isActive ? 'bg-syntax-600/20 border-syntax-500/50 text-white font-medium' : 'border-transparent text-slate-400 hover:bg-slate-800/60 hover:text-slate-200';
+                
+                const itemHtml = `
+                    <div onclick="switchSession('${s.id}')" class="group flex items-center justify-between px-3 py-2.5 rounded-xl border ${activeClass} cursor-pointer transition text-xs">
+                        <div class="flex items-center space-x-2.5 truncate flex-1 pr-2">
+                            <i class="fa-regular fa-message text-[11px] ${isActive ? 'text-syntax-400' : 'text-slate-500'}"></i>
+                            <span class="truncate">${escapeHtml(s.title)}</span>
+                        </div>
+                        <button onclick="deleteSession('${s.id}', event)" class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 p-1 rounded transition">
+                            <i class="fa-solid fa-trash-can text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                html += itemHtml;
+            });
+
+            if (listEl) listEl.innerHTML = html;
+            if (mobileListEl) mobileListEl.innerHTML = html;
         }
 
         function openChatHistoryModal() {
@@ -307,198 +434,359 @@
             document.getElementById('history-modal').classList.add('hidden');
         }
 
-        function setTheme(theme) {
-            currentTheme = theme;
-            const html = document.documentElement;
-            const darkBtn = document.getElementById('theme-dark-btn');
-            const lightBtn = document.getElementById('theme-light-btn');
-
-            if (theme === 'dark') {
-                html.classList.add('dark');
-                html.style.colorScheme = 'dark';
-                document.body.className = "h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-syntax-500 selection:text-white transition-colors duration-300";
-                darkBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-white text-sm font-medium transition shadow-sm";
-                lightBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-slate-800 bg-slate-800/40 text-slate-400 text-sm font-medium transition shadow-sm";
-            } else {
-                html.classList.remove('dark');
-                html.style.colorScheme = 'light';
-                document.body.className = "h-full bg-slate-50 text-slate-900 flex overflow-hidden selection:bg-syntax-500 selection:text-white transition-colors duration-300";
-                lightBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 text-slate-900 text-sm font-medium transition shadow-sm";
-                darkBtn.className = "flex items-center justify-center space-x-2 p-3.5 rounded-2xl border border-slate-200 bg-slate-100 text-slate-600 text-sm font-medium transition shadow-sm";
-            }
+        function showWelcomeState() {
+            document.getElementById('welcome-state').classList.remove('hidden');
+            document.getElementById('messages-list').classList.add('hidden');
         }
 
-        function selectModel(modelName) {
-            currentModel = modelName;
-            document.getElementById('current-model-label').textContent = modelName;
-            document.getElementById('header-model-badge').textContent = modelName;
-
-            document.querySelectorAll('.model-option').forEach(opt => {
-                if (opt.getAttribute('data-model') === modelName) {
-                    opt.className = "model-option flex items-center justify-between p-3.5 rounded-2xl border border-syntax-500 bg-syntax-600/15 cursor-pointer transition shadow-sm";
-                    opt.querySelector('i').className = "fa-solid fa-circle-check text-syntax-400 text-sm";
-                } else {
-                    opt.className = "model-option flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900/50 cursor-pointer transition shadow-sm hover:border-slate-700";
-                    opt.querySelector('i').className = "fa-regular fa-circle text-slate-600 text-sm";
-                }
-            });
+        function hideWelcomeState() {
+            document.getElementById('welcome-state').classList.add('hidden');
+            document.getElementById('messages-list').classList.remove('hidden');
         }
 
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight, 144) + 'px';
+        function resetChatView() {
+            showWelcomeState();
+            document.getElementById('messages-list').innerHTML = '';
         }
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
+        function sendQuickPrompt(promptText) {
+            document.getElementById('user-input').value = promptText;
+            sendMessage();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
             }
         }
 
-        function sendQuickPrompt(text) {
-            document.getElementById('user-input').value = text;
-            sendMessage();
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 140) + 'px';
         }
 
-        function startNewChat() {
-            messages = [];
-            document.getElementById('welcome-state').classList.remove('hidden');
-            document.getElementById('messages-list').classList.add('hidden');
-            document.getElementById('messages-list').innerHTML = '';
+        async function sendMessage() {
+            const inputEl = document.getElementById('user-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            inputEl.value = '';
+            autoResize(inputEl);
+
+            const currentSession = sessions.find(s => s.id === activeSessionId);
+            if (currentSession) {
+                currentSession.messages.push({ role: 'user', content: prompt });
+                if (currentSession.title === 'New Chat') {
+                    currentSession.title = prompt.length > 25 ? prompt.substring(0, 25) + '...' : prompt;
+                }
+                saveSessionsToStorage();
+            }
+
+            hideWelcomeState();
+            appendUserMessageToUI(prompt);
+            renderHistoryUI();
+            showThinkingIndicator();
+
+            let assistantResponse = "";
+            try {
+                assistantResponse = await callAIEndpoint(prompt, currentSession ? currentSession.messages : []);
+            } catch (err) {
+                console.warn('Endpoint failed, falling back to local generator:', err);
+                assistantResponse = generateSmartConversationalResponse(prompt, currentModel);
+            }
+
+            removeThinkingIndicator();
+
+            if (currentSession) {
+                currentSession.messages.push({ role: 'assistant', content: assistantResponse });
+                saveSessionsToStorage();
+            }
+
+            await streamAssistantResponse(assistantResponse);
         }
 
-        function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+        async function callAIEndpoint(prompt, history) {
+            const geminiKey = localStorage.getItem('syntax_gemini_key') || '';
+            const openrouterKey = localStorage.getItem('syntax_openrouter_key') || '';
 
-            document.getElementById('welcome-state').classList.add('hidden');
-            const messagesList = document.getElementById('messages-list');
-            messagesList.classList.remove('hidden');
+            // 1. Try Gemini API
+            if (geminiKey) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: history.map(m => ({
+                                role: m.role === 'assistant' ? 'model' : 'user',
+                                parts: [{ text: m.content }]
+                            }))
+                        })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) return text;
+                    }
+                } catch(e) {
+                    console.debug('Gemini call failed');
+                }
+            }
 
-            appendMessage('user', text);
-            input.value = '';
-            input.style.height = 'auto';
+            // 2. Try Pollinations AI Endpoint
+            try {
+                const encodedPrompt = encodeURIComponent(prompt);
+                const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}`);
+                if (res.ok) {
+                    const text = await res.text();
+                    if (text && text.length > 3 && !text.includes('Error')) {
+                        return text;
+                    }
+                }
+            } catch(e) {
+                console.debug('Pollinations call failed');
+            }
 
-            // Simulate AI response
-            setTimeout(() => {
-                let simulatedResponse = generateSimulatedResponse(text);
-                appendMessage('assistant', simulatedResponse);
-            }, 600);
+            // 3. Try OpenRouter API
+            if (openrouterKey) {
+                try {
+                    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${openrouterKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: 'google/gemma-2-9b-it:free',
+                            messages: history.map(m => ({ role: m.role, content: m.content }))
+                        })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const text = data?.choices?.[0]?.message?.content;
+                        if (text) return text;
+                    }
+                } catch(e) {
+                    console.debug('OpenRouter call failed');
+                }
+            }
+
+            // 4. Local Fallback Generator
+            return generateSmartConversationalResponse(prompt, currentModel);
         }
 
-        function appendMessage(role, content) {
-            messages.push({ role, content });
+        function generateSmartConversationalResponse(query, model) {
+            const q = query.toLowerCase();
+            if (q.includes('roblox') || q.includes('luau') || q.includes('datastore')) {
+                return `When handling Roblox DataStore persistence in Luau, wrap your calls in \`pcall()\` to handle network failures gracefully:\n\n\`\`\`lua:DataStoreService.lua\nlocal DataStoreService = game:GetService("DataStoreService")\nlocal playerCoinsStore = DataStoreService:GetDataStore("PlayerCoins_v1")\n\nlocal function saveData(player)\n    local key = "Player_" .. player.UserId\n    local dataToSave = player.leaderstats.Coins.Value\n    \n    local success, err = pcall(function()\n        playerCoinsStore:SetAsync(key, dataToSave)\n    end)\n    \n    if not success then\n        warn("Failed to save data: " .. tostring(err))\n    end\nend\n\`\`\``;
+            }
+            if (q.includes('react') || q.includes('hook') || q.includes('state')) {
+                return `In React, managing asynchronous effects cleanly requires cleanup handlers to prevent state updates on unmounted components:\n\n\`\`\`javascript:useFetch.jsx\nimport { useState, useEffect } from 'react';\n\nexport function useFetch(url) {\n    const [data, setData] = useState(null);\n    const [loading, setLoading] = useState(true);\n\n    useEffect(() => {\n        const controller = new AbortController();\n        \n        fetch(url, { signal: controller.signal })\n            .then(res => res.json())\n            .then(data => { setData(data); setLoading(false); })\n            .catch(err => {\n                if (err.name !== 'AbortError') setLoading(false);\n            });\n            \n        return () => controller.abort();\n    }, [url]);\n\n    return { data, loading };\n}\n\`\`\``;
+            }
+            return `That is a great point regarding software architecture and code maintainability. Depending on your tech stack and performance budget, we can structure this to be modular and scalable. Let me know what specific framework or language you are targeting, and we can write the precise implementation!`;
+        }
+
+        function appendUserMessageToUI(text) {
             const messagesList = document.getElementById('messages-list');
             const messageDiv = document.createElement('div');
-
-            if (role === 'user') {
-                messageDiv.className = "flex justify-end";
-                messageDiv.innerHTML = `
-                    <div class="max-w-2xl bg-syntax-600 text-white rounded-3xl rounded-tr-sm px-5 py-3.5 text-sm shadow-md leading-relaxed">
-                        ${escapeHtml(content)}
-                    </div>
-                `;
-            } else {
-                messageDiv.className = "flex justify-start space-x-3.5";
-                messageDiv.innerHTML = `
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center text-white shrink-0 shadow-lg">
-                        <i class="fa-solid fa-code text-xs"></i>
-                    </div>
-                    <div class="max-w-3xl flex-1 bg-slate-900/95 border border-slate-800 rounded-3xl rounded-tl-sm p-5 md:p-6 text-sm shadow-xl leading-relaxed text-slate-200 overflow-hidden">
-                        ${formatMarkdown(content)}
-                    </div>
-                `;
-            }
-
+            messageDiv.className = "flex justify-end space-x-3.5";
+            messageDiv.innerHTML = `
+                <div class="max-w-3xl flex-1 bg-syntax-600/15 border border-syntax-500/30 rounded-3xl rounded-tr-sm p-5 md:p-6 text-sm shadow-xl leading-relaxed text-slate-100">
+                    ${escapeHtml(text)}
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0 shadow-lg">
+                    <i class="fa-solid fa-user text-xs"></i>
+                </div>
+            `;
             messagesList.appendChild(messageDiv);
-            const chatContainer = document.getElementById('chat-container');
-            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+            scrollToBottom();
         }
 
-        function generateSimulatedResponse(query) {
-            const q = query.toLowerCase();
-            if (q.includes('node') || q.includes('jwt') || q.includes('middleware')) {
-                return 'I am Syntax. Here is a secure JWT authentication middleware setup for Node.js using Express, built according to best practices:\n\n```javascript:authMiddleware.js\nconst jwt = require(\'jsonwebtoken\');\n\nfunction verifyToken(req, res, next) {\n  const authHeader = req.headers[\'authorization\'];\n  const token = authHeader && authHeader.split(\' \')[1];\n\n  if (!token) {\n    return res.status(401).json({ error: \'Access token missing or malformed\' });\n  }\n\n  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {\n    if (err) {\n      return res.status(403).json({ error: \'Invalid or expired token\' });\n    }\n    req.user = user;\n    next();\n  });\n}\n\nmodule.exports = verifyToken;\n```';
-            } else if (q.includes('tailwind') || q.includes('card') || q.includes('grid')) {
-                return 'I am Syntax. Here is a modern responsive card grid layout built with Tailwind CSS:\n\n```html:CardGrid.html\n<div class=\"max-w-6xl mx-auto px-4 py-8\">\n  <div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\">\n    <div class=\"bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl hover:border-syntax-500/50 transition\">\n      <div class=\"w-10 h-10 rounded-xl bg-syntax-600/20 text-syntax-400 flex items-center justify-center mb-4\">\n        <i class=\"fa-solid fa-bolt\"></i>\n      </div>\n      <h3 class=\"text-lg font-bold text-white mb-2\">High Performance</h3>\n      <p class=\"text-slate-400 text-sm\">Optimized for lightning speed and seamless execution.</p>\n    </div>\n  </div>\n</div>\n```';
-            } else {
-                return 'I am Syntax, your dedicated AI coding assistant powered by ' + currentModel + '. Here is the optimal code solution for your request:\n\n```javascript:solution.js\n// Optimized solution generated by Syntax\nfunction executeWorkflow() {\n  console.log("Syntax execution initialized...");\n  return {\n    status: "success",\n    assistant: "Syntax",\n    model: "' + currentModel + '",\n    timestamp: Date.now()\n  };\n}\n\nexecuteWorkflow();\n```\n\nLet me know if you would like unit tests or further refactoring!';
+        function appendAssistantMessageToUI(text) {
+            const messagesList = document.getElementById('messages-list');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = "flex justify-start space-x-3.5";
+            messageDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center text-white shrink-0 shadow-lg">
+                    <i class="fa-solid fa-code text-xs"></i>
+                </div>
+                <div class="max-w-3xl flex-1 bg-slate-900/95 border border-slate-800 rounded-3xl rounded-tl-sm p-5 md:p-6 text-sm shadow-xl leading-relaxed text-slate-200 overflow-hidden">
+                    ${formatMarkdown(text)}
+                </div>
+            `;
+            messagesList.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function showThinkingIndicator() {
+            const messagesList = document.getElementById('messages-list');
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'thinking-indicator';
+            indicatorDiv.className = "flex justify-start space-x-3.5";
+            indicatorDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center text-white shrink-0 shadow-lg">
+                    <i class="fa-solid fa-code text-xs"></i>
+                </div>
+                <div class="bg-slate-900/95 border border-slate-800 rounded-3xl rounded-tl-sm p-4 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-syntax-400 animate-bounce"></span>
+                    <span class="w-2 h-2 rounded-full bg-syntax-400 animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-2 h-2 rounded-full bg-syntax-400 animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+            `;
+            messagesList.appendChild(indicatorDiv);
+            scrollToBottom();
+        }
+
+        function removeThinkingIndicator() {
+            const indicator = document.getElementById('thinking-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        async function streamAssistantResponse(fullText) {
+            const messagesList = document.getElementById('messages-list');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = "flex justify-start space-x-3.5";
+            
+            const contentDivId = 'stream-' + Date.now();
+            messageDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-syntax-600 to-indigo-400 flex items-center justify-center text-white shrink-0 shadow-lg">
+                    <i class="fa-solid fa-code text-xs"></i>
+                </div>
+                <div id="${contentDivId}" class="max-w-3xl flex-1 bg-slate-900/95 border border-slate-800 rounded-3xl rounded-tl-sm p-5 md:p-6 text-sm shadow-xl leading-relaxed text-slate-200 overflow-hidden">
+                </div>
+            `;
+            messagesList.appendChild(messageDiv);
+
+            const container = document.getElementById(contentDivId);
+            if (!container) return;
+
+            const chunkSize = Math.max(1, Math.floor(fullText.length / 45));
+            let currentIndex = 0;
+
+            while (currentIndex < fullText.length) {
+                currentIndex = Math.min(currentIndex + chunkSize, fullText.length);
+                const currentChunk = fullText.substring(0, currentIndex);
+                container.innerHTML = formatMarkdown(currentChunk);
+                scrollToBottom();
+                await new Promise(res => setTimeout(res, 12));
             }
-        }
 
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            container.innerHTML = formatMarkdown(fullText);
+            scrollToBottom();
         }
 
         function formatMarkdown(text) {
-            let formatted = escapeHtml(text);
+            if (!text) return '';
+            let escaped = escapeHtml(text);
 
-            // Replace ```lang:filename code ```
-            formatted = formatted.replace(/```([a-zA-Z0-9_-]+):([^\n]+)\n([\s\S]*?)```/g, (match, lang, filename, code) => {
-                const cleanCode = code.trim();
-                const codeId = 'code-' + Math.random().toString(36).substring(2, 9);
+            // Parse Code Blocks: ```lang:filename\n...```
+            escaped = escaped.replace(/```([a-zA-Z0-9_-]+):([^\n]+)\n([\s\S]*?)```/g, (match, lang, filename, code) => {
+                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
                 return `
-                    <div class="my-4 rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-xl">
-                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 text-xs">
+                    <div class="my-4 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
+                        <div class="bg-slate-900/90 px-4 py-2.5 flex items-center justify-between border-b border-slate-800 text-xs">
                             <div class="flex items-center space-x-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-syntax-500 inline-block"></span>
-                                <span class="font-mono font-medium text-slate-300">${filename}</span>
+                                <span class="font-mono text-slate-300 font-medium">${filename.trim()}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono uppercase">${lang}</span>
                             </div>
-                            <button onclick="copyCode('${codeId}')" class="flex items-center space-x-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-xl transition shadow-sm">
-                                <i class="fa-regular fa-copy text-xs"></i>
-                                <span id="${codeId}-btn-text">Copy</span>
+                            <button onclick="copyCode('${codeId}', this)" class="flex items-center space-x-1.5 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 px-2.5 py-1 rounded-lg transition">
+                                <i class="fa-regular fa-copy text-[11px]"></i>
+                                <span>Copy</span>
                             </button>
                         </div>
-                        <pre class="p-4 overflow-x-auto text-xs md:text-sm text-slate-200 leading-relaxed"><code id="${codeId}">${cleanCode}</code></pre>
+                        <pre class="p-4 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed"><code id="${codeId}">${code}</code></pre>
                     </div>
                 `;
             });
 
-            // Replace standard ```lang code ```
-            formatted = formatted.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-                const cleanCode = code.trim();
-                const codeId = 'code-' + Math.random().toString(36).substring(2, 9);
+            // Parse Generic Code Blocks: ```lang\n...```
+            escaped = escaped.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
                 return `
-                    <div class="my-4 rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-xl">
-                        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 text-xs">
-                            <span class="font-mono font-medium text-slate-400">${lang || 'code'}</span>
-                            <button onclick="copyCode('${codeId}')" class="flex items-center space-x-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-xl transition shadow-sm">
-                                <i class="fa-regular fa-copy text-xs"></i>
-                                <span id="${codeId}-btn-text">Copy</span>
+                    <div class="my-4 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-2xl">
+                        <div class="bg-slate-900/90 px-4 py-2.5 flex items-center justify-between border-b border-slate-800 text-xs">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-syntax-500 inline-block"></span>
+                                <span class="font-mono text-slate-300 font-medium">${lang || 'code'}</span>
+                            </div>
+                            <button onclick="copyCode('${codeId}', this)" class="flex items-center space-x-1.5 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 px-2.5 py-1 rounded-lg transition">
+                                <i class="fa-regular fa-copy text-[11px]"></i>
+                                <span>Copy</span>
                             </button>
                         </div>
-                        <pre class="p-4 overflow-x-auto text-xs md:text-sm text-slate-200 leading-relaxed"><code id="${codeId}">${cleanCode}</code></pre>
+                        <pre class="p-4 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed"><code id="${codeId}">${code}</code></pre>
                     </div>
                 `;
             });
 
-            // Headings
-            formatted = formatted.replace(/### (.*?)\n/g, '<h4 class="text-base font-bold text-white mt-4 mb-2">$1</h4>');
-            formatted = formatted.replace(/## (.*?)\n/g, '<h3 class="text-lg font-bold text-white mt-5 mb-2">$1</h3>');
+            // Inline Code
+            escaped = escaped.replace(/`([^`]+)`/g, '<code class="bg-slate-950 text-syntax-300 px-1.5 py-0.5 rounded text-xs font-mono border border-slate-800">$1</code>');
+
+            // Bold & Italics
+            escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+            escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="italic text-slate-300">$1</em>');
 
             // Line breaks
-            formatted = formatted.replace(/\n/g, '<br>');
-            return formatted;
+            escaped = escaped.replace(/\n/g, '<br>');
+
+            return escaped;
         }
 
-        function copyCode(codeId) {
-            const codeElement = document.getElementById(codeId);
-            const btnText = document.getElementById(codeId + '-btn-text');
-            const textToCopy = codeElement.innerText;
+        function copyCode(elementId, btnElement) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.innerText;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                if (btnElement) {
+                    btnElement.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i><span>Copied!</span>';
+                    setTimeout(() => {
+                        btnElement.innerHTML = '<i class="fa-regular fa-copy"></i><span>Copy</span>';
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Failed to copy text', err);
+            }
+            document.body.removeChild(textarea);
+        }
 
-            const tempInput = document.createElement('textarea');
-            tempInput.value = textToCopy;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
+        function scrollToBottom() {
+            const container = document.getElementById('chat-container');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
 
-            btnText.innerText = 'Copied!';
-            setTimeout(() => {
-                btnText.innerText = 'Copy';
-            }, 2000);
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function loadSessions() {
+            const saved = localStorage.getItem('syntax_sessions');
+            if (saved) {
+                try {
+                    sessions = JSON.parse(saved);
+                } catch(e) {
+                    sessions = [];
+                }
+            }
+            renderHistoryUI();
+        }
+
+        function saveSessionsToStorage() {
+            localStorage.setItem('syntax_sessions', JSON.stringify(sessions));
         }
     </script>
 </body>
