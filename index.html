@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI</title>
-    <link rel="icon" type="image/png" sizes="32x32" href=".mei.png">
+    <title>Mei AI Workspace</title>
+    <link rel="icon" type="image/png" sizes="32x32" href=".mei.html">
 
     <!-- CSS Frameworks & Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -372,8 +372,13 @@
 
                 <div class="space-y-4 pt-2 border-t border-gray-200 dark:border-gray-800">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Custom API Key (Optional)</label>
-                        <input type="password" id="geminiApiKeyInput" placeholder="sk-or-... or AIzaSy..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Google Gemini API Key (Optional)</label>
+                        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">OpenRouter API Key & Model (Optional)</label>
+                        <input type="password" id="openrouterApiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono mb-2">
+                        <input type="text" id="openrouterModelInput" placeholder="deepseek/deepseek-chat" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
                     </div>
                 </div>
             </div>
@@ -405,7 +410,9 @@
             currentChatId: null,
             theme: localStorage.getItem('ai_theme') || 'dark',
             model: localStorage.getItem('ai_model') || 'auto',
-            apiKey: localStorage.getItem('ai_api_key') || '',
+            geminiApiKey: localStorage.getItem('gemini_api_key') || '',
+            openrouterApiKey: localStorage.getItem('openrouter_api_key') || '',
+            openrouterModel: localStorage.getItem('openrouter_model') || 'deepseek/deepseek-chat',
             attachments: []
         };
 
@@ -444,6 +451,8 @@
         const themeDarkBtn = document.getElementById('themeDarkBtn');
         const modelSelect = document.getElementById('modelSelect');
         const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
+        const openrouterApiKeyInput = document.getElementById('openrouterApiKeyInput');
+        const openrouterModelInput = document.getElementById('openrouterModelInput');
 
         // Image Gen Modal
         const imageGenModal = document.getElementById('imageGenModal');
@@ -567,7 +576,9 @@
             setTheme(appState.theme);
             if (modelSelect) modelSelect.value = appState.model;
             if (activeModelBadge) activeModelBadge.textContent = MODEL_LABELS[appState.model] || 'Auto (Smart Routing)';
-            if (geminiApiKeyInput) geminiApiKeyInput.value = appState.apiKey;
+            if (geminiApiKeyInput) geminiApiKeyInput.value = appState.geminiApiKey;
+            if (openrouterApiKeyInput) openrouterApiKeyInput.value = appState.openrouterApiKey;
+            if (openrouterModelInput) openrouterModelInput.value = appState.openrouterModel;
 
             if (appState.chats.length === 0) {
                 createNewChat(false);
@@ -623,9 +634,15 @@
         if (saveSettingsBtn) {
             saveSettingsBtn.addEventListener('click', () => {
                 appState.model = modelSelect.value;
-                appState.apiKey = geminiApiKeyInput.value.trim();
+                appState.geminiApiKey = geminiApiKeyInput ? geminiApiKeyInput.value.trim() : '';
+                appState.openrouterApiKey = openrouterApiKeyInput ? openrouterApiKeyInput.value.trim() : '';
+                appState.openrouterModel = openrouterModelInput && openrouterModelInput.value.trim() ? openrouterModelInput.value.trim() : 'deepseek/deepseek-chat';
+
                 localStorage.setItem('ai_model', appState.model);
-                localStorage.setItem('ai_api_key', appState.apiKey);
+                localStorage.setItem('gemini_api_key', appState.geminiApiKey);
+                localStorage.setItem('openrouter_api_key', appState.openrouterApiKey);
+                localStorage.setItem('openrouter_model', appState.openrouterModel);
+
                 if (activeModelBadge) activeModelBadge.textContent = MODEL_LABELS[appState.model] || 'Auto (Smart Routing)';
                 settingsModal.classList.add('hidden');
             });
@@ -933,6 +950,69 @@
         }
 
         async function callAiEngineWithStreaming(promptText, msgId) {
+            // Check OpenRouter API Key if configured
+            if (appState.openrouterApiKey) {
+                try {
+                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${appState.openrouterApiKey}`,
+                            "Content-Type": "application/json",
+                            "HTTP-Referer": window.location.href,
+                            "X-Title": "Mei AI Workspace"
+                        },
+                        body: JSON.stringify({
+                            model: appState.openrouterModel || "deepseek/deepseek-chat",
+                            messages: [
+                                { role: "system", content: SYSTEM_PROMPT },
+                                { role: "user", content: promptText }
+                            ]
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.choices && data.choices[0]?.message?.content) {
+                        const rawText = data.choices[0].message.content;
+                        let currentDisplayed = "";
+                        for (let i = 0; i < rawText.length; i += 2) {
+                            currentDisplayed += rawText.substring(i, i + 2);
+                            updateMessageContent(msgId, currentDisplayed);
+                            await new Promise(r => setTimeout(r, 12));
+                        }
+                        updateMessageContent(msgId, rawText);
+                        return rawText;
+                    }
+                } catch (e) {
+                    console.error("OpenRouter API Error:", e);
+                }
+            }
+
+            // Check Gemini API Key if configured
+            if (appState.geminiApiKey) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiApiKey}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nUser: " + promptText }] }]
+                        })
+                    });
+                    const data = await res.json();
+                    const geminiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (geminiText) {
+                        let currentDisplayed = "";
+                        for (let i = 0; i < geminiText.length; i += 2) {
+                            currentDisplayed += geminiText.substring(i, i + 2);
+                            updateMessageContent(msgId, currentDisplayed);
+                            await new Promise(r => setTimeout(r, 12));
+                        }
+                        updateMessageContent(msgId, geminiText);
+                        return geminiText;
+                    }
+                } catch (e) {
+                    console.error("Gemini API Error:", e);
+                }
+            }
+
             let modelName = "openai";
             if (appState.model === 'gemma') modelName = "gemma";
             if (appState.model === 'smart') modelName = "deepseek";
@@ -966,7 +1046,6 @@
                     const fallbackRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(promptText)}?model=${modelName}`);
                     if (fallbackRes.ok) {
                         const fetchedText = await fallbackRes.text();
-                        // Verify response is not an empty string or error payload
                         if (fetchedText && fetchedText.trim().length > 0 && !fetchedText.includes("Internal Server Error")) {
                             rawText = fetchedText;
                         }
@@ -976,12 +1055,10 @@
                 }
             }
 
-            // Intelligent context-aware AI fallback if network requests fail
             if (!rawText || rawText.trim().length === 0) {
                 rawText = generateSmartFallbackResponse(promptText);
             }
 
-            // ChatGPT Streaming Typewriter Effect
             let currentDisplayed = "";
             for (let i = 0; i < rawText.length; i += 2) {
                 currentDisplayed += rawText.substring(i, i + 2);
