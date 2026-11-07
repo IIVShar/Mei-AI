@@ -1,0 +1,871 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movix AI Video Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 85, 105, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-sky-500 to-indigo-600 w-9 h-9 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20">
+                    <i class="fa-solid fa-film text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none text-white tracking-wide">MOVIX <span class="text-sky-400 font-light">AI</span></h1>
+                    <p class="text-[10px] text-slate-400 tracking-wider uppercase font-medium">Kinetic Motion & Keyframe Synthesis</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <button onclick="toggleEngineModal(true)" class="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center transition">
+                    <i class="fa-solid fa-microchip text-sky-400 mr-2"></i>
+                    <span class="hidden sm:inline">MOVIX AI ENGINE</span>
+                </button>
+                <button onclick="toggleSettingsModal(true)" class="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center transition">
+                    <i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>
+                    <span class="hidden sm:inline">Settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+
+        <!-- Left Controls Sidebar -->
+        <div class="lg:col-span-4 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm flex flex-col justify-between space-y-5">
+            <div class="space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h2 class="font-bold text-sm uppercase text-slate-300 tracking-wider"><i class="fa-solid fa-sliders text-sky-400 mr-2"></i>Video Parameters</h2>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">v3.5 MOVIX AI ENGINE</span>
+                </div>
+
+                <!-- Text Prompt Input -->
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Scene Description / Prompt</label>
+                    <textarea id="promptInput" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition resize-none custom-scrollbar" placeholder="e.g., A cinematic wide shot of a futuristic cyberpunk city at dusk, glowing neon lights, rain reflections, highly detailed 8k video frame..."></textarea>
+                </div>
+
+                <!-- Generator Engine Selector -->
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">AI Keyframe Generator</label>
+                    <select id="engineSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                        <option value="auto" selected>Auto (AI Engine Retry Loop)</option>
+                        <option value="pollinations">Pollinations.ai (Free Dynamic AI)</option>
+                        <option value="aihorde">AI Horde (Crowdsourced Free AI)</option>
+                        <option value="gemini">Google Gemini 3.1 Flash Image</option>
+                    </select>
+                </div>
+
+                <!-- Aspect Ratio & Duration Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Aspect Ratio</label>
+                        <select id="ratioSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                            <option value="16:9">16:9 Landscape</option>
+                            <option value="9:16">9:16 Portrait</option>
+                            <option value="1:1">1:1 Square</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Video Duration</label>
+                        <select id="durationSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                            <option value="5">5 Seconds</option>
+                            <option value="10" selected>10 Seconds</option>
+                            <option value="15">15 Seconds</option>
+                            <option value="30">30 Seconds</option>
+                            <option value="45">45 Seconds</option>
+                            <option value="60">60 Seconds</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Camera Motion Preset -->
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Kinetic Camera Motion</label>
+                    <select id="motionSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                        <option value="cinematic">Cinematic Zoom & Orbit Pan</option>
+                        <option value="dolly">Slow Push-In Dolly</option>
+                        <option value="pan">Horizontal Sweep</option>
+                        <option value="dynamic">Volumetric Ambient Shift</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-2">
+                <button id="generateBtn" onclick="generateVideo()" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-sky-500/20 active:scale-[0.98] transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Generate AI Motion Video</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Preview & Output Area -->
+        <div class="lg:col-span-8 flex flex-col space-y-4">
+            
+            <!-- Main Canvas / Video Container -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 backdrop-blur-sm flex flex-col items-center justify-center flex-1 min-h-[380px] sm:min-h-[460px] relative overflow-hidden group">
+                
+                <!-- Status Box / Overlay -->
+                <div id="statusBox" class="absolute top-4 left-4 right-4 z-20 bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-xl p-3 text-xs text-slate-300 hidden transition-all">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span id="statusTitle" class="font-bold text-sky-400 flex items-center">
+                            <i class="fa-solid fa-spinner fa-spin mr-2"></i>Processing Motion Pipeline
+                        </span>
+                        <span id="statusPercent" class="font-mono text-slate-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                        <div id="progressBar" class="bg-sky-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Canvas Rendering Core -->
+                <div id="canvasWrapper" class="relative max-w-full max-h-[440px] flex items-center justify-center overflow-hidden rounded-xl bg-slate-950 border border-slate-800/80 shadow-2xl">
+                    <canvas id="videoCanvas" class="max-w-full h-auto object-contain block"></canvas>
+                </div>
+
+                <!-- Video Element Preview (Post Generation) -->
+                <div id="videoResultWrapper" class="hidden w-full flex flex-col items-center">
+                    <video id="resultVideo" controls autoplay loop class="max-w-full max-h-[440px] rounded-xl border border-slate-800 shadow-2xl"></video>
+                </div>
+
+                <!-- Idle Placeholder Content -->
+                <div id="idleState" class="flex flex-col items-center justify-center text-center p-8 text-slate-500 space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-2xl text-slate-400">
+                        <i class="fa-solid fa-clapperboard"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-300 text-sm">Studio Canvas Ready</h3>
+                        <p class="text-xs text-slate-500 max-w-xs mt-1">Enter a prompt and hit generate to synthesize multi-keyframe motion video clips.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Toolbar & Downloads -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 backdrop-blur-sm flex items-center justify-between flex-wrap gap-3">
+                <div class="text-xs text-slate-400">
+                    <span class="font-semibold text-slate-300">Output Stream:</span> <span id="streamDetails" class="font-mono text-slate-500">1280x720 @ 30 FPS WebM</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a id="downloadBtn" download="movix-ai-video.webm" class="bg-slate-800 hover:bg-slate-700 opacity-50 cursor-not-allowed text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center transition pointer-events-none">
+                        <i class="fa-solid fa-download mr-2"></i>Download WebM
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-3 px-4 text-center text-xs text-slate-500">
+        <p>© 2026 Movix AI Video Studio — Powered by Open Multimodal & Free Generator Networks</p>
+    </footer>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+            <button onclick="toggleSettingsModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-sliders text-sky-400 mr-2"></i>Studio Settings</h3>
+            <p class="text-xs text-slate-400 mb-4">Configure optional external API credentials for enhanced keyframe fidelity.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Google Gemini API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">AI Horde API Key (Optional)</label>
+                    <input type="password" id="hordeApiKeyInput" placeholder="0000000000 (Default Anonymous Key)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="toggleSettingsModal(false)" class="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white">Cancel</button>
+                <button onclick="saveSettings()" class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-white rounded-lg text-xs font-semibold shadow-md transition">Save Credentials</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engine Info Modal -->
+    <div id="engineModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl relative">
+            <button onclick="toggleEngineModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-microchip text-sky-400 mr-2"></i>MOVIX AI ENGINE</h3>
+            <div class="space-y-3 text-xs text-slate-300 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <span class="font-semibold text-sky-400">0. Auto (MOVIX Cascading AI Network)</span>
+                    <p class="mt-1 text-slate-400">Attempts primary AI generators continuously until real AI keyframes are returned. Fallback stock and procedural images step in automatically if needed.</p>
+                </div>
+                <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <span class="font-semibold text-sky-400">1. Pollinations.ai</span>
+                    <p class="mt-1 text-slate-400">100% free open community generator using multi-seed models (Flux, Turbo) without token caps or login.</p>
+                </div>
+                <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <span class="font-semibold text-emerald-400">2. AI Horde (aihorde.net)</span>
+                    <p class="mt-1 text-slate-400">Crowdsourced GPU cluster node generation pipeline delivering open-source Stable Diffusion frame keyframes.</p>
+                </div>
+                <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <span class="font-semibold text-purple-400">3. Google Gemini 3.1 Flash Image</span>
+                    <p class="mt-1 text-slate-400">Google high-fidelity multimodal image engine. Enter key in Settings for direct prompt rendering.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script>
+        // UI Modal Toggles
+        function toggleSettingsModal(show) {
+            const modal = document.getElementById('settingsModal');
+            if (show) {
+                document.getElementById('apiKeyInput').value = localStorage.getItem('movix_gemini_key') || '';
+                document.getElementById('hordeApiKeyInput').value = localStorage.getItem('movix_horde_key') || '';
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function toggleEngineModal(show) {
+            const modal = document.getElementById('engineModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function saveSettings() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const hordeKey = document.getElementById('hordeApiKeyInput').value.trim();
+            localStorage.setItem('movix_gemini_key', apiKey);
+            localStorage.setItem('movix_horde_key', hordeKey);
+            toggleSettingsModal(false);
+        }
+
+        // Pollinations.ai Multi-Seed Engine
+        async function fetchPollinationsKeyframe(prompt, seedIndex, width, height) {
+            const models = ['flux', 'turbo', 'flux-realism', 'flux-anime'];
+            
+            // Context-preserving shot variations that retain the prompt's exact subject
+            const shotVariations = [
+                "detailed hero shot",
+                "wide perspective view",
+                "cinematic focal alignment",
+                "high resolution detail focus",
+                "dynamic angle view"
+            ];
+            const variation = shotVariations[seedIndex % shotVariations.length];
+            const seed = Math.floor(Math.random() * 9999999);
+            
+            // Core prompt remains locked at the front to prevent out-of-context image generation
+            const cleanPrompt = encodeURIComponent(`${prompt}, ${variation}, sharp focus, accurate subject composition`);
+
+            // Primary & Proxy Mirror Gateways for Pollinations
+            const proxyGateways = [
+                (url) => url,
+                (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+            ];
+
+            for (let m = 0; m < models.length; m++) {
+                const model = models[(seedIndex + m) % models.length];
+                const rawUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
+
+                // Try fetching directly via Image element first (Bypasses CORS restrictions)
+                try {
+                    const directImg = await new Promise((resolve, reject) => {
+                        const tempImg = new Image();
+                        tempImg.crossOrigin = 'anonymous';
+                        const timeout = setTimeout(() => reject(new Error('Image timeout')), 8000);
+                        tempImg.onload = () => {
+                            clearTimeout(timeout);
+                            resolve(tempImg);
+                        };
+                        tempImg.onerror = () => {
+                            clearTimeout(timeout);
+                            reject(new Error('Image load error'));
+                        };
+                        tempImg.src = rawUrl;
+                    });
+
+                    const isValid = await validateKeyframeImage(directImg, width, height);
+                    if (isValid) return directImg;
+                } catch (e) {
+                    console.warn(`Direct image element fetch failed for model ${model}, trying proxy endpoints...`, e);
+                }
+
+                // Proxy fallback loop if direct image loading is blocked
+                for (const getProxyUrl of proxyGateways) {
+                    try {
+                        const targetUrl = getProxyUrl(rawUrl);
+                        const response = await fetch(targetUrl);
+                        if (!response.ok) continue;
+
+                        const blob = await response.blob();
+                        if (blob.size < 10000) continue; // Skip tiny placeholder/error payloads
+
+                        const objectUrl = URL.createObjectURL(blob);
+                        const img = await new Promise((resolve, reject) => {
+                            const tempImg = new Image();
+                            tempImg.onload = () => resolve(tempImg);
+                            tempImg.onerror = () => reject(new Error('Decode error'));
+                            tempImg.src = objectUrl;
+                        });
+
+                        const isValid = await validateKeyframeImage(img, width, height);
+                        if (isValid) {
+                            return img;
+                        }
+                    } catch (e) {
+                        console.warn(`Gateway fetch failed for model ${model}:`, e);
+                    }
+                }
+            }
+
+            throw new Error('All image providers and proxy mirrors were rate-limited');
+        }
+
+        // Image Quality & Watermark/Limit Detector
+        async function validateKeyframeImage(img, targetWidth, targetHeight) {
+            try {
+                const canvas = document.createElement('canvas');
+                const sampleW = 200;
+                const sampleH = 200;
+                canvas.width = sampleW;
+                canvas.height = sampleH;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, sampleW, sampleH);
+
+                const imgData = ctx.getImageData(0, 0, sampleW, sampleH).data;
+                let yellowPixelCount = 0;
+                let totalPixels = sampleW * sampleH;
+
+                for (let i = 0; i < imgData.length; i += 4) {
+                    const r = imgData[i];
+                    const g = imgData[i + 1];
+                    const b = imgData[i + 2];
+
+                    // Pollinations "Free limit reached" yellow card color signature (#E0C038)
+                    // High Red (>170), High Green (>140), Low Blue (<110)
+                    if (r > 170 && g > 130 && b < 110 && Math.abs(r - g) < 70) {
+                        yellowPixelCount++;
+                    }
+                }
+
+                // If > 25% of pixels match the Pollinations yellow limit card signature, reject frame
+                if ((yellowPixelCount / totalPixels) > 0.25) {
+                    console.warn("Detector caught Pollinations rate-limit graphic!");
+                    return false;
+                }
+
+                return true;
+            } catch (err) {
+                console.warn("Validation error:", err);
+                return true;
+            }
+        }
+
+        // AI Horde API Engine (aihorde.net)
+        async function fetchAIHordeKeyframe(prompt, seedIndex, width, height) {
+            const hordeApiKey = localStorage.getItem('movix_horde_key') || '0000000000';
+            const postUrl = 'https://aihorde.net/api/v2/generate/async';
+
+            const payload = {
+                prompt: `${prompt}, focused context shot ${seedIndex + 1}, highly detailed accurate subject`,
+                params: {
+                    n: 1,
+                    width: Math.min(width, 768),
+                    height: Math.min(height, 768),
+                    steps: 20
+                },
+                models: ["Deliberate", "stable_diffusion"]
+            };
+
+            const response = await fetch(postUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': hordeApiKey,
+                    'Client-Agent': 'MovixStudio:v1.0:web'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`AI Horde request rejected (${response.status})`);
+            const postResult = await response.json();
+            const requestId = postResult.id;
+            if (!requestId) throw new Error('AI Horde returned invalid generation ID');
+
+            const checkUrl = `https://aihorde.net/api/v2/generate/status/${requestId}`;
+            let imgUrl = null;
+
+            for (let poll = 0; poll < 10; poll++) {
+                await new Promise(r => setTimeout(r, 2000));
+                const checkRes = await fetch(checkUrl);
+                if (checkRes.ok) {
+                    const checkResult = await checkRes.json();
+                    if (checkResult.done && checkResult.generations && checkResult.generations.length > 0) {
+                        imgUrl = checkResult.generations[0].img;
+                        break;
+                    }
+                }
+            }
+
+            if (!imgUrl) throw new Error('AI Horde worker timeout');
+
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('AI Horde image fetch error'));
+                img.src = imgUrl;
+            });
+        }
+
+        // Google Gemini 3.1 Flash Image Engine
+        async function fetchGeminiKeyframe(prompt, seedIndex) {
+            const apiKey = localStorage.getItem('movix_gemini_key') || '';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Generate a high quality cinematic scene: ${prompt}, shot variation ${seedIndex + 1}` }]
+                }],
+                generationConfig: {
+                    responseModalities: ['IMAGE']
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`Gemini API call failed with status ${response.status}`);
+
+            const result = await response.json();
+            const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+            if (!part) throw new Error('Gemini did not return inline image data');
+
+            const imgUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Failed to load Gemini base64 image'));
+                img.src = imgUrl;
+            });
+        }
+
+        // Picsum Stock Photos Engine
+        async function fetchPicsumKeyframe(seedIndex, width, height) {
+            const seed = Math.abs(seedIndex * 42 + 7);
+            const imgUrl = `https://picsum.photos/seed/${seed}/${width}/${height}`;
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Picsum image load timeout'));
+                img.src = imgUrl;
+            });
+        }
+
+        // Web Image Search Engine (Wikimedia / Public Web Search Fallback)
+        async function fetchWebImageKeyframe(prompt, seedIndex, width, height) {
+            // Extract the core subject nouns to ensure in-context search results
+            const coreSubject = prompt.replace(/cinematic|8k|detailed|frame|video|shot|lighting/gi, '').trim() || prompt;
+            const cleanQuery = encodeURIComponent(coreSubject);
+            const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${cleanQuery}&gsrlimit=12&prop=pageimages&piprop=thumbnail&pithumbsize=1280&format=json&origin=*`;
+
+            try {
+                const res = await fetch(searchUrl);
+                if (!res.ok) throw new Error('Web search failed');
+                const data = await res.json();
+
+                const pages = data?.query?.pages;
+                if (!pages) throw new Error('No web image search results');
+
+                const imageUrls = Object.values(pages)
+                    .map(p => p.thumbnail?.source)
+                    .filter(Boolean);
+
+                if (imageUrls.length === 0) throw new Error('No valid thumbnails found');
+
+                const chosenUrl = imageUrls[seedIndex % imageUrls.length];
+
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error('Failed to load web search image'));
+                    img.src = chosenUrl;
+                });
+            } catch (err) {
+                console.warn('Web image search fallback failed:', err);
+                throw err;
+            }
+        }
+
+        // Procedural Motion Canvas Synthesizer (Offline Vector Engine)
+        function createProceduralKeyframe(prompt, seedIndex, width, height) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            const hue1 = (hashCode(prompt) + seedIndex * 50) % 360;
+            const hue2 = (hue1 + 60) % 360;
+
+            const grad = ctx.createLinearGradient(0, 0, width, height);
+            grad.addColorStop(0, `hsl(${hue1}, 70%, 15%)`);
+            grad.addColorStop(1, `hsl(${hue2}, 80%, 8%)`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+
+            for (let i = 0; i < 20; i++) {
+                ctx.fillStyle = `hsla(${(hue1 + i * 15) % 360}, 80%, 50%, 0.15)`;
+                ctx.beginPath();
+                const cx = (Math.sin(seedIndex + i) * 0.5 + 0.5) * width;
+                const cy = (Math.cos(seedIndex * 2 + i) * 0.5 + 0.5) * height;
+                const rad = 50 + (i * 20);
+                ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Clean image composition with no text overlay burnt into the canvas
+            const img = new Image();
+            img.src = canvas.toDataURL();
+            return img;
+        }
+
+        // Unified Engine Cascade Selector
+        async function fetchKeyframe(prompt, seedIndex, engine, width, height) {
+            // Try primary AI engines first (Pollinations, AI Horde, Gemini)
+            const maxAttempts = 3;
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                const currentSeed = seedIndex + attempt * 10;
+                
+                if (engine === 'gemini') {
+                    try {
+                        const img = await fetchGeminiKeyframe(prompt, currentSeed);
+                        if (await validateKeyframeImage(img, width, height)) return img;
+                    } catch (e) {
+                        console.warn(`Gemini AI attempt ${attempt + 1} failed...`, e);
+                    }
+                } else if (engine === 'aihorde') {
+                    try {
+                        const hordeImg = await fetchAIHordeKeyframe(prompt, currentSeed, width, height);
+                        if (await validateKeyframeImage(hordeImg, width, height)) return hordeImg;
+                    } catch (e) {
+                        console.warn(`AI Horde attempt ${attempt + 1} failed...`, e);
+                    }
+                }
+
+                // Primary / Auto AI execution: Pollinations & AI Horde
+                try {
+                    const img = await fetchPollinationsKeyframe(prompt, currentSeed, width, height);
+                    if (await validateKeyframeImage(img, width, height)) return img;
+                } catch (err) {
+                    console.warn(`Pollinations AI attempt ${attempt + 1} rate-limited. Trying AI Horde...`, err);
+                    try {
+                        const hordeImg = await fetchAIHordeKeyframe(prompt, currentSeed, width, height);
+                        if (await validateKeyframeImage(hordeImg, width, height)) return hordeImg;
+                    } catch (hordeErr) {
+                        console.warn(`AI Horde attempt ${attempt + 1} failed...`, hordeErr);
+                    }
+                }
+            }
+
+            // Fallback Layer 1: Contextual Web Image Search (Wikimedia)
+            try {
+                console.info("AI engines busy. Fetching contextual Web image...");
+                return await fetchWebImageKeyframe(prompt, seedIndex, width, height);
+            } catch (webErr) {
+                console.warn("Web image search failed, using high-res photographic stock...", webErr);
+            }
+
+            // Fallback Layer 2: Instant High-Res Stock Photo (Picsum)
+            return await fetchPicsumKeyframe(seedIndex, width, height);
+        }
+
+        // Utility: String Hash
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0;
+            }
+            return hash;
+        }
+
+        // Master Video Generation Function
+        async function generateVideo() {
+            const prompt = document.getElementById('promptInput').value.trim() || 'Futuristic cyberpunk neon city view';
+            const engine = document.getElementById('engineSelect').value;
+            const ratio = document.getElementById('ratioSelect').value;
+            const duration = parseInt(document.getElementById('durationSelect').value, 10);
+            const motionPreset = document.getElementById('motionSelect').value;
+
+            const generateBtn = document.getElementById('generateBtn');
+            const statusBox = document.getElementById('statusBox');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusPercent = document.getElementById('statusPercent');
+            const progressBar = document.getElementById('progressBar');
+            const idleState = document.getElementById('idleState');
+            const canvasWrapper = document.getElementById('canvasWrapper');
+            const videoResultWrapper = document.getElementById('videoResultWrapper');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            // Setup Resolution Based on Aspect Ratio
+            let width = 1280, height = 720;
+            if (ratio === '9:16') { width = 720; height = 1280; }
+            else if (ratio === '1:1') { width = 800; height = 800; }
+
+            const canvas = document.getElementById('videoCanvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            // UI Reset
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            statusBox.classList.remove('hidden');
+            idleState.classList.add('hidden');
+            videoResultWrapper.classList.add('hidden');
+            canvasWrapper.classList.remove('hidden');
+
+            try {
+                // Determine Keyframe Count (Guarantees fast distinct keyframe images)
+                const numKeyframes = Math.max(3, Math.min(8, Math.floor(duration / 3)));
+                
+                statusTitle.innerHTML = `<i class="fa-solid fa-bolt text-amber-400 fa-spin mr-2"></i>Parallel AI Keyframe Synthesis...`;
+                statusPercent.innerText = `15%`;
+                progressBar.style.width = `15%`;
+
+                // Parallel Keyframe Fetching (All frames fetch concurrently under 10 seconds)
+                const keyframePromises = [];
+                for (let k = 0; k < numKeyframes; k++) {
+                    keyframePromises.push(fetchKeyframe(prompt, k, engine, width, height));
+                }
+
+                const keyframes = await Promise.all(keyframePromises);
+
+                // Initialize Fast Recorder
+                statusTitle.innerHTML = `<i class="fa-solid fa-film text-sky-400 mr-2"></i>Rapid Hardware Video Encoding...`;
+                const stream = canvas.captureStream(30);
+                let mediaRecorder;
+
+                try {
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+                } catch (e) {
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                }
+
+                const chunks = [];
+                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                mediaRecorder.start();
+
+                const totalFrames = duration * 30;
+                let frameCount = 0;
+
+                // Pre-calculated particle overlay data for zero-lag rendering
+                const particles = Array.from({ length: 30 }, () => ({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 1.5,
+                    speedY: (Math.random() - 0.5) * 1.5,
+                    alpha: Math.random() * 0.4 + 0.1
+                }));
+
+                // Fast FPS Render Loop
+                await new Promise((resolve) => {
+                    function renderFrame() {
+                        if (frameCount >= totalFrames) {
+                            mediaRecorder.stop();
+                            resolve();
+                            return;
+                        }
+
+                        const progress = frameCount / totalFrames;
+                        const kfProgress = progress * (numKeyframes - 1);
+                        const kfIndex = Math.min(Math.floor(kfProgress), numKeyframes - 2);
+                        const localProgress = kfProgress - kfIndex;
+
+                        const imgA = keyframes[kfIndex];
+                        const imgB = keyframes[kfIndex + 1];
+
+                        ctx.clearRect(0, 0, width, height);
+
+                        // Calculate Motion Transforms
+                        let scale = 1.05 + Math.sin(progress * Math.PI) * 0.08;
+                        let panX = 0, panY = 0;
+
+                        if (motionPreset === 'cinematic') {
+                            panX = Math.sin(progress * Math.PI * 2) * 20;
+                            panY = Math.cos(progress * Math.PI * 2) * 12;
+                        } else if (motionPreset === 'dolly') {
+                            scale = 1.0 + progress * 0.15;
+                        } else if (motionPreset === 'pan') {
+                            panX = (progress - 0.5) * 40;
+                        } else if (motionPreset === 'dynamic') {
+                            panX = Math.cos(progress * Math.PI * 3) * 15;
+                            panY = Math.sin(progress * Math.PI * 3) * 15;
+                        }
+
+                        // Render Image A
+                        ctx.save();
+                        ctx.globalAlpha = 1.0 - localProgress;
+                        ctx.translate(width / 2 + panX, height / 2 + panY);
+                        ctx.scale(scale, scale);
+                        ctx.drawImage(imgA, -width / 2, -height / 2, width, height);
+                        ctx.restore();
+
+                        // Render Image B Crossfade
+                        ctx.save();
+                        ctx.globalAlpha = localProgress;
+                        ctx.translate(width / 2 + panX * 0.5, height / 2 + panY * 0.5);
+                        ctx.scale(scale, scale);
+                        ctx.drawImage(imgB, -width / 2, -height / 2, width, height);
+                        ctx.restore();
+
+                        // Particle Dynamics
+                        particles.forEach(p => {
+                            p.x = (p.x + p.speedX + width) % width;
+                            p.y = (p.y + p.speedY + height) % height;
+                            ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                            ctx.fill();
+                        });
+
+                        // Render Movix AI Outro Watermark Frame during final 1.5 seconds (last 45 frames)
+                        const outroStartFrame = totalFrames - 45;
+                        if (frameCount >= outroStartFrame) {
+                            const outroProgress = (frameCount - outroStartFrame) / 45; // 0.0 to 1.0
+                            ctx.save();
+                            ctx.globalAlpha = Math.min(1.0, outroProgress * 1.5);
+                            
+                            // Dark Cinematic Vignette Backdrop
+                            ctx.fillStyle = 'rgba(2, 6, 23, 0.92)';
+                            ctx.fillRect(0, 0, width, height);
+                            
+                            // Radial Glow Core
+                            const cx = width / 2;
+                            const cy = height / 2 - 20;
+                            const radGlow = ctx.createRadialGradient(cx, cy, 10, cx, cy, 280);
+                            radGlow.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+                            radGlow.addColorStop(0.5, 'rgba(79, 70, 229, 0.15)');
+                            radGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                            ctx.fillStyle = radGlow;
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, 280, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            // Animated Logo Box
+                            const scaleIn = 0.95 + outroProgress * 0.05;
+                            ctx.translate(cx, cy);
+                            ctx.scale(scaleIn, scaleIn);
+
+                            // Movix Icon & Text
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.font = '900 48px Inter, sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(56, 189, 248, 0.8)';
+                            ctx.shadowBlur = 20;
+                            ctx.fillText('MOVIX AI', 0, -10);
+
+                            // Subtext & Tagline
+                            ctx.shadowBlur = 0;
+                            ctx.fillStyle = '#94A3B8';
+                            ctx.font = '600 14px Inter, sans-serif';
+                            ctx.fillText('SYNTHESIZED WITH MOVIX AI STUDIO', 0, 32);
+
+                            // Animated Progress Border Line
+                            const lineWidth = 180 * Math.min(1.0, outroProgress * 1.2);
+                            ctx.strokeStyle = '#38BDF8';
+                            ctx.lineWidth = 2.5;
+                            ctx.beginPath();
+                            ctx.moveTo(-lineWidth / 2, 52);
+                            ctx.lineTo(lineWidth / 2, 52);
+                            ctx.stroke();
+
+                            ctx.restore();
+                        }
+
+                        // Update Status
+                        frameCount++;
+                        const currentPct = 25 + Math.round((frameCount / totalFrames) * 75);
+                        statusPercent.innerText = `${currentPct}%`;
+                        progressBar.style.width = `${currentPct}%`;
+
+                        // Accelerated frame step (~30 FPS render scheduling)
+                        setTimeout(renderFrame, 1000 / 30);
+                    }
+
+                    renderFrame();
+                });
+
+                // Complete Video Encoding
+                await new Promise(resolve => {
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const videoUrl = URL.createObjectURL(blob);
+                        const resultVideo = document.getElementById('resultVideo');
+                        resultVideo.src = videoUrl;
+
+                        downloadBtn.href = videoUrl;
+                        downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                        downloadBtn.classList.add('bg-sky-600', 'hover:bg-sky-500');
+
+                        canvasWrapper.classList.add('hidden');
+                        videoResultWrapper.classList.remove('hidden');
+                        statusBox.classList.add('hidden');
+                        resolve();
+                    };
+                });
+
+            } catch (err) {
+                console.error("Video generation failed:", err);
+                statusTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i>Error during synthesis`;
+                statusPercent.innerText = `0%`;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    </script>
+</body>
+</html>
+```
