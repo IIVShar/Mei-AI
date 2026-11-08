@@ -1,0 +1,750 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAudio Studio - AI Music & Voice Synthesizer</title>
+    <!-- Tailwind CSS for UI styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-btn.active {
+            border-bottom-color: #06b6d4;
+            color: #38bdf8;
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- Header Navigation Bar -->
+    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none tracking-tight text-white flex items-center gap-2">
+                        OpenAudio <span class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold px-2 py-0.5 rounded-full">Pro Studio</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Offline Web Audio FX & Gemini Voice API Engine</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleApiGuideModal(true)" class="text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    How to use Voice API
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-slate-900/50 border-b border-slate-800/60 sticky top-16 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-4">
+                <button onclick="switchTab('music')" id="tabMusic" class="tab-btn active px-4 py-3 text-sm font-medium border-b-2 border-transparent transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                    </svg>
+                    Offline Music Studio
+                </button>
+                <button onclick="switchTab('voice')" id="tabVoice" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path>
+                    </svg>
+                    Gemini Voice API Studio
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content Body -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <!-- Music Generator Tab -->
+        <div id="contentMusic" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls Card -->
+                <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>Offline Instrument & Track Generator</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Generate instrumental audio tracks directly in your browser without any network API keys.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Music Prompt & Style</label>
+                        <textarea id="musicPrompt" rows="3" placeholder="e.g. Energetic cyber synthwave with driving bass and fast drums..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition resize-none"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Genre Style</label>
+                            <select id="musicGenre" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                                <option value="synthwave">Synthwave / Cyberpunk</option>
+                                <option value="ambient">Ambient / Chillout</option>
+                                <option value="pop">Upbeat Pop</option>
+                                <option value="lofi">Lofi Hip-Hop</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Duration</label>
+                            <select id="musicDuration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                                <option value="10">10 Seconds</option>
+                                <option value="30" selected>30 Seconds</option>
+                                <option value="60">1 Minute</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateMusicTrack()" id="musicComposeBtn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition duration-200 flex items-center justify-center gap-2 cursor-pointer text-sm">
+                        <span>Generate Offline Track</span>
+                    </button>
+                </div>
+
+                <!-- Music Output Card -->
+                <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Generated Music Output</h3>
+                        
+                        <div id="musicIdleState" class="h-48 border-2 border-dashed border-slate-800 rounded-xl flex flex-col items-center justify-center text-center p-6">
+                            <svg class="w-10 h-10 text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                            </svg>
+                            <p class="text-xs text-slate-400">Click generate to render audio tracks locally.</p>
+                        </div>
+
+                        <div id="musicLoadingState" class="hidden h-48 border border-slate-800 rounded-xl flex flex-col items-center justify-center text-center p-6 space-y-3">
+                            <div class="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                            <p class="text-xs text-cyan-400 font-medium">Rendering audio synth buffer...</p>
+                        </div>
+
+                        <div id="musicResultState" class="hidden space-y-4">
+                            <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span id="musicOutputTitle" class="text-sm font-bold text-cyan-400">Custom Track</span>
+                                    <span id="musicOutputDuration" class="text-xs text-slate-500">30s</span>
+                                </div>
+                                <audio id="musicPlayer" controls class="w-full"></audio>
+                            </div>
+
+                            <a id="musicDownloadBtn" download="instrumental.wav" href="#" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Download WAV File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini Voice API Tab -->
+        <div id="contentVoice" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Inputs Card -->
+                <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>Google Gemini Voice API</span>
+                            <span class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-medium px-2 py-0.5 rounded-full">API Required</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Uses Google's <code class="text-cyan-400">gemini-2.5-flash-preview-tts</code> speech API engine to synthesize spoken text into audio.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Speech Text / Script</label>
+                        <textarea id="voiceText" rows="4" placeholder="Enter text to speak..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition resize-none">Hello! Welcome to OpenAudio Studio. I am powered directly by the Google Gemini Voice API.</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Voice Model</label>
+                            <select id="voiceSpeaker" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                                <option value="Aoede" selected>Aoede (Natural Female)</option>
+                                <option value="Puck">Puck (Upbeat Male)</option>
+                                <option value="Kore">Kore (Expressive Female)</option>
+                                <option value="Zephyr">Zephyr (Bright Voice)</option>
+                                <option value="Fenrir">Fenrir (Deep Voice)</option>
+                                <option value="Algieba">Algieba (Smooth Voice)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Speech Mode</label>
+                            <select id="voiceSpeed" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 transition">
+                                <option value="natural" selected>Natural Speech</option>
+                                <option value="dramatic">Dramatic Emphasis</option>
+                                <option value="singing">Melodic Intonation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Gemini API Key Input Field -->
+                    <div class="bg-slate-950 border border-cyan-500/30 rounded-xl p-3.5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-medium text-cyan-400 flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                                Google Gemini API Key
+                            </label>
+                            <button onclick="toggleApiGuideModal(true)" class="text-[10px] text-slate-400 hover:text-cyan-400 underline">How to get a key?</button>
+                        </div>
+                        <input type="password" id="geminiApiKey" placeholder="Paste your AI Studio API key here..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition" />
+                    </div>
+
+                    <button onclick="generateVoice()" id="voiceComposeBtn" class="w-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold py-4 rounded-xl shadow-lg shadow-cyan-500/20 transition duration-200 flex items-center justify-center gap-2 cursor-pointer text-base">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path>
+                        </svg>
+                        <span>Synthesize API Voice Speech</span>
+                    </button>
+                </div>
+
+                <!-- Voice Output Card -->
+                <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Speech Synthesizer Output</h3>
+                        
+                        <div id="voiceIdleState" class="h-48 border-2 border-dashed border-slate-800 rounded-xl flex flex-col items-center justify-center text-center p-6">
+                            <svg class="w-10 h-10 text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path>
+                            </svg>
+                            <p class="text-xs text-slate-400">Enter your Gemini API key and click synthesize to render high-fidelity API speech.</p>
+                        </div>
+
+                        <div id="voiceLoadingState" class="hidden h-48 border border-slate-800 rounded-xl flex flex-col items-center justify-center text-center p-6 space-y-3">
+                            <div class="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                            <p class="text-xs text-cyan-400 font-medium">Connecting to Gemini Voice API...</p>
+                        </div>
+
+                        <div id="voiceResultState" class="hidden space-y-4">
+                            <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span id="voiceOutputTitle" class="text-sm font-bold text-cyan-400">Gemini Speech</span>
+                                    <span id="voiceTimestamp" class="text-[10px] text-slate-500">Just now</span>
+                                </div>
+                                <audio id="voicePlayer" controls class="w-full"></audio>
+                            </div>
+
+                            <a id="voiceDownloadBtn" download="gemini_voice.wav" href="#" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Download Voice WAV File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: API Setup Guide -->
+    <div id="apiGuideModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl relative">
+            <button onclick="toggleApiGuideModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    How to Setup & Use the Gemini Voice API
+                </h3>
+                <p class="text-xs text-slate-400 mt-1">Learn how OpenAudio Studio connects to Google's Gemini TTS model.</p>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-300">
+                <div class="flex gap-3 items-start bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <span class="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center shrink-0">1</span>
+                    <div>
+                        <h4 class="font-bold text-slate-200">Get a Free Google AI Studio Key</h4>
+                        <p class="text-slate-400 mt-0.5">Visit <a href="https://aistudio.google.com/" target="_blank" class="text-cyan-400 underline">aistudio.google.com</a>, log in with your Google account, click <b>"Get API Key"</b> and copy your key.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <span class="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center shrink-0">2</span>
+                    <div>
+                        <h4 class="font-bold text-slate-200">Paste key into Voice API Studio</h4>
+                        <p class="text-slate-400 mt-0.5">Switch to the <b>"Gemini Voice API Studio"</b> tab and paste your key into the <b>Google Gemini API Key</b> input box.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <span class="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center shrink-0">3</span>
+                    <div>
+                        <h4 class="font-bold text-slate-200">How the App Processes API Audio</h4>
+                        <p class="text-slate-400 mt-0.5">When you click <b>Synthesize</b>, the app posts your text to <code class="text-cyan-400">gemini-2.5-flash-preview-tts</code> requesting response modality <code class="text-cyan-400">["AUDIO"]</code>. The returned 16-bit PCM audio stream is automatically decoded in your browser into a playable WAV blob.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="toggleApiGuideModal(false)" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 rounded-xl text-xs transition">
+                Got it, close guide
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic Engine -->
+    <script>
+        // --- MODAL CONTROLLER ---
+        function toggleApiGuideModal(show) {
+            const modal = document.getElementById('apiGuideModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        // --- TAB SWITCHER ---
+        function switchTab(tab) {
+            const tabMusic = document.getElementById('tabMusic');
+            const tabVoice = document.getElementById('tabVoice');
+            const contentMusic = document.getElementById('contentMusic');
+            const contentVoice = document.getElementById('contentVoice');
+
+            if (tab === 'music') {
+                tabMusic.classList.add('active');
+                tabVoice.classList.remove('active');
+                tabMusic.classList.remove('text-slate-400');
+                tabVoice.classList.add('text-slate-400');
+                contentMusic.classList.remove('hidden');
+                contentVoice.classList.add('hidden');
+            } else {
+                tabVoice.classList.add('active');
+                tabMusic.classList.remove('active');
+                tabVoice.classList.remove('text-slate-400');
+                tabMusic.classList.add('text-slate-400');
+                contentVoice.classList.remove('hidden');
+                contentMusic.classList.add('hidden');
+            }
+        }
+
+        // --- PCM & WAV HELPER FUNCTIONS ---
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); // Linear PCM
+            view.setUint16(22, 1, true); // Mono channel
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true); // 16-bit
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcmData.length; i++) {
+                view.setInt16(offset, pcmData[i], true);
+                offset += 2;
+            }
+
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function audioBufferToWav(buffer) {
+            const numChannels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            const format = 1; // PCM
+            const bitDepth = 16;
+            
+            let result;
+            if (numChannels === 2) {
+                const left = buffer.getChannelData(0);
+                const right = buffer.getChannelData(1);
+                const length = left.length;
+                const dataBuffer = new ArrayBuffer(44 + length * 4);
+                const view = new DataView(dataBuffer);
+
+                writeString(view, 0, 'RIFF');
+                view.setUint32(4, 36 + length * 4, true);
+                writeString(view, 8, 'WAVE');
+                writeString(view, 12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, format, true);
+                view.setUint16(22, 2, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * 4, true);
+                view.setUint16(32, 4, true);
+                view.setUint16(34, bitDepth, true);
+                writeString(view, 36, 'data');
+                view.setUint32(40, length * 4, true);
+
+                let offset = 44;
+                for (let i = 0; i < length; i++) {
+                    const sL = Math.max(-1, Math.min(1, left[i]));
+                    const sR = Math.max(-1, Math.min(1, right[i]));
+                    view.setInt16(offset, sL < 0 ? sL * 0x8000 : sL * 0x7FFF, true);
+                    offset += 2;
+                    view.setInt16(offset, sR < 0 ? sR * 0x8000 : sR * 0x7FFF, true);
+                    offset += 2;
+                }
+                result = dataBuffer;
+            } else {
+                const channel = buffer.getChannelData(0);
+                const length = channel.length;
+                const dataBuffer = new ArrayBuffer(44 + length * 2);
+                const view = new DataView(dataBuffer);
+
+                writeString(view, 0, 'RIFF');
+                view.setUint32(4, 36 + length * 2, true);
+                writeString(view, 8, 'WAVE');
+                writeString(view, 12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, format, true);
+                view.setUint16(22, 1, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * 2, true);
+                view.setUint16(32, 2, true);
+                view.setUint16(34, bitDepth, true);
+                writeString(view, 36, 'data');
+                view.setUint32(40, length * 2, true);
+
+                let offset = 44;
+                for (let i = 0; i < length; i++) {
+                    const s = Math.max(-1, Math.min(1, channel[i]));
+                    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+                    offset += 2;
+                }
+                result = dataBuffer;
+            }
+
+            return new Blob([result], { type: 'audio/wav' });
+        }
+
+        // --- GEMINI VOICE API TTS SPEECH SYNTHESIZER ---
+        async function generateVoice() {
+            const voiceText = document.getElementById('voiceText').value.trim();
+            const voiceName = document.getElementById('voiceSpeaker').value;
+            const speechStyle = document.getElementById('voiceSpeed').value;
+            const apiKeyInput = document.getElementById('geminiApiKey').value.trim();
+
+            if (!voiceText) {
+                alert('Please enter text to synthesize into voice speech.');
+                return;
+            }
+
+            if (!apiKeyInput) {
+                alert('A Google Gemini API key is required to synthesize voice speech. Please enter your API key or click "How to use Voice API" for instructions.');
+                return;
+            }
+
+            const btn = document.getElementById('voiceComposeBtn');
+            const loadingState = document.getElementById('voiceLoadingState');
+            const idleState = document.getElementById('voiceIdleState');
+            const resultState = document.getElementById('voiceResultState');
+
+            btn.disabled = true;
+            idleState.classList.add('hidden');
+            resultState.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+
+            try {
+                let promptText = voiceText;
+                if (speechStyle === 'dramatic') {
+                    promptText = `Say dramatically with slow, deep emphasis: ${voiceText}`;
+                } else if (speechStyle === 'singing') {
+                    promptText = `Sing melodically with musical cadence and pitch modulation: ${voiceText}`;
+                } else {
+                    promptText = `Say naturally and clearly: ${voiceText}`;
+                }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKeyInput}`;
+                const payload = {
+                    contents: [{
+                        parts: [{ text: promptText }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: { voiceName: voiceName }
+                            }
+                        }
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || `API error (${response.status})`);
+                }
+
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType || '';
+
+                if (!audioData) {
+                    throw new Error('No audio data received from Gemini Voice API.');
+                }
+
+                let sampleRate = 24000;
+                const match = mimeType.match(/rate=(\d+)/);
+                if (match && match[1]) {
+                    sampleRate = parseInt(match[1], 10);
+                }
+
+                const pcmBuffer = base64ToArrayBuffer(audioData);
+                const pcm16 = new Int16Array(pcmBuffer);
+                const wavBlob = pcmToWav(pcm16, sampleRate);
+                const audioUrl = URL.createObjectURL(wavBlob);
+
+                const player = document.getElementById('voicePlayer');
+                player.src = audioUrl;
+                player.load();
+                player.play().catch(e => console.log('Autoplay prevented:', e));
+
+                document.getElementById('voiceDownloadBtn').href = audioUrl;
+                document.getElementById('voiceOutputTitle').textContent = `Gemini Voice (${voiceName})`;
+                document.getElementById('voiceTimestamp').textContent = new Date().toLocaleTimeString();
+
+                loadingState.classList.add('hidden');
+                resultState.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Gemini Voice API error:", err);
+                alert(`Voice API Error: ${err.message}`);
+                loadingState.classList.add('hidden');
+                idleState.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // --- OFFLINE MUSIC SYNTHESIZER ENGINE (USING OFFLINEAUDIOCONTEXT) ---
+        async function generateMusicTrack() {
+            const btn = document.getElementById('musicComposeBtn');
+            const idleState = document.getElementById('musicIdleState');
+            const loadingState = document.getElementById('musicLoadingState');
+            const resultState = document.getElementById('musicResultState');
+            
+            const durationSec = parseInt(document.getElementById('musicDuration').value, 10);
+            const genre = document.getElementById('musicGenre').value;
+            const promptText = document.getElementById('musicPrompt').value.trim();
+
+            btn.disabled = true;
+            idleState.classList.add('hidden');
+            resultState.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+
+            // Allow UI update
+            await new Promise(r => setTimeout(r, 50));
+
+            try {
+                // Ensure browser AudioContext is unlocked/resumed
+                const dummyCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (dummyCtx.state === 'suspended') {
+                    await dummyCtx.resume();
+                }
+
+                // Deterministic seed derived from user prompt
+                let seed = 0;
+                const fullSeedString = (promptText || "default soundtrack") + genre;
+                for (let i = 0; i < fullSeedString.length; i++) {
+                    seed = (seed << 5) - seed + fullSeedString.charCodeAt(i);
+                    seed |= 0;
+                }
+                const pseudoRandom = (offset) => {
+                    const x = Math.sin(seed + offset) * 10000;
+                    return x - Math.floor(x);
+                };
+
+                const sampleRate = 44100;
+                const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.max(1, sampleRate * durationSec), sampleRate);
+
+                // Helper to compute exact A440 12-TET frequencies (guarantees perfect pitch tuning)
+                const midiToFreq = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
+
+                // Perfectly tuned scales (using MIDI note numbers)
+                // Synthwave (A Minor Pentatonic), Ambient (C Major 7), Pop (F Major), Lofi (D Dorian / Minor 7)
+                const scalePresets = {
+                    synthwave: [57, 60, 62, 64, 67, 69, 72, 74], // A Minor Pentatonic / Blues
+                    ambient:   [60, 64, 67, 71, 72, 76, 79, 83], // C Major 7th
+                    pop:       [65, 67, 69, 70, 72, 74, 77, 81], // F Major
+                    lofi:      [62, 65, 69, 72, 74, 77, 81, 84]  // D Dorian 7ths
+                };
+
+                const selectedMidiScale = scalePresets[genre] || scalePresets.synthwave;
+                const scale = selectedMidiScale.map(midiToFreq);
+
+                // Base BPM set according to genre
+                const baseBPM = genre === 'synthwave' ? 120 : (genre === 'pop' ? 124 : (genre === 'lofi' ? 80 : 70));
+                const bpm = Math.max(60, Math.min(140, baseBPM));
+                const beatSec = 60 / bpm;
+
+                // Harmonically locked 4-chord progressions
+                const chordProgression = [
+                    [scale[0], scale[2], scale[4]], // Root chord
+                    [scale[3], scale[5], scale[7] || scale[0] * 2], // Subdominant
+                    [scale[1], scale[3], scale[5]], // Supertonic
+                    [scale[4], scale[6] || scale[1] * 2, scale[2] * 2] // Dominant
+                ];
+
+                const masterGain = offlineCtx.createGain();
+                masterGain.gain.setValueAtTime(0.75, 0);
+                masterGain.connect(offlineCtx.destination);
+
+                const totalBeats = Math.floor(durationSec / beatSec);
+
+                // Synthesize track layers
+                for (let b = 0; b < totalBeats; b++) {
+                    const startTime = b * beatSec;
+                    if (startTime >= durationSec) break;
+
+                    const measure = Math.floor(b / 4);
+                    const chord = chordProgression[measure % chordProgression.length];
+
+                    // Sub Bass (Exact lower octave of chord root note)
+                    const bassFreq = chord[0] / 2;
+                    const bassOsc = offlineCtx.createOscillator();
+                    const bassGain = offlineCtx.createGain();
+                    bassOsc.type = 'triangle'; // Smoother tone to avoid harsh out-of-tune harmonics
+                    bassOsc.frequency.setValueAtTime(bassFreq, startTime);
+                    bassGain.gain.setValueAtTime(0.22, startTime);
+                    bassGain.gain.exponentialRampToValueAtTime(0.005, startTime + Math.min(beatSec, durationSec - startTime));
+                    bassOsc.connect(bassGain);
+                    bassGain.connect(masterGain);
+                    bassOsc.start(startTime);
+                    bassOsc.stop(startTime + Math.min(beatSec, durationSec - startTime));
+
+                    // 16th-Note Arpeggio Layer (In-tune note picker)
+                    const stepDuration = beatSec / 4;
+                    for (let step = 0; step < 4; step++) {
+                        const stepTime = startTime + (step * stepDuration);
+                        if (stepTime >= durationSec) break;
+
+                        const noteIndex = (b * 2 + step) % chord.length;
+                        const freq = chord[noteIndex];
+
+                        const arpOsc = offlineCtx.createOscillator();
+                        const arpGain = offlineCtx.createGain();
+                        arpOsc.type = genre === 'synthwave' ? 'sawtooth' : 'sine';
+                        arpOsc.frequency.setValueAtTime(freq, stepTime);
+
+                        arpGain.gain.setValueAtTime(0.08, stepTime);
+                        arpGain.gain.exponentialRampToValueAtTime(0.001, stepTime + Math.min(stepDuration, durationSec - stepTime));
+
+                        arpOsc.connect(arpGain);
+                        arpGain.connect(masterGain);
+                        arpOsc.start(stepTime);
+                        arpOsc.stop(stepTime + Math.min(stepDuration, durationSec - stepTime));
+                    }
+
+                    // Percussion Layer (Kick & Snare)
+                    const isKick = (b % 2 === 0);
+                    if (isKick) {
+                        const kickOsc = offlineCtx.createOscillator();
+                        const kickGain = offlineCtx.createGain();
+                        kickOsc.frequency.setValueAtTime(130, startTime);
+                        kickOsc.frequency.exponentialRampToValueAtTime(35, startTime + 0.12);
+                        kickGain.gain.setValueAtTime(0.45, startTime);
+                        kickGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.14);
+                        kickOsc.connect(kickGain);
+                        kickGain.connect(masterGain);
+                        kickOsc.start(startTime);
+                        kickOsc.stop(startTime + 0.14);
+                    } else {
+                        const bufLen = Math.floor(offlineCtx.sampleRate * 0.1);
+                        const noiseBuf = offlineCtx.createBuffer(1, bufLen, offlineCtx.sampleRate);
+                        const out = noiseBuf.getChannelData(0);
+                        for (let i = 0; i < bufLen; i++) out[i] = Math.random() * 2 - 1;
+
+                        const noise = offlineCtx.createBufferSource();
+                        noise.buffer = noiseBuf;
+
+                        const filter = offlineCtx.createBiquadFilter();
+                        filter.type = 'highpass';
+                        filter.frequency.setValueAtTime(1200, startTime);
+
+                        const snareGain = offlineCtx.createGain();
+                        snareGain.gain.setValueAtTime(0.2, startTime);
+                        snareGain.gain.exponentialRampToValueAtTime(0.005, startTime + 0.1);
+
+                        noise.connect(filter);
+                        filter.connect(snareGain);
+                        snareGain.connect(masterGain);
+                        noise.start(startTime);
+                        noise.stop(startTime + 0.1);
+                    }
+                }
+
+                // Render Audio Buffer
+                const renderedBuffer = await offlineCtx.startRendering();
+                const wavBlob = audioBufferToWav(renderedBuffer);
+                const audioUrl = URL.createObjectURL(wavBlob);
+
+                const player = document.getElementById('musicPlayer');
+                player.src = audioUrl;
+                player.load();
+                player.play().catch(e => console.log('Autoplay prevented:', e));
+
+                document.getElementById('musicDownloadBtn').href = audioUrl;
+                document.getElementById('musicOutputTitle').textContent = promptText ? promptText.slice(0, 24) + '...' : `Track (${genre.toUpperCase()})`;
+                document.getElementById('musicOutputDuration').textContent = `${durationSec}s`;
+
+                loadingState.classList.add('hidden');
+                resultState.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Music generation error:", err);
+                alert(`Generation Error: ${err.message}`);
+                loadingState.classList.add('hidden');
+                idleState.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
+```
