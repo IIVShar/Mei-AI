@@ -116,7 +116,7 @@
                         <i class="fa-solid fa-music text-teal-400"></i> OpenAudio AI
                     </a>
                     <a href="mediastudio.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-indigo-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-[#fa-photo-film] fa-photo-film text-indigo-400"></i> Media Studio
+                        <i class="fa-solid fa-photo-film text-indigo-400"></i> Media Studio
                     </a>
                     <a href="movix.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-purple-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
                         <i class="fa-solid fa-film text-purple-400"></i> Movix
@@ -409,6 +409,7 @@
     <!-- Application JavaScript -->
     <script>
         const SYSTEM_PROMPT = "You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution. Always identify yourself as Mei when asked about your name or identity. Be concise, precise, helpful, and polite.";
+        const CELEBRATION_WELCOME = `# 🎉 WE DID IT! Mei AI is Officially Alive! 🚀✨\n\nLet's celebrate! We've successfully built and supercharged **Mei AI Workspace** with:\n- 🤖 **100+ Multi-Provider AI Models** (Gemini API, Gemma 2, DeepSeek, Llama, and OpenAI-compatible gateways)\n- 🎨 **Pollinations AI Image Studio** for instant high-detail Flux & Turbo visuals\n- 🎵 **OpenAudio AI & Media Studio** integrations\n- ⚡ **ChatGPT-style Typewriter Streaming** with animated glowing Mei core\n- 📂 **Interactive Dropdown Menus** for seamless navigation (Movix, Matix, Custom Wbots, and more)\n\nType anything below, attach files, or pick a suggestion to test out our creation! 🥂🔥`;
 
         const MODEL_LABELS = {
             'auto': 'Auto (Smart Routing)',
@@ -520,10 +521,11 @@
             const newChat = {
                 id: 'chat_' + Date.now(),
                 title: 'New Chat',
-                messages: []
+                messages: [{ role: 'assistant', content: CELEBRATION_WELCOME }]
             };
             appState.chats.unshift(newChat);
             appState.currentChatId = newChat.id;
+            saveChatsToStorage();
             if (loadFresh) {
                 loadChat(newChat.id);
             }
@@ -537,11 +539,11 @@
 
             if (messagesList) messagesList.innerHTML = '';
             if (chat.messages.length === 0) {
-                if (emptyState) emptyState.classList.remove('hidden');
-            } else {
-                if (emptyState) emptyState.classList.add('hidden');
-                chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
+                chat.messages.push({ role: 'assistant', content: CELEBRATION_WELCOME });
+                saveChatsToStorage();
             }
+            if (emptyState) emptyState.classList.add('hidden');
+            chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
             renderHistory();
         }
 
@@ -595,11 +597,7 @@
             if (openrouterModelInput) openrouterModelInput.value = appState.openrouterModel;
 
             if (appState.chats.length === 0) {
-                createNewChat(false);
-                // Initial welcome message
-                setTimeout(() => {
-                    appendMessage('assistant', `# 🎉 WE DID IT! Mei AI is Officially Alive! 🚀✨\n\nLet's celebrate! We've successfully built and supercharged **Mei AI Workspace** with:\n- 🤖 **100+ Multi-Provider AI Models** (Gemini API, Gemma 2, DeepSeek, Llama, and OpenAI-compatible gateways)\n- 🎨 **Pollinations AI Image Studio** for instant high-detail Flux & Turbo visuals\n- 🎵 **OpenAudio AI & Media Studio** integrations\n- ⚡ **ChatGPT-style Typewriter Streaming** with animated glowing Mei core\n- 📂 **Interactive Dropdown Menus** for seamless navigation (Movix, Matix, Custom Wbots, and more)\n\nType anything below, attach files, or pick a suggestion to test out our creation! 🥂🔥`, true);
-                }, 300);
+                createNewChat(true);
             } else {
                 loadChat(appState.chats[0].id);
             }
@@ -716,7 +714,7 @@
                 if (!generatedImageLastUrl) return;
                 closeImageStudio();
                 appendMessage('assistant', `Here is your generated image for: *"${imgPromptInput.value.trim()}"*\n\n![Generated Image](${generatedImageLastUrl})`, true);
-                saveCurrentChat();
+                saveMessageToActiveChat('assistant', `Here is your generated image for: *"${imgPromptInput.value.trim()}"*\n\n![Generated Image](${generatedImageLastUrl})`);
             });
         }
 
@@ -808,7 +806,7 @@
             clearChatBtn.addEventListener('click', () => {
                 const chat = appState.chats.find(c => c.id === appState.currentChatId);
                 if (chat) {
-                    chat.messages = [];
+                    chat.messages = [{ role: 'assistant', content: CELEBRATION_WELCOME }];
                     chat.title = 'New Chat';
                     saveChatsToStorage();
                     loadChat(chat.id);
@@ -866,7 +864,7 @@
             saveMessageToActiveChat('user', fullUserContent);
 
             const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (currentChat && currentChat.messages.length <= 2) {
+            if (currentChat && currentChat.messages.length <= 3) {
                 currentChat.title = text.length > 28 ? text.substring(0, 28) + '...' : text;
                 renderHistory();
             }
