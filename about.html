@@ -1,361 +1,860 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Mei AI - Next-Gen Intelligence Ecosystem</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Mei AI</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        gemini: {
+                        mei: {
                             bg: '#131314',
-                            card: '#1e1f20',
-                            cardHover: '#282a2c',
-                            border: '#282a2c',
+                            sidebar: '#1e1e20',
+                            card: '#282a2c',
+                            userBubble: '#2b2d30',
                             accent: '#a8c7fa'
                         }
                     },
-                    animation: {
-                        'pulse-glow': 'pulseGlow 7s ease-in-out infinite',
-                        'float': 'float 5s ease-in-out infinite',
-                        'spin-slow': 'spin 14s linear infinite'
-                    },
                     keyframes: {
-                        pulseGlow: {
-                            '0%, 100%': { opacity: 0.35, transform: 'scale(1)' },
-                            '50%': { opacity: 0.65, transform: 'scale(1.08)' }
+                        bibbybitPulse: {
+                            '0%, 100%': { transform: 'scale(1) rotate(0deg)', filter: 'brightness(1) hue-rotate(0deg)' },
+                            '50%': { transform: 'scale(1.15) rotate(3deg)', filter: 'brightness(1.3) hue-rotate(45deg)' }
                         },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' }
+                        bibbybitGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '1', transform: 'scale(1.4)' }
                         }
+                    },
+                    animation: {
+                        'bibbybit-pulse': 'bibbybitPulse 2s ease-in-out infinite',
+                        'bibbybit-glow': 'bibbybitGlow 2s ease-in-out infinite'
                     }
                 }
             }
         }
     </script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #131314;
-            color: #ffffff;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #131314; }
-        ::-webkit-scrollbar-thumb { background: #282a2c; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #374151; }
-
-        .glass-card {
-            background: rgba(30, 31, 32, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        .glass-card:hover {
-            border-color: rgba(255, 255, 255, 0.18);
-            background: rgba(40, 42, 44, 0.85);
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        .typing-cursor::after {
+            content: '▋';
+            display: inline-block;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+            color: #a855f7;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
-<body class="bg-[#131314] text-gray-100 antialiased selection:bg-purple-500 selection:text-white">
+<body class="bg-[#f9fafb] dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
-    <!-- Ambient Glowing Gradient Mesh Background Nodes -->
-    <div class="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-gradient-to-r from-blue-600/25 via-purple-600/25 to-pink-600/25 blur-[150px] pointer-events-none rounded-full animate-pulse-glow z-0"></div>
-    <div class="fixed bottom-[-150px] right-[-100px] w-[600px] h-[600px] bg-gradient-to-tr from-purple-800/15 via-blue-600/15 to-pink-600/10 blur-[180px] pointer-events-none rounded-full z-0"></div>
+    <!-- Mobile Drawer Overlay -->
+    <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden"></div>
 
-    <!-- Navigation Header -->
-    <header class="sticky top-0 w-full z-50 bg-[#131314]/80 backdrop-blur-md border-b border-gray-800/60">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer">
-                <!-- Capsule Logo Badge -->
-                <div class="w-4 h-8 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_18px_rgba(168,85,247,0.85)] flex-shrink-0 animate-pulse"></div>
-                <span class="text-xl font-semibold tracking-tight text-white">Mei AI</span>
+    <!-- Sidebar (Collapsed by default) -->
+    <aside id="sidebar" class="w-72 bg-white dark:bg-mei-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 h-full z-40 fixed lg:static -translate-x-full">
+        <div class="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50">
+            <div class="flex items-center gap-2.5">
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                    <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+                </div>
+                <span class="font-bold text-base text-gray-800 dark:text-gray-100 tracking-wide">Mei Workspace</span>
             </div>
+            <button id="closeSidebarBtn" type="button" class="text-gray-400 hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-800 transition cursor-pointer">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
 
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
-                <a href="#overview" class="hover:text-blue-400 transition">Overview</a>
-                <a href="#capabilities" class="hover:text-purple-400 transition">Capabilities</a>
-                <a href="#creator" class="hover:text-pink-400 transition">Creator</a>
-                <a href="#architecture" class="hover:text-purple-400 transition">Architecture</a>
-                <a href="#faq" class="hover:text-blue-400 transition">FAQ</a>
-            </nav>
+        <div class="p-3">
+            <button id="newChatBtn" type="button" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium shadow-md transition cursor-pointer">
+                <i class="fa-solid fa-plus"></i> New Chat
+            </button>
+        </div>
 
-            <div class="flex items-center gap-3">
-                <a href="index.html" class="px-5 py-2 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-95 transition shadow-lg cursor-pointer">
-                    Try Mei AI
-                </a>
+        <div class="px-3 py-1 space-y-1 border-b border-gray-200 dark:border-gray-800/60 pb-3">
+            <!-- Main Navigation Links -->
+            <button id="homeBtn" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
+                <i class="fa-solid fa-house text-blue-400"></i> Home
+            </button>
+            
+            <button id="openSettingsNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
+                <i class="fa-solid fa-key text-amber-400"></i> API Keys & Settings
+            </button>
+            
+            <!-- Explore Dropdown -->
+            <div class="pt-1">
+                <button id="exploreDropdownBtn" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-compass text-purple-400"></i> Explore Apps
+                    </div>
+                    <i id="exploreChevron" class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-200"></i>
+                </button>
+                <div id="exploreMenu" class="hidden flex-col pl-9 pr-3 py-1 space-y-1">
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Build a clean and intuitive note-taking productivity app UI named 'Dumbo' with a sidebar and rich text editor using standard HTML and Tailwind CSS.">
+                        <i class="fa-solid fa-code text-[10px] text-blue-400"></i> Dumbo
+                    </button>
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Build a 'Matix' digital rain falling green code animation (like The Matrix) using a single HTML5 canvas file and Javascript.">
+                        <i class="fa-solid fa-code-commit text-[10px] text-green-400"></i> Matix
+                    </button>
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Build a comprehensive media editing dashboard UI named 'MediaStudio' with a video timeline, toolbars, and asset library using standard HTML and Tailwind CSS.">
+                        <i class="fa-solid fa-photo-film text-[10px] text-purple-400"></i> MediaStudio
+                    </button>
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Build a futuristic AI web application interface named 'Meizero' with a sleek dark mode dashboard design using standard HTML and Tailwind CSS.">
+                        <i class="fa-solid fa-robot text-[10px] text-blue-400"></i> Meizero
+                    </button>
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Create a cinematic movie streaming catalog UI named 'Movix' with a responsive grid of movie posters, a featured hero section, and a navigation bar.">
+                        <i class="fa-solid fa-film text-[10px] text-pink-400"></i> Movix
+                    </button>
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Build a modern music streaming platform UI named 'OpenAudio' with a dark theme, player controls, playlist sidebar, and track list using HTML and Tailwind CSS.">
+                        <i class="fa-solid fa-music text-[10px] text-teal-400"></i> OpenAudio
+                    </button>
+                    <button type="button" class="explore-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer text-left" data-prompt="Build a web-based code editor interface named 'Syntax' with a file tree sidebar, syntax-highlighted code area, and terminal panel using HTML and Tailwind CSS.">
+                        <i class="fa-solid fa-terminal text-[10px] text-orange-400"></i> Syntax
+                    </button>
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- Main Content Container -->
-    <main class="relative z-10 max-w-6xl mx-auto px-6 py-16 space-y-32">
-
-        <!-- HERO SECTION -->
-        <section id="overview" class="text-center max-w-4xl mx-auto space-y-8 pt-6">
-            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium">
-                <i class="fa-solid fa-sparkles text-purple-400 animate-pulse"></i> Student Created
+        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+            <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-1">Recent Chats</div>
+            <div id="chatHistoryList" class="space-y-1">
+                <div class="px-3 py-2 text-xs text-gray-500 italic">No previous chats</div>
             </div>
+        </div>
 
-            <h1 class="text-5xl sm:text-7xl font-bold tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-                Supercharge your creativity and productivity
-            </h1>
+        <div class="p-3 border-t border-gray-200 dark:border-gray-800/60 space-y-1">
+            <button id="openSettingsBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer">
+                <i class="fa-solid fa-gear text-gray-400"></i> App Preferences
+            </button>
+        </div>
+    </aside>
 
-            <p class="text-gray-400 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-normal">
-                Mei AI is an open student project bringing together multi-model smart routing, keyless model access, free image generation, and local browser privacy into a clean workspace.
-            </p>
+    <!-- Main Flex Outer Container -->
+    <div class="flex-1 flex w-full h-full overflow-hidden relative">
+        <!-- Main Chat Area -->
+        <main id="mainChatArea" class="flex-1 flex flex-col h-full relative overflow-hidden transition-all duration-300">
+            <!-- Top Header Navigation -->
+            <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-mei-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
+                <div class="flex items-center gap-3">
+                    <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer" title="Toggle Navigation Sidebar">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
 
-            <div class="pt-4 flex justify-center">
-                <a href="index.html" class="px-8 py-3.5 text-sm font-semibold rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:opacity-95 transition shadow-xl transform hover:-translate-y-0.5 cursor-pointer">
-                    Try Mei AI
-                </a>
-            </div>
-        </section>
-
-        <!-- CAPABILITIES GRID SECTION -->
-        <section id="capabilities" class="space-y-12">
-            <div class="text-center max-w-2xl mx-auto space-y-3">
-                <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Built for Unmatched Versatility</h2>
-                <p class="text-gray-400 text-sm sm:text-base">Experience high availability and low latency with intelligent fallback mechanisms.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1 -->
-                <div class="glass-card p-8 rounded-3xl transition duration-300 flex flex-col justify-between gap-6 shadow-2xl group">
-                    <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-2xl group-hover:bg-blue-500 group-hover:text-white transition duration-300">
-                            <i class="fa-solid fa-network-wired"></i>
+                    <div class="flex items-center gap-2.5">
+                        <div class="relative flex items-center justify-center">
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                            <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
                         </div>
-                        <h3 class="text-xl font-semibold text-white">20+ Smart Model Router</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            Automatically routes prompts across top-tier open models including Qwen 2.5, Llama 3.3, Mistral, DeepSeek V3/R1, and Phi-3.5 with fallback resiliency.
-                        </p>
+                        <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
                     </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between text-xs font-semibold text-blue-400">
-                        <span>Keyless Access</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-                    </div>
-                </div>
 
-                <!-- Card 2 -->
-                <div class="glass-card p-8 rounded-3xl transition duration-300 flex flex-col justify-between gap-6 shadow-2xl group">
-                    <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-2xl group-hover:bg-purple-500 group-hover:text-white transition duration-300">
-                            <i class="fa-solid fa-image"></i>
+                    <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
+                        Auto (Smart Multi-Routing)
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-2 relative">
+                    <button id="openCanvasHeaderBtn" type="button" class="hidden flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-purple-700 dark:text-purple-300 bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 transition cursor-pointer">
+                        <i class="fa-solid fa-code text-purple-500"></i> Mei Canvas
+                    </button>
+
+                    <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear current chat content">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Scrollable Chat Container -->
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36 relative flex flex-col">
+                <!-- Landing State Banner -->
+                <div id="emptyState" class="m-auto flex flex-col items-center justify-center text-center max-w-2xl w-full">
+                    <div class="relative flex items-center justify-center mb-3">
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-md animate-bibbybit-glow"></div>
+                        <div class="relative w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with 1000+ open-source AI models, Mei Canvas live app editor, file attachments, and typewriter responses.</p>
+
+                    <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
+                        <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
+                            <span>🎉 WE DID IT! Mei AI Workspace is Alive! 🚀✨</span>
                         </div>
-                        <h3 class="text-xl font-semibold text-white">Free Flux Image Generation</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            Create high-definition 1024x1024 visuals on demand powered by Flux image synthesis. Simply describe your visual concept to render artwork instantly.
+                        <p class="text-xs text-gray-300 leading-relaxed mb-2">
+                            Build live single-file HTML web applications, slide presentations, or code utilities right here!
                         </p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between text-xs font-semibold text-purple-400">
-                        <span>On-Demand Synthesis</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="glass-card p-8 rounded-3xl transition duration-300 flex flex-col justify-between gap-6 shadow-2xl group">
-                    <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 text-2xl group-hover:bg-pink-500 group-hover:text-white transition duration-300">
-                            <i class="fa-solid fa-key"></i>
+                        <div class="flex flex-wrap gap-2 text-[11px] text-gray-400">
+                            <span class="bg-purple-500/20 px-2 py-0.5 rounded text-purple-300">🤖 1000+ AI Models</span>
+                            <span class="bg-pink-500/20 px-2 py-0.5 rounded text-pink-300">💻 Mei Canvas Preview</span>
+                            <span class="bg-teal-500/20 px-2 py-0.5 rounded text-teal-300">⚡ Single-File Standard HTML</span>
                         </div>
-                        <h3 class="text-xl font-semibold text-white">Custom API Integration</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            Optionally configure your own Google Gemini API key (<code class="text-blue-400">AIzaSy...</code>) or OpenRouter key (<code class="text-purple-400">sk-or-v1...</code>) for direct API quota access.
-                        </p>
                     </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between text-xs font-semibold text-pink-400">
-                        <span>Google & OpenRouter</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- ABOUT THE CREATOR SECTION -->
-        <section id="creator" class="space-y-8 max-w-4xl mx-auto w-full">
-            <div class="text-center space-y-2">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium">
-                    <i class="fa-solid fa-user-graduate text-pink-400"></i> Classroom Tech Project
-                </div>
-                <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Behind the Project</h2>
-                <p class="text-gray-400 text-sm sm:text-base">Built between classes with a passion for coding, and accessible AI.</p>
-            </div>
-
-            <div class="glass-card p-8 sm:p-10 rounded-3xl transition duration-300 shadow-2xl relative overflow-hidden border border-gray-800/80">
-                <!-- Subtle internal glowing accent -->
-                <div class="absolute -top-24 -right-24 w-60 h-60 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
-                    <!-- Creator Avatar / Icon Badge -->
-                    <div class="flex-shrink-0 relative">
-                        <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-blue-600 via-purple-600 to-pink-500 p-1 shadow-2xl">
-                            <div class="w-full h-full bg-[#1e1e20] rounded-[22px] flex flex-col items-center justify-center text-center p-3">
-                                <i class="fa-solid fa-laptop-code text-3xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-1"></i>
-                                <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Student</span>
-                                <span class="text-[10px] uppercase font-bold tracking-widest text-purple-400">Developer</span>
+                    <!-- Prompt Shortcuts -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left mt-2">
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build an interactive 16:9 HTML slide deck presentation about Space Exploration with 4 slides using HTML/CSS only.">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-file-powerpoint text-purple-400"></i> Create 16:9 Presentation Deck
                             </div>
-                        </div>
-                        <div class="absolute -bottom-2 -right-2 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-md">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Built in 2026
-                        </div>
-                    </div>
+                            <div class="text-gray-500 dark:text-gray-400">Generates slide-container deck in Mei Canvas</div>
+                        </button>
 
-                    <!-- Creator Details -->
-                    <div class="flex-1 space-y-5 text-center md:text-left">
-                        <div>
-                            <h3 class="text-2xl font-bold text-white tracking-tight">Student Developer</h3>
-                            <p class="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-                                Passionate about Coding, Game Dev
-                            </p>
-                        </div>
-
-                        <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
-                            Hey! I'm a student developer passionate about coding, full-stack web development, and Roblox Luau scripting. I created Mei AI as a classroom-friendly learning project to build an accessible, fast, and privacy-conscious AI workspace for fellow students, educators, and creators.
-                        </p>
-
-                        <!-- Skill / Focus Tags -->
-                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1">
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 border border-blue-500/20 text-blue-300">
-                                <i class="fa-solid fa-user-graduate mr-1.5 text-blue-400"></i> Student Developer
-                            </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-purple-500/10 border border-purple-500/20 text-purple-300">
-                                <i class="fa-solid fa-calculator mr-1.5 text-purple-400"></i> Student Github Creator
-                            </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-pink-500/10 border border-pink-500/20 text-pink-300">
-                                <i class="fa-solid fa-gamepad mr-1.5 text-pink-400"></i> Roblox Luau Creator
-                            </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
-                                <i class="fa-solid fa-code mr-1.5 text-emerald-400"></i> Full-Stack Project
-                            </span>
-                        </div>
-
-                        <!-- Action Link Button -->
-                        <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
-                            <a href="https://github.com/IIVShar/Mei-AI" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#282a2c] hover:bg-gray-700 text-xs font-semibold text-gray-200 transition border border-gray-700">
-                                <i class="fa-brands fa-github text-sm"></i> View Project on GitHub
-                            </a>
-                            <span class="text-xs text-gray-500 italic">Built for learning & open collaboration</span>
-                        </div>
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build a complete single-file interactive Pomodoro timer web app using standard HTML, Tailwind CSS, and vanilla JavaScript.">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-clock text-blue-400"></i> Create Pomodoro Timer App
+                            </div>
+                            <div class="text-gray-500 dark:text-gray-400">Single-file web application with live preview</div>
+                        </button>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- SYSTEM ARCHITECTURE SPECIFICATIONS -->
-        <section id="architecture" class="p-10 rounded-3xl bg-[#1e1f20] border border-gray-800/80 space-y-8 shadow-2xl">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6">
-                <div>
-                    <h3 class="text-2xl font-bold text-white">System Architecture & Specs</h3>
-                    <p class="text-gray-400 text-sm mt-1">Single-file client design built for local privacy and high availability.</p>
-                </div>
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Operational State
-                </div>
+                <!-- Messages List Container -->
+                <div id="messagesList" class="max-w-3xl mx-auto w-full space-y-6"></div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="space-y-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Routing Engine</span>
-                    <p class="text-lg font-semibold text-gray-200">20+ Model Auto Router</p>
-                    <p class="text-xs text-gray-400">Fallback failover active</p>
+            <!-- Bottom Floating Input Bar -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-mei-bg dark:via-mei-bg to-transparent z-20 pointer-events-auto">
+                <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
+                    
+                    <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
+
+                    <div class="flex items-end">
+                        <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json,.js,.py,.html,.css">
+                        
+                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach File or Image">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+
+                        <button id="imageStudioBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate Image prompt shortcut">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+
+                        <textarea 
+                            id="messageInput" 
+                            rows="1" 
+                            placeholder="Message Mei"
+                            class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
+
+                        <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • 1000+ AI Models & Live Mei Canvas</p>
+            </div>
+        </main>
+
+        <!-- Mei Canvas Side Panel -->
+        <div id="canvasPanel" class="hidden w-full lg:w-1/2 h-full bg-[#1e1e20] border-l border-gray-800 flex flex-col z-30 transition-all duration-300">
+            <!-- Canvas Toolbar Header -->
+            <div class="h-14 px-4 bg-[#18181a] border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group"></i> Mei Canvas
+                    </span>
+                    <span id="canvasTitle" class="text-sm font-medium text-gray-200 truncate">App Preview</span>
                 </div>
 
-                <div class="space-y-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Privacy Model</span>
-                    <p class="text-lg font-semibold text-gray-200">100% Local Storage</p>
-                    <p class="text-xs text-gray-400">Zero backend data retention</p>
-                </div>
+                <div class="flex items-center gap-2">
+                    <!-- Tab Switcher -->
+                    <div class="flex items-center bg-gray-900 p-1 rounded-lg border border-gray-800 text-xs">
+                        <button id="canvasPreviewTab" type="button" class="px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer">Preview</button>
+                        <button id="canvasCodeTab" type="button" class="px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer">Code</button>
+                    </div>
 
-                <div class="space-y-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Vision & Files</span>
-                    <p class="text-lg font-semibold text-gray-200">Multimodal Enabled</p>
-                    <p class="text-xs text-gray-400">Supports images & code docs</p>
-                </div>
+                    <button id="downloadCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Download HTML File">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
 
-                <div class="space-y-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Rendering Tech</span>
-                    <p class="text-lg font-semibold text-gray-200">Markdown & Syntax</p>
-                    <p class="text-xs text-gray-400">Code block copy supported</p>
+                    <button id="closeCanvasBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Close Mei Canvas">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
                 </div>
             </div>
-        </section>
 
-        <!-- FREQUENTLY ASKED QUESTIONS -->
-        <section id="faq" class="space-y-8 max-w-3xl mx-auto w-full">
-            <div class="text-center space-y-2">
-                <h2 class="text-3xl font-bold text-white">Frequently Asked Questions</h2>
-                <p class="text-gray-400 text-sm">Everything you need to know about Mei AI architecture and usage.</p>
-            </div>
-
-            <div class="space-y-4">
-                <details class="group bg-[#1e1f20] border border-gray-800 rounded-2xl p-6 cursor-pointer [&_summary::-webkit-details-marker]:hidden transition duration-200 hover:border-gray-700">
-                    <summary class="flex items-center justify-between font-semibold text-gray-200">
-                        Is my chat history or personal data stored on remote servers?
-                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs text-gray-400"></i></span>
-                    </summary>
-                    <p class="text-sm text-gray-400 mt-4 leading-relaxed">
-                        No. All chat messages, active app settings, and custom API keys are saved strictly inside your browser's local storage engine (LocalStorage). No user logs or personal telemetry are retained.
-                    </p>
-                </details>
-
-                <details class="group bg-[#1e1f20] border border-gray-800 rounded-2xl p-6 cursor-pointer [&_summary::-webkit-details-marker]:hidden transition duration-200 hover:border-gray-700">
-                    <summary class="flex items-center justify-between font-semibold text-gray-200">
-                        Do I need an API key to use Mei AI?
-                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs text-gray-400"></i></span>
-                    </summary>
-                    <p class="text-sm text-gray-400 mt-4 leading-relaxed">
-                        No API key is required by default. Mei AI utilizes intelligent multi-model routing across open endpoints. However, if you prefer dedicated quotas, you can input your own Google Gemini or OpenRouter API key under Settings.
-                    </p>
-                </details>
-
-                <details class="group bg-[#1e1f20] border border-gray-800 rounded-2xl p-6 cursor-pointer [&_summary::-webkit-details-marker]:hidden transition duration-200 hover:border-gray-700">
-                    <summary class="flex items-center justify-between font-semibold text-gray-200">
-                        How does image generation work?
-                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down text-xs text-gray-400"></i></span>
-                    </summary>
-                    <p class="text-sm text-gray-400 mt-4 leading-relaxed">
-                        By toggling Image Mode in the prompt bar, your description is passed to high-resolution Flux image synthesis engines to render 1024x1024 artwork directly inside the workspace.
-                    </p>
-                </details>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full border-t border-gray-800/60 py-10 px-6 text-center text-xs text-gray-500 relative z-10 bg-[#131314]">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-6 rounded-full bg-gradient-to-b from-blue-500 to-pink-500"></div>
-                <span class="font-semibold text-gray-400 text-sm">Mei AI</span>
-            </div>
-            <p>© 2026 Mei AI Assistant. Designed for privacy, speed, and multi-model versatility.</p>
-            <div class="flex items-center gap-6 text-gray-400">
-                <a href="#overview" class="hover:text-white transition">Overview</a>
-                <a href="#capabilities" class="hover:text-white transition">Features</a>
-                <a href="#faq" class="hover:text-white transition">Privacy FAQ</a>
+            <!-- Canvas View Area -->
+            <div class="flex-1 relative bg-black/40 overflow-hidden">
+                <!-- Live HTML Preview iFrame -->
+                <iframe id="canvasIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+                
+                <!-- Raw Code View Editor -->
+                <div id="canvasCodeContainer" class="hidden w-full h-full overflow-auto p-4 bg-[#141416] text-gray-200 font-mono text-xs">
+                    <pre><code id="canvasCodeElement" class="language-html"></code></pre>
+                </div>
             </div>
         </div>
-    </footer>
+    </div>
 
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-base font-semibold text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-purple-400"></i> Settings & API Keys
+                </h3>
+                <button id="closeSettingsBtn" class="text-gray-400 hover:text-gray-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-3 text-xs max-h-[60vh] overflow-y-auto pr-2">
+                <div>
+                    <label class="block text-gray-400 mb-1 font-medium">Preferred AI Provider</label>
+                    <select id="modelSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-purple-500">
+                        <option value="auto">Auto (Free Smart Multi-Routing)</option>
+                        <option value="meizero">Meizero</option>
+                        <option value="movix">Movix</option>
+                        <option value="matix">Matix</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="groq">Groq</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="pollen">Pollinations / Pollen API</option>
+                    </select>
+                </div>
+
+                <div class="pt-2 border-t border-gray-800 space-y-2">
+                    <label class="block text-gray-400 mb-1 font-medium text-[10px] uppercase tracking-wider">API Keys (Single Key or Multi-Key Config)</label>
+                    <textarea id="multiApiKeyInput" rows="4" placeholder="Enter API Key(s) here. You can paste a single key or format as:&#10;openai=sk-...&#10;groq=gsk_...&#10;gemini=AIza...&#10;openrouter=sk-or-...&#10;pollen=pk_..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px] resize-none"></textarea>
+                    <p class="text-[10px] text-gray-500 mt-1">Keys are stored locally in your browser. Paste a single key or map multiple providers line-by-line.</p>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+                <button id="saveSettingsBtn" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // System Prompt enforcing single-file standard HTML
+        const MEI_SYSTEM_PROMPT = "You are Mei AI, an advanced AI assistant built into the Mei AI Workspace.\nWhen asked to build a web application, game, landing page, slide presentation, or interactive code:\n- ALWAYS generate standalone, standard HTML/CSS/JS in a single block wrapped in ```html code blocks.\n- ONLY use pure standard HTML, inline CSS / Tailwind CDN, and standard vanilla JavaScript.\n- Do NOT use React, Angular, Vue, or JSX components unless explicitly requested by the user. Standard HTML ONLY.\n- For presentation decks, build styled 16:9 1280x720 slide containers using standard HTML.\n- Format code blocks cleanly so they open automatically in the side-by-side Mei Canvas editor.";
+
+        // State Variables
+        let chatHistory = [];
+        let activeAttachments = [];
+        let currentCanvasCode = "";
+        let isGenerating = false;
+        let currentAbortController = null;
+        let currentStreamInterval = null;
+        let currentBotContentEl = null;
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const homeBtn = document.getElementById('homeBtn');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesList = document.getElementById('messagesList');
+        const chatContainer = document.getElementById('chatContainer');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const fileInput = document.getElementById('fileInput');
+        const attachBtn = document.getElementById('attachBtn');
+        const imageStudioBtn = document.getElementById('imageStudioBtn');
+        const attachmentPreview = document.getElementById('attachmentPreview');
+        const canvasPanel = document.getElementById('canvasPanel');
+        const canvasIframe = document.getElementById('canvasIframe');
+        const canvasCodeElement = document.getElementById('canvasCodeElement');
+        const canvasCodeContainer = document.getElementById('canvasCodeContainer');
+        const canvasPreviewTab = document.getElementById('canvasPreviewTab');
+        const canvasCodeTab = document.getElementById('canvasCodeTab');
+        const closeCanvasBtn = document.getElementById('closeCanvasBtn');
+        const downloadCanvasCodeBtn = document.getElementById('downloadCanvasCodeBtn');
+        const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const multiApiKeyInput = document.getElementById('multiApiKeyInput');
+        const modelSelect = document.getElementById('modelSelect');
+
+        // Sidebar Controls
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+        sidebarToggleBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // New Chat Action
+        newChatBtn.addEventListener('click', () => {
+            chatHistory = [];
+            messagesList.innerHTML = '';
+            document.getElementById('emptyState').style.display = 'flex';
+            canvasPanel.classList.add('hidden');
+            openCanvasHeaderBtn.classList.add('hidden');
+            if (!overlay.classList.contains('hidden')) {
+                toggleSidebar();
+            }
+        });
+
+        // Home Button Logic
+        homeBtn.addEventListener('click', () => {
+            newChatBtn.click(); // Maps to the same clean slate logic as New Chat
+        });
+
+        // Explore Dropdown Logic
+        const exploreDropdownBtn = document.getElementById('exploreDropdownBtn');
+        const exploreMenu = document.getElementById('exploreMenu');
+        const exploreChevron = document.getElementById('exploreChevron');
+
+        exploreDropdownBtn.addEventListener('click', () => {
+            exploreMenu.classList.toggle('hidden');
+            exploreMenu.classList.toggle('flex');
+            exploreChevron.classList.toggle('rotate-180');
+        });
+
+        document.querySelectorAll('.explore-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                messageInput.value = btn.dataset.prompt;
+                messageInput.focus();
+                if (!overlay.classList.contains('hidden')) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Settings Controls
+        const openSettingsHandler = () => {
+            multiApiKeyInput.value = localStorage.getItem('mei_multi_api_keys') || '';
+            modelSelect.value = localStorage.getItem('mei_model') || 'auto';
+            settingsModal.classList.remove('hidden');
+            if (!overlay.classList.contains('hidden')) toggleSidebar();
+        };
+        openSettingsBtn.addEventListener('click', openSettingsHandler);
+        document.getElementById('openSettingsNavBtn').addEventListener('click', openSettingsHandler);
+        
+        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        saveSettingsBtn.addEventListener('click', () => {
+            localStorage.setItem('mei_multi_api_keys', multiApiKeyInput.value.trim());
+            localStorage.setItem('mei_model', modelSelect.value);
+            settingsModal.classList.add('hidden');
+        });
+
+        // Helper to parse key input (handles both single raw key and provider=key formats)
+        function getParsedKeys() {
+            const raw = localStorage.getItem('mei_multi_api_keys') || '';
+            const keys = { openai: '', groq: '', gemini: '', openrouter: '', pollen: '' };
+            
+            if (!raw) return keys;
+
+            const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+            lines.forEach(line => {
+                if (line.includes('=')) {
+                    const [prov, ...rest] = line.split('=');
+                    const k = prov.toLowerCase().trim();
+                    const val = rest.join('=').trim();
+                    if (keys.hasOwnProperty(k)) {
+                        keys[k] = val;
+                    }
+                } else {
+                    // If user enters a single key without prefix, assign to selected model or all
+                    if (line.startsWith('sk-or-')) keys.openrouter = line;
+                    else if (line.startsWith('sk-')) keys.openai = line;
+                    else if (line.startsWith('gsk_')) keys.groq = line;
+                    else if (line.startsWith('AIza')) keys.gemini = line;
+                    else if (line.startsWith('pk_') || line.startsWith('pollen_')) keys.pollen = line;
+                    else {
+                        // Generic key fallback
+                        keys.openai = line;
+                        keys.pollen = line;
+                    }
+                }
+            });
+            return keys;
+        }
+
+        // Textarea Auto-expand
+        messageInput.addEventListener('input', () => {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 192) + 'px';
+        });
+
+        // Image Studio Shortcut
+        imageStudioBtn.addEventListener('click', () => {
+            messageInput.value = "Generate a visually rich single-file HTML hero artwork with gradient animations for: ";
+            messageInput.focus();
+        });
+
+        // Attachments Handler
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    activeAttachments.push({
+                        name: file.name,
+                        type: file.type,
+                        data: evt.target.result
+                    });
+                    renderAttachments();
+                };
+                if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+            fileInput.value = '';
+        });
+
+        window.removeAttachment = function(index) {
+            activeAttachments.splice(index, 1);
+            renderAttachments();
+        };
+
+        function renderAttachments() {
+            if (activeAttachments.length === 0) {
+                attachmentPreview.classList.add('hidden');
+                attachmentPreview.innerHTML = '';
+                return;
+            }
+            attachmentPreview.classList.remove('hidden');
+            attachmentPreview.innerHTML = activeAttachments.map((att, idx) => `
+                <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg text-xs text-gray-300 border border-gray-700">
+                    <i class="${att.type.startsWith('image/') ? 'fa-solid fa-image text-pink-400' : 'fa-solid fa-file-code text-blue-400'}"></i>
+                    <span class="max-w-[120px] truncate">${att.name}</span>
+                    <button type="button" onclick="window.removeAttachment(${idx})" class="text-gray-400 hover:text-red-400 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        // Mei Canvas Functions
+        function openCanvas(code, title = "App Preview") {
+            currentCanvasCode = code;
+            document.getElementById('canvasTitle').textContent = title;
+            canvasPanel.classList.remove('hidden');
+            openCanvasHeaderBtn.classList.remove('hidden');
+
+            // Render iFrame
+            canvasIframe.srcdoc = code;
+
+            // Render Code View
+            canvasCodeElement.textContent = code;
+            if (window.hljs) {
+                hljs.highlightElement(canvasCodeElement);
+            }
+        }
+
+        closeCanvasBtn.addEventListener('click', () => canvasPanel.classList.add('hidden'));
+        openCanvasHeaderBtn.addEventListener('click', () => canvasPanel.classList.remove('hidden'));
+
+        canvasPreviewTab.addEventListener('click', () => {
+            canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
+            canvasCodeTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
+            canvasIframe.classList.remove('hidden');
+            canvasCodeContainer.classList.add('hidden');
+        });
+
+        canvasCodeTab.addEventListener('click', () => {
+            canvasCodeTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
+            canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
+            canvasCodeContainer.classList.remove('hidden');
+            canvasIframe.classList.add('hidden');
+        });
+
+        downloadCanvasCodeBtn.addEventListener('click', () => {
+            if (!currentCanvasCode) return;
+            const blob = new Blob([currentCanvasCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mei-app.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Chat Logic & Typewriter Streaming
+        function appendUserMessage(text) {
+            const userBubble = document.createElement('div');
+            userBubble.className = "flex justify-end mb-4";
+            userBubble.innerHTML = `
+                <div class="max-w-2xl bg-mei-userBubble border border-gray-700/60 text-gray-100 p-4 rounded-2xl shadow-sm text-sm">
+                    ${window.marked ? marked.parse(text) : text}
+                </div>
+            `;
+            messagesList.appendChild(userBubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function createBotPlaceholder() {
+            const botContainer = document.createElement('div');
+            botContainer.className = "flex items-start gap-3 mb-6";
+            botContainer.innerHTML = `
+                <div class="relative flex items-center justify-center mt-1 flex-shrink-0">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                    <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+                </div>
+                <div class="flex-1 bg-gray-900/60 border border-gray-800 text-gray-100 p-4 rounded-2xl text-sm leading-relaxed overflow-hidden">
+                    <div class="bot-content typing-cursor"><span class="text-gray-500 dark:text-gray-400 italic animate-pulse">Thinking...</span></div>
+                </div>
+            `;
+            messagesList.appendChild(botContainer);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return botContainer.querySelector('.bot-content');
+        }
+
+        async function fetchAIResponse(userPrompt) {
+            const selectedModel = localStorage.getItem('mei_model') || 'auto';
+            const keys = getParsedKeys();
+            
+            currentAbortController = new AbortController();
+            const signal = currentAbortController.signal;
+
+            const payloadMessages = [
+                { role: "system", content: MEI_SYSTEM_PROMPT },
+                ...chatHistory,
+                { role: "user", content: userPrompt }
+            ];
+
+            // Premium / Key-based Provider Routing
+            let providerEndpoint = null;
+            let fetchOptions = null;
+            let isGemini = false;
+
+            if (selectedModel === 'openai' && keys.openai) {
+                providerEndpoint = "https://api.openai.com/v1/chat/completions";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}`}, body: JSON.stringify({model: 'gpt-4o', messages: payloadMessages}) };
+            } else if (selectedModel === 'groq' && keys.groq) {
+                providerEndpoint = "https://api.groq.com/openai/v1/chat/completions";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}`}, body: JSON.stringify({model: 'llama-3.3-70b-versatile', messages: payloadMessages}) };
+            } else if (selectedModel === 'openrouter' && keys.openrouter) {
+                providerEndpoint = "https://openrouter.ai/api/v1/chat/completions";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openrouter}`}, body: JSON.stringify({model: 'openrouter/auto', messages: payloadMessages}) };
+            } else if (selectedModel === 'pollen' && keys.pollen) {
+                providerEndpoint = "https://text.pollinations.ai/";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.pollen}`}, body: JSON.stringify({messages: payloadMessages, model: 'openai'}) };
+            } else if (selectedModel === 'gemini' && keys.gemini) {
+                isGemini = true;
+                providerEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${keys.gemini}`;
+                
+                const geminiContents = payloadMessages.filter(m => m.role !== 'system').map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{text: m.content}]
+                }));
+                const sysMsg = payloadMessages.find(m => m.role === 'system');
+                const geminiBody = { contents: geminiContents };
+                if (sysMsg) geminiBody.system_instruction = { parts: [{ text: sysMsg.content }] };
+                
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(geminiBody) };
+            }
+
+            if (providerEndpoint && fetchOptions) {
+                try {
+                    fetchOptions.signal = signal;
+                    const res = await fetch(providerEndpoint, fetchOptions);
+                    if (res.ok) {
+                        const json = await res.json();
+                        return isGemini ? json.candidates[0].content.parts[0].text : (json.choices?.[0]?.message?.content || json.text || "");
+                    }
+                    console.warn(`Selected provider (${selectedModel}) failed. Falling back to free router...`, await res.text());
+                } catch (err) {
+                    if (err.name === 'AbortError') return "\n\n*(Interrupted by user)*";
+                    console.warn(`Selected provider network error. Falling back to free router...`, err);
+                }
+            }
+
+            // Public Resilient Failover Router
+            const pollenHeader = keys.pollen ? { 'Authorization': `Bearer ${keys.pollen}` } : {};
+            const endpoints = [
+                {
+                    url: "https://text.pollinations.ai/",
+                    body: { messages: payloadMessages, model: 'openai' },
+                    headers: pollenHeader
+                },
+                {
+                    url: "https://text.pollinations.ai/" + encodeURIComponent(userPrompt) + "?private=true&cache=false",
+                    isGet: true,
+                    headers: pollenHeader
+                },
+                {
+                    url: "https://api.airforce/v1/chat/completions",
+                    body: { messages: payloadMessages, model: 'llama-3.3-70b-instruct' }
+                }
+            ];
+
+            let attempt = 1;
+            while (true) {
+                for (const endpoint of endpoints) {
+                    try {
+                        let response;
+                        if (endpoint.isGet) {
+                            response = await fetch(endpoint.url, { signal, headers: endpoint.headers || {} });
+                        } else {
+                            const headers = { 'Content-Type': 'application/json', ...(endpoint.headers || {}) };
+                            response = await fetch(endpoint.url, {
+                                method: 'POST',
+                                headers,
+                                body: JSON.stringify(endpoint.body),
+                                signal
+                            });
+                        }
+
+                        if (!response.ok) continue;
+
+                        let textResult = "";
+                        const contentType = response.headers.get("content-type");
+                        
+                        if (contentType && contentType.includes("application/json")) {
+                            const json = await response.json();
+                            textResult = json.choices?.[0]?.message?.content || json.text || "";
+                        } else {
+                            textResult = await response.text();
+                            try {
+                                const parsed = JSON.parse(textResult);
+                                textResult = parsed.choices?.[0]?.message?.content || parsed.text || textResult;
+                            } catch(e) {}
+                        }
+
+                        if (textResult && !textResult.includes("Free limit reached") && !textResult.includes("Please wait a few seconds") && !textResult.includes("Nodes Overloaded")) {
+                            return textResult;
+                        }
+                    } catch (err) {
+                        if (err.name === 'AbortError') return "\n\n*(Interrupted by user)*";
+                        console.warn(`API Router Failover Node Error (Attempt ${attempt}):`, err);
+                    }
+                }
+                
+                console.log(`Attempt ${attempt} failed across all nodes. Retrying in 3 seconds...`);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                if (signal.aborted) return "\n\n*(Interrupted by user)*";
+                attempt++;
+            }
+        }
+
+        function finishGeneration() {
+            if (currentStreamInterval) clearInterval(currentStreamInterval);
+            if (currentBotContentEl) currentBotContentEl.classList.remove('typing-cursor');
+            isGenerating = false;
+            sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+            sendBtn.classList.remove('text-red-500', 'dark:text-red-400');
+            sendBtn.classList.add('text-blue-600', 'dark:text-blue-400');
+            
+            if (currentBotContentEl) {
+                currentBotContentEl.querySelectorAll('pre code').forEach((block) => {
+                    if (window.hljs) hljs.highlightElement(block);
+                });
+            }
+            currentAbortController = null;
+            currentStreamInterval = null;
+            currentBotContentEl = null;
+        }
+
+        function handleInterrupt() {
+            if (currentAbortController) currentAbortController.abort();
+            finishGeneration();
+        }
+
+        async function handleSend() {
+            const prompt = messageInput.value.trim();
+            if (!prompt && !isGenerating) return;
+
+            isGenerating = true;
+            sendBtn.innerHTML = '<i class="fa-solid fa-circle-stop"></i>';
+            sendBtn.classList.remove('text-blue-600', 'dark:text-blue-400');
+            sendBtn.classList.add('text-red-500', 'dark:text-red-400');
+            
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            let fullUserContent = prompt;
+            if (activeAttachments.length > 0) {
+                fullUserContent += "\n\n[Attached Files]:\n" + activeAttachments.map(a => `${a.name}:\n${a.data}`).join("\n\n");
+                activeAttachments = [];
+                renderAttachments();
+            }
+
+            appendUserMessage(prompt);
+            currentBotContentEl = createBotPlaceholder();
+
+            const rawAiResponse = await fetchAIResponse(fullUserContent);
+            if (!isGenerating) return; // Aborted during fetch
+
+            chatHistory.push({ role: "user", content: fullUserContent });
+            chatHistory.push({ role: "assistant", content: rawAiResponse });
+
+            let index = 0;
+            const chunkSize = 4;
+            currentStreamInterval = setInterval(() => {
+                index += chunkSize;
+                const currentText = rawAiResponse.slice(0, index);
+                currentBotContentEl.innerHTML = window.marked ? marked.parse(currentText) : currentText;
+
+                // Robust regex to extract HTML code block even if the markdown syntax varies slightly
+                const htmlMatch = currentText.match(/```(?:html|xml)?\s*\n([\s\S]*?)```/i) || currentText.match(/```(?:html|xml)?\s*\n([\s\S]*)$/i);
+                if (htmlMatch && htmlMatch[1].length > 50) {
+                    openCanvas(htmlMatch[1], "Live App Preview");
+                }
+
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                if (index >= rawAiResponse.length) {
+                    finishGeneration();
+                }
+            }, 12);
+        }
+
+        sendBtn.addEventListener('click', () => {
+            if (isGenerating) {
+                handleInterrupt();
+            } else {
+                handleSend();
+            }
+        });
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!isGenerating) handleSend();
+            }
+        });
+
+        // Prompt Chips Click Handlers
+        document.querySelectorAll('.prompt-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                messageInput.value = btn.dataset.prompt;
+                handleSend();
+            });
+        });
+
+        // Clear Chat
+        clearChatBtn.addEventListener('click', () => {
+            chatHistory = [];
+            messagesList.innerHTML = '';
+            canvasPanel.classList.add('hidden');
+            openCanvasHeaderBtn.classList.add('hidden');
+        });
+    </script>
 </body>
 </html>
