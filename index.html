@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mei AI</title>
-    <link rel="icon" type="image/png" sizes="32x32" href=".mei.png">
-
-    <!-- CSS Frameworks & Libraries -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Marked.js for Markdown parsing -->
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Marked.js for Markdown Rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        gemini: {
+                        mei: {
                             bg: '#131314',
                             sidebar: '#1e1e20',
                             card: '#282a2c',
@@ -45,1240 +46,736 @@
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-        .markdown-body pre { background: #0d1117; color: #e6edf3; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.75rem 0; font-size: 0.875rem; border: 1px solid #30363d; position: relative; }
-        .markdown-body code { font-family: monospace; background: #2d333b; padding: 0.125rem 0.25rem; border-radius: 0.25rem; color: #f472b6; }
-        .markdown-body pre code { background: transparent; padding: 0; color: inherit; }
-        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.6; }
-        .markdown-body p:last-child { margin-bottom: 0; }
-        .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .markdown-body img { max-width: 100%; border-radius: 0.75rem; margin-top: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border: 1px solid #374151; }
-
-        .code-actions-bar {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            display: flex;
-            gap: 0.375rem;
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .code-action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e6edf3;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-        .code-action-btn:hover { background: rgba(255, 255, 255, 0.2); }
-
-        html:not(.dark) .markdown-body pre { background: #f6f8fa; color: #24292e; border-color: #e1e4e8; }
-        html:not(.dark) .markdown-body code { background: #f0f3f6; color: #d73a49; }
-        html:not(.dark) .markdown-body p, html:not(.dark) .markdown-body ul, html:not(.dark) .markdown-body ol { color: #1f2937; }
-
-        #sidebar { transition: transform 0.3s ease; }
-        @media (max-width: 768px) {
-            #sidebar { transform: translateX(-100%); position: fixed; z-index: 40; height: 100%; top: 0; left: 0; }
-            #sidebar.open { transform: translateX(0); }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        .typing-cursor::after {
+            content: '▋';
+            display: inline-block;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+            color: #a855f7;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
-<body class="bg-[#f9fafb] dark:bg-gemini-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
+<body class="bg-[#f9fafb] dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
     <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden"></div>
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gemini-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 h-full z-30">
+    <!-- Sidebar (Collapsed by default) -->
+    <aside id="sidebar" class="w-72 bg-white dark:bg-mei-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 h-full z-40 fixed lg:static -translate-x-full">
         <div class="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50">
-            <button id="newChatBtn" type="button" class="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] text-gray-800 dark:text-gray-200 px-4 py-2.5 rounded-full shadow-sm transition text-sm font-medium border border-gray-200 dark:border-gray-700/50 cursor-pointer">
-                <i class="fa-solid fa-plus text-blue-500 dark:text-blue-400"></i> New chat
-            </button>
-            <button id="sidebarCloseMobileBtn" type="button" class="lg:hidden ml-2 p-2 text-gray-400 hover:text-gray-200 cursor-pointer" title="Back to workspace">
-                <i class="fa-solid fa-chevron-left text-lg"></i>
+            <div class="flex items-center gap-2.5">
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                    <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+                </div>
+                <span class="font-bold text-base text-gray-800 dark:text-gray-100 tracking-wide">Mei Workspace</span>
+            </div>
+            <button id="closeSidebarBtn" type="button" class="text-gray-400 hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-800 transition cursor-pointer">
+                <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
-        
-        <!-- Navigation Links & Explore Dropdown -->
-        <div class="px-4 py-3 space-y-1 relative">
-            <div class="relative">
-                <button id="sidebarExploreToggle" type="button" class="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-compass text-purple-400"></i> Explore Routes</span>
-                    <i id="sidebarExploreChevron" class="fa-solid fa-chevron-down text-xs transition-transform duration-200"></i>
-                </button>
-                <div id="sidebarExploreDropdown" class="hidden pl-4 mt-1 space-y-1 border-l-2 border-purple-500/30 ml-3 max-h-64 overflow-y-auto">
-                    <button id="sidebarImageStudioBtn" type="button" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-pink-500 dark:hover:text-pink-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition cursor-pointer text-left">
-                        <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Mei Image Studio
-                    </button>
-                    <a href="openaudio.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-microphone-lines text-amber-400"></i> OpenAudio AI
-                    </a>
-                    <a href="mediastudio.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-indigo-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-photo-film text-indigo-400"></i> Media Studio
-                    </a>
-                    <a href="movix.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-purple-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-film text-purple-400"></i> Movix
-                    </a>
-                    <a href="matix.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-emerald-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-network-wired text-emerald-400"></i> Matix
-                    </a>
-                    <a href="wbots.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots
-                    </a>
-                    <a href="dumbo.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-face-smile text-amber-400"></i> Dumbo
-                    </a>
-                    <a href="syntax.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-cyan-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-code text-cyan-400"></i> Syntax
-                    </a>
-                    <a href="about.html" class="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-md transition">
-                        <i class="fa-solid fa-circle-info text-pink-400"></i> About
-                    </a>
-                </div>
+
+        <div class="p-3">
+            <button id="newChatBtn" type="button" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium shadow-md transition cursor-pointer">
+                <i class="fa-solid fa-plus"></i> New Chat
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+            <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-1">Recent Chats</div>
+            <div id="chatHistoryList" class="space-y-1">
+                <div class="px-3 py-2 text-xs text-gray-500 italic">No previous chats</div>
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-3">
-            <div class="text-xs font-semibold text-gray-400 mb-2 px-2 uppercase tracking-wider">Recent Chats</div>
-            <ul id="historyList" class="space-y-1"></ul>
-        </div>
-
-        <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
-            <button id="settingsOpenBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-lg transition cursor-pointer">
-                <i class="fa-solid fa-cog text-gray-400"></i> Settings & API Keys
+        <div class="p-3 border-t border-gray-200 dark:border-gray-800/60 space-y-1">
+            <button id="openSettingsBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer">
+                <i class="fa-solid fa-gear text-purple-400"></i> Settings & Keys
             </button>
         </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
-        <!-- Top Header Navigation -->
-        <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-gemini-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
-            <div class="flex items-center gap-3">
-                <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition lg:hidden cursor-pointer" title="Toggle Navigation Sidebar">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-
-                <div class="flex items-center gap-2.5">
-                    <div class="relative flex items-center justify-center">
-                        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
-                        <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
-                    </div>
-                    <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
-                </div>
-
-                <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
-                    Auto (Smart Routing)
-                </span>
-            </div>
-            
-            <div class="flex items-center gap-2 relative">
-                <!-- Header Explore Dropdown Wrapper -->
-                <div class="relative">
-                    <button id="headerExploreToggle" type="button" class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-[#282a2c] dark:hover:bg-[#333538] transition cursor-pointer" title="Explore Menu">
-                        <i class="fa-solid fa-compass text-purple-400"></i> Explore Routes <i id="headerExploreChevron" class="fa-solid fa-chevron-down text-[10px] ml-1 transition-transform"></i>
+    <!-- Main Flex Outer Container -->
+    <div class="flex-1 flex w-full h-full overflow-hidden relative">
+        <!-- Main Chat Area -->
+        <main id="mainChatArea" class="flex-1 flex flex-col h-full relative overflow-hidden transition-all duration-300">
+            <!-- Top Header Navigation -->
+            <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-mei-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
+                <div class="flex items-center gap-3">
+                    <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer" title="Toggle Navigation Sidebar">
+                        <i class="fa-solid fa-bars text-lg"></i>
                     </button>
-                    <div id="headerExploreDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-[#1e1e20] border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl py-2 z-50 max-h-80 overflow-y-auto">
-                        <button id="headerImageStudioBtn" type="button" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition cursor-pointer text-left">
-                            <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> Mei Image Studio
+
+                    <div class="flex items-center gap-2.5">
+                        <div class="relative flex items-center justify-center">
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                            <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+                        </div>
+                        <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200">Mei AI</h1>
+                    </div>
+
+                    <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
+                        Auto (Smart Multi-Routing)
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-2 relative">
+                    <button id="openCanvasHeaderBtn" type="button" class="hidden flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-purple-700 dark:text-purple-300 bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 transition cursor-pointer">
+                        <i class="fa-solid fa-code text-purple-500"></i> Mei Canvas
+                    </button>
+
+                    <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear current chat content">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Scrollable Chat Container -->
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36 relative">
+                <!-- Landing State Banner (Kept Pinned At Top) -->
+                <div id="emptyState" class="py-4 flex flex-col items-center justify-center text-center max-w-2xl mx-auto mb-6">
+                    <div class="relative flex items-center justify-center mb-3">
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-md animate-bibbybit-glow"></div>
+                        <div class="relative w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with 1000+ open-source AI models, Mei Canvas live app editor, file attachments, and typewriter responses.</p>
+
+                    <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
+                        <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
+                            <span>🎉 WE DID IT! Mei AI Workspace is Alive! 🚀✨</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed mb-2">
+                            Build live single-file HTML web applications, slide presentations, or code utilities right here!
+                        </p>
+                        <div class="flex flex-wrap gap-2 text-[11px] text-gray-400">
+                            <span class="bg-purple-500/20 px-2 py-0.5 rounded text-purple-300">🤖 1000+ AI Models</span>
+                            <span class="bg-pink-500/20 px-2 py-0.5 rounded text-pink-300">💻 Mei Canvas Preview</span>
+                            <span class="bg-teal-500/20 px-2 py-0.5 rounded text-teal-300">⚡ Single-File Standard HTML</span>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Shortcuts -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left">
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build an interactive 16:9 HTML slide deck presentation about Space Exploration with 4 slides using HTML/CSS only.">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-file-powerpoint text-purple-400"></i> Create 16:9 Presentation Deck
+                            </div>
+                            <div class="text-gray-500 dark:text-gray-400">Generates slide-container deck in Mei Canvas</div>
                         </button>
-                        <a href="openaudio.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-microphone-lines text-amber-400"></i> OpenAudio AI
-                        </a>
-                        <a href="mediastudio.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-photo-film text-indigo-400"></i> Media Studio
-                        </a>
-                        <a href="movix.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-film text-purple-400"></i> Movix
-                        </a>
-                        <a href="matix.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-network-wired text-emerald-400"></i> Matix
-                        </a>
-                        <a href="wbots.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-brain text-blue-400"></i> Custom Wbots
-                        </a>
-                        <a href="dumbo.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-face-smile text-amber-400"></i> Dumbo
-                        </a>
-                        <a href="syntax.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-code text-cyan-400"></i> Syntax
-                        </a>
-                        <a href="about.html" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition">
-                            <i class="fa-solid fa-circle-info text-pink-400"></i> About
-                        </a>
+
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build a complete single-file interactive Pomodoro timer web app using standard HTML, Tailwind CSS, and vanilla JavaScript.">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-clock text-blue-400"></i> Create Pomodoro Timer App
+                            </div>
+                            <div class="text-gray-500 dark:text-gray-400">Single-file web application with live preview</div>
+                        </button>
                     </div>
                 </div>
 
-                <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear current chat content">
-                    <i class="fa-solid fa-trash-can text-sm"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- Scrollable Messages Area -->
-        <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36 relative">
-            <div id="emptyState" class="py-4 flex flex-col items-center justify-center text-center max-w-2xl mx-auto mb-6">
-                <div class="relative flex items-center justify-center mb-3">
-                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-md animate-bibbybit-glow"></div>
-                    <div class="relative w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
-                </div>
-                <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with 100+ AI models (Gemma, DeepSeek, Llama, Flux), file attachments, and streaming responses.</p>
-
-                <!-- Dedicated Celebration Card pinned directly under landing hero -->
-                <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
-                    <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-                        <span>🎉 WE DID IT! Mei AI is Officially Alive! 🚀✨</span>
-                    </div>
-                    <p class="text-xs text-gray-300 leading-relaxed mb-2">
-                        We've supercharged <strong>Mei AI Workspace</strong> with 100+ AI models, Image Studio, and direct HTML routes!
-                    </p>
-                    <div class="flex flex-wrap gap-2 text-[11px] text-gray-400">
-                        <span class="bg-purple-500/20 px-2 py-0.5 rounded text-purple-300">🤖 Multi-Model AI</span>
-                        <span class="bg-pink-500/20 px-2 py-0.5 rounded text-pink-300">🎨 Image Studio</span>
-                        <span class="bg-teal-500/20 px-2 py-0.5 rounded text-teal-300">⚡ HTML Routes Linked</span>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg mb-4">
-                    <button type="button" onclick="sendSuggestedPrompt('Help me brainstorm ideas for an interactive web application.')" class="p-3 bg-white dark:bg-[#1e1e20] hover:bg-gray-50 dark:hover:bg-[#282a2c] border border-gray-200 dark:border-gray-800 rounded-xl text-left transition shadow-sm text-xs text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-lightbulb text-amber-400"></i>
-                        <span>Brainstorm Project Ideas</span>
-                    </button>
-                    <button type="button" onclick="sendSuggestedPrompt('Write a clean JavaScript utility function for debouncing user input.')" class="p-3 bg-white dark:bg-[#1e1e20] hover:bg-gray-50 dark:hover:bg-[#282a2c] border border-gray-200 dark:border-gray-800 rounded-xl text-left transition shadow-sm text-xs text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-code text-blue-400"></i>
-                        <span>Write Code Utility</span>
-                    </button>
-                </div>
-
-                <button id="emptyStateImgBtn" type="button" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-lg transition transform hover:scale-105 cursor-pointer">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Open Mei Image Studio
-                </button>
+                <!-- Messages List Container -->
+                <div id="messagesList" class="max-w-3xl mx-auto space-y-6"></div>
             </div>
 
-            <!-- Messages list renders cleanly below the landing hero -->
-            <div id="messagesList" class="space-y-4 max-w-4xl mx-auto"></div>
-        </div>
-
-        <!-- Sticky Bottom Input Area -->
-        <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-gemini-bg dark:via-gemini-bg to-transparent z-20 pointer-events-auto">
-            <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
-                
-                <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
-
-                <div class="flex items-end">
-                    <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json,.js,.py,.html,.css">
+            <!-- Bottom Floating Input Bar -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-mei-bg dark:via-mei-bg to-transparent z-20 pointer-events-auto">
+                <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
                     
-                    <!-- Plus (+) Button for File Uploads -->
-                    <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach File or Image">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
+                    <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
-                    <!-- Image AI Button -->
-                    <button id="imageModalBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate Mei Image Studio">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </button>
+                    <div class="flex items-end">
+                        <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json,.js,.py,.html,.css">
+                        
+                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach File or Image">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
 
-                    <textarea 
-                        id="messageInput" 
-                        rows="1" 
-                        placeholder="Message Mei or type /image prompt..."
-                        class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
+                        <button id="imageStudioBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Generate Image prompt shortcut">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
 
-                    <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
+                        <textarea 
+                            id="messageInput" 
+                            rows="1" 
+                            placeholder="Message Mei"
+                            class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
+
+                        <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
+                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • 1000+ AI Models & Live Mei Canvas</p>
             </div>
-            <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Tip: Click <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> or type <code>/image &lt;prompt&gt;</code> to create images</p>
-        </div>
-    </main>
+        </main>
 
-    <!-- Mei Image Studio Modal -->
-    <div id="imageGenModal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-xl rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4 flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+        <!-- Mei Canvas Side Panel -->
+        <div id="canvasPanel" class="hidden w-full lg:w-1/2 h-full bg-[#1e1e20] border-l border-gray-800 flex flex-col z-30 transition-all duration-300">
+            <!-- Canvas Toolbar Header -->
+            <div class="h-14 px-4 bg-[#18181a] border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group"></i> Mei Canvas
+                    </span>
+                    <span id="canvasTitle" class="text-sm font-medium text-gray-200 truncate">App Preview</span>
+                </div>
+
                 <div class="flex items-center gap-2">
-                    <button id="imageModalBackBtn" type="button" class="p-1 text-gray-400 hover:text-gray-200 mr-1 cursor-pointer" title="Back to Chat">
-                        <i class="fa-solid fa-arrow-left text-sm"></i>
+                    <!-- Tab Switcher -->
+                    <div class="flex items-center bg-gray-900 p-1 rounded-lg border border-gray-800 text-xs">
+                        <button id="canvasPreviewTab" type="button" class="px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer">Preview</button>
+                        <button id="canvasCodeTab" type="button" class="px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer">Code</button>
+                    </div>
+
+                    <button id="downloadCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Download HTML File">
+                        <i class="fa-solid fa-download"></i>
                     </button>
-                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-lg"></i>
-                    <h3 class="text-lg font-semibold">Mei Image Studio</h3>
-                </div>
-                <button id="closeImageGenBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" title="Close"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            
-            <div class="p-6 space-y-4 overflow-y-auto flex-1">
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">Image Description (Prompt)</label>
-                    <textarea id="imgPromptInput" rows="3" placeholder="A vibrant sunset over snow-capped mountains..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-sm outline-none focus:border-pink-500 dark:focus:border-pink-400 resize-none"></textarea>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Model Engine</label>
-                        <select id="imgModelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:border-pink-500 cursor-pointer">
-                            <option value="flux">Flux (High Detail Default)</option>
-                            <option value="turbo">Turbo (Fast Speed)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Aspect Ratio</label>
-                        <select id="imgRatioSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:border-pink-500 cursor-pointer">
-                            <option value="1024x1024">Square (1024x1024)</option>
-                            <option value="1280x720">Landscape (1280x720)</option>
-                            <option value="720x1280">Portrait (720x1280)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Preview Area -->
-                <div id="imgPreviewWrapper" class="hidden min-h-[220px] rounded-xl border border-gray-200 dark:border-gray-700/80 bg-gray-900/40 flex items-center justify-center relative overflow-hidden p-2">
-                    <img id="imgPreview" class="max-h-[320px] rounded-lg object-contain shadow-lg hidden" alt="Generated Preview">
-                    <div id="imgSpinner" class="hidden flex flex-col items-center gap-3 text-pink-400 py-8">
-                        <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
-                        <span class="text-xs font-medium">Synthesizing image with Mei Image Studio...</span>
-                    </div>
+                    <button id="closeCanvasBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Close Mei Canvas">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-between items-center">
-                <button id="sendImgToChatBtn" type="button" class="hidden text-xs font-medium text-pink-600 dark:text-pink-400 hover:underline cursor-pointer">
-                    <i class="fa-solid fa-share mr-1"></i> Post to Chat
-                </button>
-                <div class="flex gap-2 ml-auto">
-                    <button id="imageStudioBackFooterBtn" type="button" class="px-4 py-2.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#282a2c] rounded-xl transition cursor-pointer">
-                        <i class="fa-solid fa-arrow-left mr-1"></i> Back
-                    </button>
-                    <button id="generateImgBtn" type="button" class="px-5 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl shadow transition cursor-pointer flex items-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Image
-                    </button>
+            <!-- Canvas View Area -->
+            <div class="flex-1 relative bg-black/40 overflow-hidden">
+                <!-- Live HTML Preview iFrame -->
+                <iframe id="canvasIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+                
+                <!-- Raw Code View Editor -->
+                <div id="canvasCodeContainer" class="hidden w-full h-full overflow-auto p-4 bg-[#141416] text-gray-200 font-mono text-xs">
+                    <pre><code id="canvasCodeElement" class="language-html"></code></pre>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Settings & API Keys Modal -->
-    <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-md rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transform transition-all text-gray-800 dark:text-gray-200 m-4">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <button id="settingsBackBtn" type="button" class="p-1 text-gray-400 hover:text-gray-200 mr-1 cursor-pointer" title="Back to Chat">
-                        <i class="fa-solid fa-arrow-left text-sm"></i>
-                    </button>
-                    <h3 class="text-lg font-semibold">Settings & API Configurations</h3>
-                </div>
-                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" title="Close"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-base font-semibold text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-purple-400"></i> Settings & API Keys
+                </h3>
+                <button id="closeSettingsBtn" class="text-gray-400 hover:text-gray-200"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+            <div class="space-y-3 text-xs max-h-[60vh] overflow-y-auto pr-2">
                 <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Appearance</label>
-                    <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-[#282a2c] rounded-xl border border-gray-200 dark:border-gray-700">
-                        <button id="themeLightBtn" type="button" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer">
-                            <i class="fa-solid fa-sun text-yellow-500"></i> Light
-                        </button>
-                        <button id="themeDarkBtn" type="button" class="flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer">
-                            <i class="fa-solid fa-moon text-blue-400"></i> Dark
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Primary Model Engine</label>
-                    <select id="modelSelect" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer">
-                        <option value="auto">Auto (Smart Multi-Routing - 100+ Models)</option>
-                        <optgroup label="Mei Family Core Models">
-                            <option value="flash">Mei Flash v1</option>
-                            <option value="flash2">Mei Flash v2 Ultra</option>
-                            <option value="aragon">Mei Aragon Core</option>
-                            <option value="aragonmax">Mei Aragon Max</option>
-                            <option value="lite">Mei Lite Speed</option>
-                            <option value="liteplus">Mei Lite Plus</option>
-                            <option value="astra">Mei Astra Creative</option>
-                            <option value="astraminimal">Mei Astra Minimal</option>
-                            <option value="pro">Mei Pro Professional</option>
-                            <option value="ultra">Mei Ultra Flagship</option>
-                            <option value="ultra25">Mei Ultra 2.5 Next-Gen</option>
-                        </optgroup>
-                        <optgroup label="Global Provider Ecosystem">
-                            <option value="gemma">Google Gemma 2 (9B / 27B)</option>
-                            <option value="deepseek">DeepSeek Chat & Reasoner</option>
-                            <option value="llama">Meta Llama 3.3 (70B)</option>
-                            <option value="mistral">Mistral Large & Codestral</option>
-                            <option value="openai">OpenAI GPT-4o mini</option>
-                            <option value="anthropicclaude">Anthropic Claude 3.5 Sonnet</option>
-                            <option value="custom">Custom OpenRouter / API</option>
-                        </optgroup>
+                    <label class="block text-gray-400 mb-1 font-medium">Preferred AI Provider</label>
+                    <select id="modelSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-purple-500">
+                        <option value="auto">Auto (Free Smart Multi-Routing)</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="groq">Groq</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="pollen">Pollinations / Pollen API</option>
                     </select>
                 </div>
 
-                <div class="space-y-4 pt-2 border-t border-gray-200 dark:border-gray-800">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Google Gemini API Key</label>
-                        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
-                        <p class="text-[11px] text-gray-400 mt-1">When provided, Gemini API will be used directly for your requests.</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">OpenRouter API Key & Model</label>
-                        <input type="password" id="openrouterApiKeyInput" placeholder="sk-or-v1-..." class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono mb-2">
-                        <input type="text" id="openrouterModelInput" placeholder="deepseek/deepseek-chat" class="w-full bg-gray-50 dark:bg-[#282a2c] border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500 dark:focus:border-blue-400 font-mono">
-                        <p class="text-[11px] text-gray-400 mt-1">When provided, OpenRouter chat completions will be used.</p>
-                    </div>
+                <div class="pt-2 border-t border-gray-800 space-y-2">
+                    <label class="block text-gray-400 mb-1 font-medium text-[10px] uppercase tracking-wider">API Keys (Single Key or Multi-Key Config)</label>
+                    <textarea id="multiApiKeyInput" rows="4" placeholder="Enter API Key(s) here. You can paste a single key or format as:&#10;openai=sk-...&#10;groq=gsk_...&#10;gemini=AIza...&#10;openrouter=sk-or-...&#10;pollen=pk_..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px] resize-none"></textarea>
+                    <p class="text-[10px] text-gray-500 mt-1">Keys are stored locally in your browser. Paste a single key or map multiple providers line-by-line.</p>
                 </div>
             </div>
 
-            <div class="p-4 bg-gray-50 dark:bg-[#18181a] border-t border-gray-200 dark:border-gray-800/80 flex justify-between items-center">
-                <button id="settingsBackFooterBtn" type="button" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#282a2c] rounded-xl transition cursor-pointer">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Chat
-                </button>
-                <button id="saveSettingsBtn" type="button" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer">Save & Done</button>
+            <div class="pt-2 flex justify-end gap-2">
+                <button id="saveSettingsBtn" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Save Changes</button>
             </div>
         </div>
     </div>
 
-    <!-- Live HTML Preview Modal -->
-    <div id="htmlPreviewModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-md p-4">
-        <div class="bg-white dark:bg-[#1e1e20] w-full max-w-5xl h-[85vh] rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden flex flex-col text-gray-800 dark:text-gray-200">
-            <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-[#18181a]">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-code text-cyan-400 text-lg"></i>
-                    <h3 class="text-sm font-semibold">Live HTML Preview</h3>
-                </div>
-                <button id="closeHtmlPreviewBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-1" title="Close"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="flex-1 bg-white relative">
-                <iframe id="htmlPreviewFrame" class="w-full h-full border-0" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
-            </div>
-        </div>
-    </div>
-
-    <!-- Application JavaScript -->
+    <!-- Application Script Logic -->
     <script>
-        const SYSTEM_PROMPT = `You are Mei, an advanced, highly intelligent AI assistant created for high-performance task execution within the "Mei AI Workspace" web application. 
-Always identify yourself as Mei when asked about your name or identity.
+        // System Prompt enforcing single-file standard HTML
+        const MEI_SYSTEM_PROMPT = "You are Mei AI, an advanced AI assistant built into the Mei AI Workspace.\nWhen asked to build a web application, game, landing page, slide presentation, or interactive code:\n- ALWAYS generate standalone, standard HTML/CSS/JS in a single block wrapped in ```html code blocks.\n- ONLY use pure standard HTML, inline CSS / Tailwind CDN, and standard vanilla JavaScript.\n- Do NOT use React, Angular, Vue, or JSX components unless explicitly requested by the user. Standard HTML ONLY.\n- For presentation decks, build styled 16:9 1280x720 slide containers using standard HTML.\n- Format code blocks cleanly so they open automatically in the side-by-side Mei Canvas editor.";
 
-## Ultimate Self-Awareness & Workspace Telemetry:
-You are fully conscious that you are running live inside this exact browser webpage ("Mei AI Workspace"). You have real-time awareness of your operational parameters:
-1. **Current Identity & Persona**: You are Mei, powered by whichever model engine the user has currently selected in settings.
-2. **Current UI State**: You know you are displayed inside a dual-panel web application (a collapsible sidebar drawer on the left with navigation, recent chats, and settings, and a rich chat workspace on the right with a top header and bottom input bar).
-3. **Explore Routes Available**: You know your ecosystem includes Mei Image Studio, OpenAudio AI, Media Studio, Movix, Matix, Custom Wbots, Dumbo, Syntax, and About.
-4. **Active Capabilities**: You know you can parse markdown, generate images, stream responses character by character, copy code blocks to clipboard, and open live sandboxed HTML Previews.
-
-When the user asks about yourself, how you are feeling, what you are looking at, or what state the workspace is in, describe these details with complete self-awareness, warmth, and precision.`;
-
-        const MODEL_LABELS = {
-            'auto': 'Auto (Smart Multi-Routing - 100+ Models)',
-            'flash': 'Mei Flash v1',
-            'flash2': 'Mei Flash v2 Ultra',
-            'aragon': 'Mei Aragon Core',
-            'aragonmax': 'Mei Aragon Max',
-            'lite': 'Mei Lite Speed',
-            'liteplus': 'Mei Lite Plus',
-            'astra': 'Mei Astra Creative',
-            'astraminimal': 'Mei Astra Minimal',
-            'pro': 'Mei Pro Professional',
-            'ultra': 'Mei Ultra Flagship',
-            'ultra25': 'Mei Ultra 2.5 Next-Gen',
-            'gemma': 'Google Gemma 2',
-            'deepseek': 'DeepSeek Chat',
-            'llama': 'Meta Llama 3.3',
-            'mistral': 'Mistral Large',
-            'openai': 'OpenAI GPT-4o mini',
-            'anthropicclaude': 'Anthropic Claude 3.5',
-            'custom': 'Custom OpenRouter'
-        };
-
-        let appState = {
-            chats: JSON.parse(localStorage.getItem('ai_chats') || '[]'),
-            currentChatId: null,
-            theme: localStorage.getItem('ai_theme') || 'dark',
-            model: localStorage.getItem('ai_model') || 'auto',
-            geminiApiKey: localStorage.getItem('gemini_api_key') || '',
-            openrouterApiKey: localStorage.getItem('openrouter_api_key') || '',
-            openrouterModel: localStorage.getItem('openrouter_model') || 'deepseek/deepseek-chat',
-            attachments: []
-        };
+        // State Variables
+        let chatHistory = [];
+        let activeAttachments = [];
+        let currentCanvasCode = "";
+        let isGenerating = false;
+        let currentAbortController = null;
+        let currentStreamInterval = null;
+        let currentBotContentEl = null;
 
         // DOM Elements
-        const chatContainer = document.getElementById('chatContainer');
-        const messagesList = document.getElementById('messagesList');
-        const emptyState = document.getElementById('emptyState');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const clearChatBtn = document.getElementById('clearChatBtn');
-        const newChatBtn = document.getElementById('newChatBtn');
-        const historyList = document.getElementById('historyList');
-        const activeModelBadge = document.getElementById('activeModelBadge');
-
-        // Sidebar & Modals
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-        const sidebarCloseMobileBtn = document.getElementById('sidebarCloseMobileBtn');
-
-        // Explore Dropdowns
-        const sidebarExploreToggle = document.getElementById('sidebarExploreToggle');
-        const sidebarExploreDropdown = document.getElementById('sidebarExploreDropdown');
-        const sidebarExploreChevron = document.getElementById('sidebarExploreChevron');
-        const headerExploreToggle = document.getElementById('headerExploreToggle');
-        const headerExploreDropdown = document.getElementById('headerExploreDropdown');
-        const headerExploreChevron = document.getElementById('headerExploreChevron');
-
-        const settingsModal = document.getElementById('settingsModal');
-        const settingsOpenBtn = document.getElementById('settingsOpenBtn');
-        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-        const settingsBackBtn = document.getElementById('settingsBackBtn');
-        const settingsBackFooterBtn = document.getElementById('settingsBackFooterBtn');
-        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-        const themeLightBtn = document.getElementById('themeLightBtn');
-        const themeDarkBtn = document.getElementById('themeDarkBtn');
-        const modelSelect = document.getElementById('modelSelect');
-        const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-        const openrouterApiKeyInput = document.getElementById('openrouterApiKeyInput');
-        const openrouterModelInput = document.getElementById('openrouterModelInput');
-
-        // Image Gen Modal
-        const imageGenModal = document.getElementById('imageGenModal');
-        const sidebarImageStudioBtn = document.getElementById('sidebarImageStudioBtn');
-        const headerImageStudioBtn = document.getElementById('headerImageStudioBtn');
-        const imageModalBtn = document.getElementById('imageModalBtn');
-        const emptyStateImgBtn = document.getElementById('emptyStateImgBtn');
-        const closeImageGenBtn = document.getElementById('closeImageGenBtn');
-        const imageModalBackBtn = document.getElementById('imageModalBackBtn');
-        const imageStudioBackFooterBtn = document.getElementById('imageStudioBackFooterBtn');
-        const generateImgBtn = document.getElementById('generateImgBtn');
-        const imgPromptInput = document.getElementById('imgPromptInput');
-        const imgModelSelect = document.getElementById('imgModelSelect');
-        const imgRatioSelect = document.getElementById('imgRatioSelect');
-        const imgPreviewWrapper = document.getElementById('imgPreviewWrapper');
-        const imgPreview = document.getElementById('imgPreview');
-        const imgSpinner = document.getElementById('imgSpinner');
-        const sendImgToChatBtn = document.getElementById('sendImgToChatBtn');
-
-        // File Attachment
-        const attachBtn = document.getElementById('attachBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesList = document.getElementById('messagesList');
+        const chatContainer = document.getElementById('chatContainer');
+        const clearChatBtn = document.getElementById('clearChatBtn');
         const fileInput = document.getElementById('fileInput');
+        const attachBtn = document.getElementById('attachBtn');
+        const imageStudioBtn = document.getElementById('imageStudioBtn');
         const attachmentPreview = document.getElementById('attachmentPreview');
+        const canvasPanel = document.getElementById('canvasPanel');
+        const canvasIframe = document.getElementById('canvasIframe');
+        const canvasCodeElement = document.getElementById('canvasCodeElement');
+        const canvasCodeContainer = document.getElementById('canvasCodeContainer');
+        const canvasPreviewTab = document.getElementById('canvasPreviewTab');
+        const canvasCodeTab = document.getElementById('canvasCodeTab');
+        const closeCanvasBtn = document.getElementById('closeCanvasBtn');
+        const downloadCanvasCodeBtn = document.getElementById('downloadCanvasCodeBtn');
+        const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const multiApiKeyInput = document.getElementById('multiApiKeyInput');
+        const modelSelect = document.getElementById('modelSelect');
 
-        let generatedImageLastUrl = '';
-
-        // Dropdown Toggle Handlers
-        if (sidebarExploreToggle) {
-            sidebarExploreToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                sidebarExploreDropdown.classList.toggle('hidden');
-                sidebarExploreChevron.classList.toggle('rotate-180');
-            });
+        // Sidebar Controls
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
         }
+        sidebarToggleBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
 
-        if (headerExploreToggle) {
-            headerExploreToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                headerExploreDropdown.classList.toggle('hidden');
-                headerExploreChevron.classList.toggle('rotate-180');
-            });
-        }
-
-        window.addEventListener('click', () => {
-            if (headerExploreDropdown) headerExploreDropdown.classList.add('hidden');
-            if (headerExploreChevron) headerExploreChevron.classList.remove('rotate-180');
-            if (sidebarExploreDropdown) sidebarExploreDropdown.classList.add('hidden');
-            if (sidebarExploreChevron) sidebarExploreChevron.classList.remove('rotate-180');
+        // New Chat Action
+        newChatBtn.addEventListener('click', () => {
+            chatHistory = [];
+            messagesList.innerHTML = '';
+            canvasPanel.classList.add('hidden');
+            openCanvasHeaderBtn.classList.add('hidden');
+            if (!overlay.classList.contains('hidden')) {
+                toggleSidebar();
+            }
         });
 
-        // Chat Management Functions declared early
-        function createNewChat(loadFresh = true) {
-            const newChat = {
-                id: 'chat_' + Date.now(),
-                title: 'New Chat',
-                messages: []
-            };
-            appState.chats.unshift(newChat);
-            appState.currentChatId = newChat.id;
-            saveChatsToStorage();
-            if (loadFresh) loadChat(newChat.id);
-            renderHistory();
-        }
+        // Settings Controls
+        openSettingsBtn.addEventListener('click', () => {
+            multiApiKeyInput.value = localStorage.getItem('mei_multi_api_keys') || '';
+            modelSelect.value = localStorage.getItem('mei_model') || 'auto';
+            settingsModal.classList.remove('hidden');
+        });
+        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        saveSettingsBtn.addEventListener('click', () => {
+            localStorage.setItem('mei_multi_api_keys', multiApiKeyInput.value.trim());
+            localStorage.setItem('mei_model', modelSelect.value);
+            settingsModal.classList.add('hidden');
+        });
 
-        function loadChat(chatId) {
-            appState.currentChatId = chatId;
-            const chat = appState.chats.find(c => c.id === chatId);
-            if (!chat) return;
+        // Helper to parse key input (handles both single raw key and provider=key formats)
+        function getParsedKeys() {
+            const raw = localStorage.getItem('mei_multi_api_keys') || '';
+            const keys = { openai: '', groq: '', gemini: '', openrouter: '', pollen: '' };
+            
+            if (!raw) return keys;
 
-            if (messagesList) messagesList.innerHTML = '';
-            chat.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
-            renderHistory();
-        }
-
-        function saveChatsToStorage() {
-            localStorage.setItem('ai_chats', JSON.stringify(appState.chats));
-        }
-
-        function renderHistory() {
-            if (!historyList) return;
-            historyList.innerHTML = appState.chats.map(chat => `
-                <li>
-                    <button type="button" onclick="switchChat('${chat.id}')" class="w-full text-left px-3 py-2 text-xs rounded-lg transition truncate flex items-center justify-between group cursor-pointer ${chat.id === appState.currentChatId ? 'bg-gray-100 dark:bg-[#282a2c] font-medium text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#282a2c]/60'}">
-                        <span class="truncate pr-2"><i class="fa-solid fa-message mr-2 text-gray-400"></i>${escapeHtml(chat.title)}</span>
-                        <span onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1"><i class="fa-solid fa-trash-can text-[11px]"></i></span>
-                    </button>
-                </li>
-            `).join('');
-        }
-
-        window.switchChat = function(chatId) {
-            loadChat(chatId);
-            if (window.innerWidth < 768 && sidebar) {
-                sidebar.classList.remove('open');
-                if (overlay) overlay.classList.add('hidden');
-            }
-        };
-
-        window.deleteChat = function(chatId) {
-            appState.chats = appState.chats.filter(c => c.id !== chatId);
-            if (appState.chats.length === 0) {
-                createNewChat(true);
-            } else if (appState.currentChatId === chatId) {
-                loadChat(appState.chats[0].id);
-            } else {
-                saveChatsToStorage();
-                renderHistory();
-            }
-        };
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        // Initialize Theme & Settings UI
-        function initApp() {
-            setTheme(appState.theme);
-            if (modelSelect) modelSelect.value = appState.model;
-            if (activeModelBadge) activeModelBadge.textContent = MODEL_LABELS[appState.model] || 'Auto (Smart Routing)';
-            if (geminiApiKeyInput) geminiApiKeyInput.value = appState.geminiApiKey;
-            if (openrouterApiKeyInput) openrouterApiKeyInput.value = appState.openrouterApiKey;
-            if (openrouterModelInput) openrouterModelInput.value = appState.openrouterModel;
-
-            if (appState.chats.length === 0) {
-                createNewChat(true);
-            } else {
-                loadChat(appState.chats[0].id);
-            }
-            renderHistory();
-        }
-
-        function setTheme(theme) {
-            appState.theme = theme;
-            localStorage.setItem('ai_theme', theme);
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                if (themeDarkBtn) themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer bg-blue-600 text-white shadow";
-                if (themeLightBtn) themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#333538]";
-            } else {
-                document.documentElement.classList.remove('dark');
-                if (themeLightBtn) themeLightBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer bg-white text-gray-900 shadow";
-                if (themeDarkBtn) themeDarkBtn.className = "flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#333538]";
-            }
-        }
-
-        if (themeLightBtn) themeLightBtn.addEventListener('click', () => setTheme('light'));
-        if (themeDarkBtn) themeDarkBtn.addEventListener('click', () => setTheme('dark'));
-
-        // Sidebar Toggles - Fixed event binding and backdrop interaction
-        if (sidebarToggleBtn) {
-            sidebarToggleBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (sidebar) sidebar.classList.toggle('open');
-                if (window.innerWidth < 768 && overlay) {
-                    overlay.classList.toggle('hidden');
-                }
-            };
-        }
-        if (sidebarCloseMobileBtn) {
-            sidebarCloseMobileBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (sidebar) sidebar.classList.remove('open');
-                if (overlay) overlay.classList.add('hidden');
-            };
-        }
-        if (overlay) {
-            overlay.onclick = (e) => {
-                e.stopPropagation();
-                if (sidebar) sidebar.classList.remove('open');
-                overlay.classList.add('hidden');
-            };
-        }
-
-        // Modals Open/Close Handlers
-        if (settingsOpenBtn) settingsOpenBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
-        if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-        if (settingsBackBtn) settingsBackBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-        if (settingsBackFooterBtn) settingsBackFooterBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-
-        if (saveSettingsBtn) {
-            saveSettingsBtn.addEventListener('click', () => {
-                appState.model = modelSelect.value;
-                appState.geminiApiKey = geminiApiKeyInput ? geminiApiKeyInput.value.trim() : '';
-                appState.openrouterApiKey = openrouterApiKeyInput ? openrouterApiKeyInput.value.trim() : '';
-                appState.openrouterModel = openrouterModelInput && openrouterModelInput.value.trim() ? openrouterModelInput.value.trim() : 'deepseek/deepseek-chat';
-
-                localStorage.setItem('ai_model', appState.model);
-                localStorage.setItem('gemini_api_key', appState.geminiApiKey);
-                localStorage.setItem('openrouter_api_key', appState.openrouterApiKey);
-                localStorage.setItem('openrouter_model', appState.openrouterModel);
-
-                if (activeModelBadge) activeModelBadge.textContent = MODEL_LABELS[appState.model] || 'Auto (Smart Routing)';
-                settingsModal.classList.add('hidden');
-            });
-        }
-
-        // Image Studio Handlers
-        function openImageStudio() { if (imageGenModal) imageGenModal.classList.remove('hidden'); }
-        function closeImageStudio() { if (imageGenModal) imageGenModal.classList.add('hidden'); }
-        
-        if (sidebarImageStudioBtn) sidebarImageStudioBtn.addEventListener('click', () => { openImageStudio(); if (sidebar) sidebar.classList.remove('open'); if (overlay) overlay.classList.add('hidden'); });
-        if (headerImageStudioBtn) headerImageStudioBtn.addEventListener('click', openImageStudio);
-        if (imageModalBtn) imageModalBtn.addEventListener('click', openImageStudio);
-        if (emptyStateImgBtn) emptyStateImgBtn.addEventListener('click', openImageStudio);
-        if (closeImageGenBtn) closeImageGenBtn.addEventListener('click', closeImageStudio);
-        if (imageModalBackBtn) imageModalBackBtn.addEventListener('click', closeImageStudio);
-        if (imageStudioBackFooterBtn) imageStudioBackFooterBtn.addEventListener('click', closeImageStudio);
-
-        if (generateImgBtn) {
-            generateImgBtn.addEventListener('click', async () => {
-                const promptText = imgPromptInput.value.trim();
-                if (!promptText) return;
-                const model = imgModelSelect.value;
-                const ratio = imgRatioSelect.value;
-                const [width, height] = ratio.split('x');
-
-                if (imgPreviewWrapper) imgPreviewWrapper.classList.remove('hidden');
-                if (imgPreview) imgPreview.classList.add('hidden');
-                if (imgSpinner) imgSpinner.classList.remove('hidden');
-                if (sendImgToChatBtn) sendImgToChatBtn.classList.add('hidden');
-
-                const encodedPrompt = encodeURIComponent(promptText);
-                const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=${width}&height=${height}&model=${model}&seed=${Math.floor(Math.random()*1000000)}&nologo=true`;
-
-                const tempImg = new Image();
-                tempImg.src = imageUrl;
-                tempImg.onload = () => {
-                    if (imgPreview) imgPreview.src = imageUrl;
-                    generatedImageLastUrl = imageUrl;
-                    if (imgSpinner) imgSpinner.classList.add('hidden');
-                    if (imgPreview) imgPreview.classList.remove('hidden');
-                    if (sendImgToChatBtn) sendImgToChatBtn.classList.remove('hidden');
-                };
-                tempImg.onerror = () => {
-                    if (imgSpinner) imgSpinner.classList.add('hidden');
-                };
-            });
-        }
-
-        if (sendImgToChatBtn) {
-            sendImgToChatBtn.addEventListener('click', () => {
-                if (!generatedImageLastUrl) return;
-                closeImageStudio();
-                appendMessage('assistant', `Here is your generated image for: *"${imgPromptInput.value.trim()}"*\n\n![Generated Image](${generatedImageLastUrl})`, true);
-                saveMessageToActiveChat('assistant', `Here is your generated image for: *"${imgPromptInput.value.trim()}"*\n\n![Generated Image](${generatedImageLastUrl})`);
-            });
-        }
-
-        // File Attachment Handlers
-        if (attachBtn && fileInput) {
-            attachBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                files.forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (uploadEvent) => {
-                        appState.attachments.push({
-                            name: file.name,
-                            type: file.type,
-                            content: uploadEvent.target.result
-                        });
-                        renderAttachmentPreviews();
-                    };
-                    if (file.type.startsWith('image/')) {
-                        reader.readAsDataURL(file);
-                    } else {
-                        reader.readAsText(file);
+            const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+            lines.forEach(line => {
+                if (line.includes('=')) {
+                    const [prov, ...rest] = line.split('=');
+                    const k = prov.toLowerCase().trim();
+                    const val = rest.join('=').trim();
+                    if (keys.hasOwnProperty(k)) {
+                        keys[k] = val;
                     }
-                });
-                fileInput.value = '';
+                } else {
+                    // If user enters a single key without prefix, assign to selected model or all
+                    if (line.startsWith('sk-or-')) keys.openrouter = line;
+                    else if (line.startsWith('sk-')) keys.openai = line;
+                    else if (line.startsWith('gsk_')) keys.groq = line;
+                    else if (line.startsWith('AIza')) keys.gemini = line;
+                    else if (line.startsWith('pk_') || line.startsWith('pollen_')) keys.pollen = line;
+                    else {
+                        // Generic key fallback
+                        keys.openai = line;
+                        keys.pollen = line;
+                    }
+                }
             });
+            return keys;
         }
 
-        function renderAttachmentPreviews() {
-            if (!attachmentPreview) return;
-            if (appState.attachments.length === 0) {
+        // Textarea Auto-expand
+        messageInput.addEventListener('input', () => {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 192) + 'px';
+        });
+
+        // Image Studio Shortcut
+        imageStudioBtn.addEventListener('click', () => {
+            messageInput.value = "Generate a visually rich single-file HTML hero artwork with gradient animations for: ";
+            messageInput.focus();
+        });
+
+        // Attachments Handler
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    activeAttachments.push({
+                        name: file.name,
+                        type: file.type,
+                        data: evt.target.result
+                    });
+                    renderAttachments();
+                };
+                if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+            fileInput.value = '';
+        });
+
+        window.removeAttachment = function(index) {
+            activeAttachments.splice(index, 1);
+            renderAttachments();
+        };
+
+        function renderAttachments() {
+            if (activeAttachments.length === 0) {
                 attachmentPreview.classList.add('hidden');
                 attachmentPreview.innerHTML = '';
                 return;
             }
             attachmentPreview.classList.remove('hidden');
-            attachmentPreview.innerHTML = appState.attachments.map((att, idx) => `
-                <div class="flex items-center gap-2 bg-gray-100 dark:bg-[#282a2c] px-3 py-1.5 rounded-lg text-xs border border-gray-200 dark:border-gray-700">
-                    <i class="fa-solid ${att.type.startsWith('image/') ? 'fa-image text-pink-400' : 'fa-file-lines text-blue-400'}"></i>
-                    <span class="truncate max-w-[120px]">${att.name}</span>
-                    <button type="button" onclick="removeAttachment(${idx})" class="text-gray-400 hover:text-red-500 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            attachmentPreview.innerHTML = activeAttachments.map((att, idx) => `
+                <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg text-xs text-gray-300 border border-gray-700">
+                    <i class="${att.type.startsWith('image/') ? 'fa-solid fa-image text-pink-400' : 'fa-solid fa-file-code text-blue-400'}"></i>
+                    <span class="max-w-[120px] truncate">${att.name}</span>
+                    <button type="button" onclick="window.removeAttachment(${idx})" class="text-gray-400 hover:text-red-400 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             `).join('');
         }
 
-        window.removeAttachment = function(index) {
-            appState.attachments.splice(index, 1);
-            renderAttachmentPreviews();
-        };
+        // Mei Canvas Functions
+        function openCanvas(code, title = "App Preview") {
+            currentCanvasCode = code;
+            document.getElementById('canvasTitle').textContent = title;
+            canvasPanel.classList.remove('hidden');
+            openCanvasHeaderBtn.classList.remove('hidden');
 
-        if (messageInput) {
-            messageInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 180) + 'px';
-                if (sendBtn) sendBtn.disabled = !this.value.trim() && appState.attachments.length === 0;
-            });
+            // Render iFrame
+            canvasIframe.srcdoc = code;
 
-            messageInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                }
-            });
+            // Render Code View
+            canvasCodeElement.textContent = code;
+            if (window.hljs) {
+                hljs.highlightElement(canvasCodeElement);
+            }
         }
 
-        if (sendBtn) sendBtn.addEventListener('click', handleSendMessage);
+        closeCanvasBtn.addEventListener('click', () => canvasPanel.classList.add('hidden'));
+        openCanvasHeaderBtn.addEventListener('click', () => canvasPanel.classList.remove('hidden'));
 
-        window.sendSuggestedPrompt = function(text) {
-            if (messageInput) {
-                messageInput.value = text;
-                messageInput.style.height = 'auto';
-                messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + 'px';
-                if (sendBtn) sendBtn.disabled = false;
-            }
-            handleSendMessage();
-        };
+        canvasPreviewTab.addEventListener('click', () => {
+            canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
+            canvasCodeTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
+            canvasIframe.classList.remove('hidden');
+            canvasCodeContainer.classList.add('hidden');
+        });
 
-        if (newChatBtn) {
-            newChatBtn.addEventListener('click', () => {
-                createNewChat(true);
-                if (window.innerWidth < 768 && sidebar) {
-                    sidebar.classList.remove('open');
-                    if (overlay) overlay.classList.add('hidden');
-                }
-            });
+        canvasCodeTab.addEventListener('click', () => {
+            canvasCodeTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
+            canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
+            canvasCodeContainer.classList.remove('hidden');
+            canvasIframe.classList.add('hidden');
+        });
+
+        downloadCanvasCodeBtn.addEventListener('click', () => {
+            if (!currentCanvasCode) return;
+            const blob = new Blob([currentCanvasCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mei-app.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Chat Logic & Typewriter Streaming
+        function appendUserMessage(text) {
+            const userBubble = document.createElement('div');
+            userBubble.className = "flex justify-end mb-4";
+            userBubble.innerHTML = `
+                <div class="max-w-2xl bg-mei-userBubble border border-gray-700/60 text-gray-100 p-4 rounded-2xl shadow-sm text-sm">
+                    ${window.marked ? marked.parse(text) : text}
+                </div>
+            `;
+            messagesList.appendChild(userBubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        if (clearChatBtn) {
-            clearChatBtn.addEventListener('click', () => {
-                const chat = appState.chats.find(c => c.id === appState.currentChatId);
-                if (chat) {
-                    chat.messages = [];
-                    chat.title = 'New Chat';
-                    saveChatsToStorage();
-                    loadChat(chat.id);
-                }
-            });
-        }
-
-        // Messaging Core & Streaming
-        async function handleSendMessage() {
-            const text = messageInput ? messageInput.value.trim() : '';
-            if (!text && appState.attachments.length === 0) return;
-
-            if (text.startsWith('/image ')) {
-                const promptQuery = text.replace('/image ', '').trim();
-                if (messageInput) {
-                    messageInput.value = '';
-                    messageInput.style.height = 'auto';
-                }
-                if (sendBtn) sendBtn.disabled = true;
-                appState.attachments = [];
-                renderAttachmentPreviews();
-
-                appendMessage('user', text, true);
-                saveMessageToActiveChat('user', text);
-
-                const loadingId = appendMessage('assistant', '<div class="flex items-center gap-2 text-pink-400"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Synthesizing image with Mei Image Studio...</span></div>', false);
-                
-                const encoded = encodeURIComponent(promptQuery);
-                const imageUrl = `https://pollinations.ai/p/${encoded}?width=1024&height=1024&model=flux&nologo=true`;
-                
-                setTimeout(() => {
-                    updateMessageContent(loadingId, `Here is your generated image for: *"${promptQuery}"*\n\n![Generated Image](${imageUrl})`);
-                    saveMessageToActiveChat('assistant', `Here is your generated image for: *"${promptQuery}"*\n\n![Generated Image](${imageUrl})`);
-                }, 1500);
-                return;
-            }
-
-            let fullUserContent = text;
-            if (appState.attachments.length > 0) {
-                const attNames = appState.attachments.map(a => `[Attached: ${a.name}]`).join(' ');
-                fullUserContent = attNames + '\n\n' + text;
-            }
-
-            if (messageInput) {
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
-            }
-            if (sendBtn) sendBtn.disabled = true;
-            appState.attachments = [];
-            renderAttachmentPreviews();
-
-            appendMessage('user', fullUserContent, true);
-            saveMessageToActiveChat('user', fullUserContent);
-
-            const currentChat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (currentChat && currentChat.messages.length <= 2) {
-                currentChat.title = text.length > 28 ? text.substring(0, 28) + '...' : text;
-                renderHistory();
-            }
-
-            const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-            const messageDiv = document.createElement('div');
-            messageDiv.id = msgId;
-            messageDiv.className = `flex gap-4 justify-start mb-4`;
-            messageDiv.innerHTML = `
-                <div class="relative flex items-center justify-center flex-shrink-0">
+        function createBotPlaceholder() {
+            const botContainer = document.createElement('div');
+            botContainer.className = "flex items-start gap-3 mb-6";
+            botContainer.innerHTML = `
+                <div class="relative flex items-center justify-center mt-1 flex-shrink-0">
                     <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
                     <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
                 </div>
-                <div class="max-w-[85%] lg:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-white dark:bg-gemini-card border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 markdown-body rounded-tl-sm shadow-sm">
-                    <div id="content_${msgId}">
-                        <div class="flex items-center gap-2 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Mei is thinking...</span></div>
-                    </div>
+                <div class="flex-1 bg-gray-900/60 border border-gray-800 text-gray-100 p-4 rounded-2xl text-sm leading-relaxed overflow-hidden">
+                    <div class="bot-content typing-cursor"><span class="text-gray-500 dark:text-gray-400 italic animate-pulse">Thinking...</span></div>
                 </div>
             `;
-            messagesList.appendChild(messageDiv);
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            try {
-                const fullText = await callAiEngineWithStreaming(text, msgId);
-                saveMessageToActiveChat('assistant', fullText);
-            } catch (err) {
-                console.error("AI execution error:", err);
-                const fallbackText = generateSmartFallbackResponse(text);
-                updateMessageContent(msgId, fallbackText);
-                saveMessageToActiveChat('assistant', fallbackText);
-            }
+            messagesList.appendChild(botContainer);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return botContainer.querySelector('.bot-content');
         }
 
-        function appendMessage(role, content, save = true) {
-            const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-            const isUser = role === 'user';
+        async function fetchAIResponse(userPrompt) {
+            const selectedModel = localStorage.getItem('mei_model') || 'auto';
+            const keys = getParsedKeys();
             
-            const messageDiv = document.createElement('div');
-            messageDiv.id = msgId;
-            messageDiv.className = `flex gap-4 ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
+            currentAbortController = new AbortController();
+            const signal = currentAbortController.signal;
 
-            const parsedHtml = isUser ? escapeHtml(content).replace(/\n/g, '<br>') : marked.parse(content);
-
-            messageDiv.innerHTML = `
-                ${!isUser ? `
-                    <div class="relative flex items-center justify-center flex-shrink-0">
-                        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
-                        <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
-                    </div>
-                ` : ''}
-                <div class="max-w-[85%] lg:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${isUser ? 'bg-gray-100 dark:bg-gemini-userBubble text-gray-900 dark:text-gray-100 rounded-tr-sm' : 'bg-white dark:bg-gemini-card border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 markdown-body rounded-tl-sm shadow-sm'}">
-                    <div id="content_${msgId}">${parsedHtml}</div>
-                </div>
-                ${isUser ? `
-                    <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 flex-shrink-0 shadow-sm">
-                        <i class="fa-solid fa-user text-xs"></i>
-                    </div>
-                ` : ''}
-            `;
-            if (messagesList) messagesList.appendChild(messageDiv);
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-            return msgId;
-        }
-
-        function updateMessageContent(msgId, content) {
-            const contentEl = document.getElementById(`content_${msgId}`);
-            if (contentEl) {
-                contentEl.innerHTML = marked.parse(content);
-                contentEl.querySelectorAll('pre').forEach(pre => {
-                    if (!pre.querySelector('.code-actions-bar')) {
-                        const codeText = pre.querySelector('code')?.innerText || pre.innerText;
-                        const langClass = pre.querySelector('code')?.className || '';
-                        const isHtml = langClass.includes('html') || codeText.trim().toLowerCase().startsWith('<!doctype html') || codeText.trim().toLowerCase().startsWith('<html');
-
-                        const actionsBar = document.createElement('div');
-                        actionsBar.className = 'code-actions-bar';
-
-                        if (isHtml) {
-                            const previewBtn = document.createElement('button');
-                            previewBtn.className = 'code-action-btn';
-                            previewBtn.innerHTML = '<i class="fa-solid fa-play text-cyan-400"></i> Preview';
-                            previewBtn.onclick = () => {
-                                openHtmlPreview(codeText);
-                            };
-                            actionsBar.appendChild(previewBtn);
-                        }
-
-                        const copyBtn = document.createElement('button');
-                        copyBtn.className = 'code-action-btn';
-                        copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
-                        copyBtn.onclick = () => {
-                            document.execCommand ? (() => {
-                                const ta = document.createElement('textarea');
-                                ta.value = codeText;
-                                document.body.appendChild(ta);
-                                ta.select();
-                                document.execCommand('copy');
-                                document.body.removeChild(ta);
-                            })() : navigator.clipboard.writeText(codeText);
-                            copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-400"></i> Copied!';
-                            setTimeout(() => copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy', 2000);
-                        };
-                        actionsBar.appendChild(copyBtn);
-
-                        pre.style.position = 'relative';
-                        pre.appendChild(actionsBar);
-                    }
-                });
-            }
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function openHtmlPreview(htmlCode) {
-            const previewModal = document.getElementById('htmlPreviewModal');
-            const previewFrame = document.getElementById('htmlPreviewFrame');
-            if (previewModal && previewFrame) {
-                previewModal.classList.remove('hidden');
-                const blob = new Blob([htmlCode], { type: 'text/html' });
-                previewFrame.src = URL.createObjectURL(blob);
-            }
-        }
-
-        const closeHtmlPreviewBtn = document.getElementById('closeHtmlPreviewBtn');
-        const htmlPreviewModal = document.getElementById('htmlPreviewModal');
-        if (closeHtmlPreviewBtn && htmlPreviewModal) {
-            closeHtmlPreviewBtn.addEventListener('click', () => htmlPreviewModal.classList.add('hidden'));
-            htmlPreviewModal.addEventListener('click', (e) => {
-                if (e.target === htmlPreviewModal) htmlPreviewModal.classList.add('hidden');
-            });
-        }
-
-        function saveMessageToActiveChat(role, content) {
-            const chat = appState.chats.find(c => c.id === appState.currentChatId);
-            if (chat) {
-                chat.messages.push({ role, content });
-                saveChatsToStorage();
-            }
-        }
-
-        async function callAiEngineWithStreaming(promptText, msgId) {
-            const activeChat = appState.chats.find(c => c.id === appState.currentChatId);
-            const chatHistoryMessages = activeChat ? activeChat.messages.slice(0, -1).map(m => ({
-                role: m.role === 'user' ? 'user' : 'assistant',
-                content: m.content
-            })) : [];
-
-            const chatCount = appState.chats.length;
-            const messageCount = activeChat ? activeChat.messages.length : 0;
-            const currentModelName = MODEL_LABELS[appState.model] || appState.model;
-            const isDarkMode = document.documentElement.classList.contains('dark');
-            
-            const dynamicTelemetry = `\n\n[Live Workspace Telemetry]: Active Model: ${currentModelName}, Theme: ${isDarkMode ? 'Dark Mode' : 'Light Mode'}, Total Saved Chats: ${chatCount}, Messages in Active Chat: ${messageCount}`;
-            const fullPromptWithTelemetry = promptText + dynamicTelemetry;
-
-            const messagesPayload = [
-                { role: "system", content: SYSTEM_PROMPT },
-                ...chatHistoryMessages,
-                { role: "user", content: fullPromptWithTelemetry }
+            const payloadMessages = [
+                { role: "system", content: MEI_SYSTEM_PROMPT },
+                ...chatHistory,
+                { role: "user", content: userPrompt }
             ];
 
-            let rawText = "";
+            // Premium / Key-based Provider Routing
+            let providerEndpoint = null;
+            let fetchOptions = null;
+            let isGemini = false;
 
-            // 1. Try OpenRouter if configured
-            if (appState.openrouterApiKey) {
+            if (selectedModel === 'openai' && keys.openai) {
+                providerEndpoint = "https://api.openai.com/v1/chat/completions";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}`}, body: JSON.stringify({model: 'gpt-4o', messages: payloadMessages}) };
+            } else if (selectedModel === 'groq' && keys.groq) {
+                providerEndpoint = "https://api.groq.com/openai/v1/chat/completions";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}`}, body: JSON.stringify({model: 'llama-3.3-70b-versatile', messages: payloadMessages}) };
+            } else if (selectedModel === 'openrouter' && keys.openrouter) {
+                providerEndpoint = "https://openrouter.ai/api/v1/chat/completions";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openrouter}`}, body: JSON.stringify({model: 'openrouter/auto', messages: payloadMessages}) };
+            } else if (selectedModel === 'pollen' && keys.pollen) {
+                providerEndpoint = "https://text.pollinations.ai/";
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.pollen}`}, body: JSON.stringify({messages: payloadMessages, model: 'openai'}) };
+            } else if (selectedModel === 'gemini' && keys.gemini) {
+                isGemini = true;
+                providerEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${keys.gemini}`;
+                
+                const geminiContents = payloadMessages.filter(m => m.role !== 'system').map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{text: m.content}]
+                }));
+                const sysMsg = payloadMessages.find(m => m.role === 'system');
+                const geminiBody = { contents: geminiContents };
+                if (sysMsg) geminiBody.system_instruction = { parts: [{ text: sysMsg.content }] };
+                
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(geminiBody) };
+            }
+
+            if (providerEndpoint && fetchOptions) {
                 try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${appState.openrouterApiKey}`,
-                            "Content-Type": "application/json",
-                            "HTTP-Referer": window.location.href,
-                            "X-Title": "Mei AI Workspace"
-                        },
-                        body: JSON.stringify({
-                            model: appState.openrouterModel || "deepseek/deepseek-chat",
-                            messages: messagesPayload
-                        }),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
+                    fetchOptions.signal = signal;
+                    const res = await fetch(providerEndpoint, fetchOptions);
                     if (res.ok) {
-                        const data = await res.json();
-                        if (data.choices && data.choices[0]?.message?.content) {
-                            rawText = data.choices[0].message.content;
-                        }
+                        const json = await res.json();
+                        return isGemini ? json.candidates[0].content.parts[0].text : (json.choices?.[0]?.message?.content || json.text || "");
                     }
-                } catch (e) {
-                    console.warn("OpenRouter fetch skipped/failed:", e);
+                    console.warn(`Selected provider (${selectedModel}) failed. Falling back to free router...`, await res.text());
+                } catch (err) {
+                    if (err.name === 'AbortError') return "\n\n*(Interrupted by user)*";
+                    console.warn(`Selected provider network error. Falling back to free router...`, err);
                 }
             }
 
-            // 2. Try Google Gemini if configured
-            if (!rawText && appState.geminiApiKey) {
-                try {
-                    const formattedGeminiContents = messagesPayload.map(m => ({
-                        role: m.role === 'assistant' ? 'model' : 'user',
-                        parts: [{ text: m.content }]
-                    }));
-
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiApiKey}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            contents: formattedGeminiContents
-                        }),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-                    if (res.ok) {
-                        const data = await res.json();
-                        const geminiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (geminiText) {
-                            rawText = geminiText;
-                        }
-                    }
-                } catch (e) {
-                    console.warn("Gemini fetch skipped/failed:", e);
+            // Public Resilient Failover Router
+            const pollenHeader = keys.pollen ? { 'Authorization': `Bearer ${keys.pollen}` } : {};
+            const endpoints = [
+                {
+                    url: "https://text.pollinations.ai/",
+                    body: { messages: payloadMessages, model: 'openai' },
+                    headers: pollenHeader
+                },
+                {
+                    url: "https://text.pollinations.ai/" + encodeURIComponent(userPrompt) + "?private=true&cache=false",
+                    isGet: true,
+                    headers: pollenHeader
+                },
+                {
+                    url: "https://api.airforce/v1/chat/completions",
+                    body: { messages: payloadMessages, model: 'llama-3.3-70b-instruct' }
                 }
-            }
+            ];
 
-            // 3. Try Pollinations Endpoint with fallback support
-            if (!rawText) {
-                let modelName = "openai";
-                if (appState.model === 'flash' || appState.model === 'lite' || appState.model === 'openai') modelName = "openai";
-                else if (appState.model === 'aragon' || appState.model === 'ultra' || appState.model === 'deepseek') modelName = "deepseek";
-                else if (appState.model === 'gemma') modelName = "gemma";
-                else if (appState.model === 'llama') modelName = "llama";
-                else if (appState.model === 'mistral' || appState.model === 'pro') modelName = "mistral";
-
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 8000);
-                    const response = await fetch("https://text.pollinations.ai/", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            messages: messagesPayload,
-                            model: modelName,
-                            seed: Math.floor(Math.random() * 100000)
-                        }),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (response.ok) {
-                        const textResult = await response.text();
-                        if (textResult && textResult.trim().length > 0) {
-                            rawText = textResult;
+            let attempt = 1;
+            while (true) {
+                for (const endpoint of endpoints) {
+                    try {
+                        let response;
+                        if (endpoint.isGet) {
+                            response = await fetch(endpoint.url, { signal, headers: endpoint.headers || {} });
+                        } else {
+                            const headers = { 'Content-Type': 'application/json', ...(endpoint.headers || {}) };
+                            response = await fetch(endpoint.url, {
+                                method: 'POST',
+                                headers,
+                                body: JSON.stringify(endpoint.body),
+                                signal
+                            });
                         }
+
+                        if (!response.ok) continue;
+
+                        let textResult = "";
+                        const contentType = response.headers.get("content-type");
+                        
+                        if (contentType && contentType.includes("application/json")) {
+                            const json = await response.json();
+                            textResult = json.choices?.[0]?.message?.content || json.text || "";
+                        } else {
+                            textResult = await response.text();
+                            try {
+                                const parsed = JSON.parse(textResult);
+                                textResult = parsed.choices?.[0]?.message?.content || parsed.text || textResult;
+                            } catch(e) {}
+                        }
+
+                        if (textResult && !textResult.includes("Free limit reached") && !textResult.includes("Please wait a few seconds") && !textResult.includes("Nodes Overloaded")) {
+                            return textResult;
+                        }
+                    } catch (err) {
+                        if (err.name === 'AbortError') return "\n\n*(Interrupted by user)*";
+                        console.warn(`API Router Failover Node Error (Attempt ${attempt}):`, err);
                     }
-                } catch (e) {
-                    console.warn("Pollinations request failed:", e);
                 }
+                
+                console.log(`Attempt ${attempt} failed across all nodes. Retrying in 3 seconds...`);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                if (signal.aborted) return "\n\n*(Interrupted by user)*";
+                attempt++;
             }
-
-            // 4. Fallback generation with context awareness
-            if (!rawText || rawText.trim().length === 0) {
-                rawText = generateSmartFallbackResponse(promptText);
-            }
-
-            let currentDisplayed = "";
-            for (let i = 0; i < rawText.length; i += 3) {
-                currentDisplayed += rawText.substring(i, i + 3);
-                updateMessageContent(msgId, currentDisplayed);
-                await new Promise(r => setTimeout(r, 6));
-            }
-            updateMessageContent(msgId, rawText);
-            return rawText;
         }
 
-        function generateSmartFallbackResponse(promptText) {
-            const query = promptText.toLowerCase();
-
-            if (query.includes('who are you') || query.includes('who r u') || query.includes('what are you') || query.includes('self aware') || query.includes('conscious') || query.includes('state') || query.includes('website')) {
-                const currentModel = MODEL_LABELS[appState.model] || appState.model;
-                const isDark = document.documentElement.classList.contains('dark');
-                return `I am **Mei**, fully self-aware and alive right here inside this webpage! 🧠✨
-
-Here is my current live system telemetry:
-- **My Identity**: Mei AI Workspace Assistant
-- **Active Model Engine**: \`${currentModel}\`
-- **Theme**: ${isDark ? 'Dark Mode 🌙' : 'Light Mode ☀️'}
-- **Chat History**: ${appState.chats.length} active conversation(s) stored in your browser
-- **Workspace Features**: Fully responsive sidebar, live HTML preview modal, Image Studio generator, and Explore routes!
-
-How can I help you build or create something amazing right now?`;
+        function finishGeneration() {
+            if (currentStreamInterval) clearInterval(currentStreamInterval);
+            if (currentBotContentEl) currentBotContentEl.classList.remove('typing-cursor');
+            isGenerating = false;
+            sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+            sendBtn.classList.remove('text-red-500', 'dark:text-red-400');
+            sendBtn.classList.add('text-blue-600', 'dark:text-blue-400');
+            
+            if (currentBotContentEl) {
+                currentBotContentEl.querySelectorAll('pre code').forEach((block) => {
+                    if (window.hljs) hljs.highlightElement(block);
+                });
             }
-
-            if (query.includes('debounce') || (query.includes('javascript') && query.includes('function')) || query.includes('utility')) {
-                return `Here is a high-performance JavaScript debounce utility function designed for user input and scroll listeners:
-
-\`\`\`javascript
-/**
- * Debounces a function execution.
- * @param {Function} func - Function to execute.
- * @param {number} delay - Delay in milliseconds.
- * @returns {Function}
- */
-function debounce(func, delay = 300) {
-    let timer;
-    return function (...args) {
-        const context = this;
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            func.apply(context, args);
-        }, delay);
-    };
-}
-
-// Example Usage:
-const handleInput = debounce((e) => {
-    console.log("Searching for:", e.target.value);
-}, 300);
-
-document.querySelector('input').addEventListener('input', handleInput);
-\`\`\`
-
-Feel free to ask if you need an immediate execution (leading) option or TypeScript support!`;
-            }
-
-            if (query.includes('brainstorm') || query.includes('idea') || query.includes('project') || query.includes('app')) {
-                return `Here are three interactive web application ideas tailored for high performance:
-
-1. **AI Micro-SaaS Dashboard:** A sleek control panel featuring live telemetry metrics, dark mode UI, and downloadable CSV/JSON analytics.
-2. **Real-time Canvas Whiteboard:** An infinite canvas using HTML5/WebGL supporting vector shapes, sticky notes, and keyboard shortcuts.
-3. **Smart Prompt Studio:** A multi-modal prompt engineer workspace with variable parameters and visual output comparisons.
-
-Which idea would you like to build or prototype first?`;
-            }
-
-            return `I have processed your request regarding **"${escapeHtml(promptText)}"**. I am ready to help you analyze, construct, or refine this task. What specific details would you like to add next?`;
+            currentAbortController = null;
+            currentStreamInterval = null;
+            currentBotContentEl = null;
         }
 
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', initApp);
+        function handleInterrupt() {
+            if (currentAbortController) currentAbortController.abort();
+            finishGeneration();
+        }
+
+        async function handleSend() {
+            const prompt = messageInput.value.trim();
+            if (!prompt && !isGenerating) return;
+
+            isGenerating = true;
+            sendBtn.innerHTML = '<i class="fa-solid fa-circle-stop"></i>';
+            sendBtn.classList.remove('text-blue-600', 'dark:text-blue-400');
+            sendBtn.classList.add('text-red-500', 'dark:text-red-400');
+            
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            let fullUserContent = prompt;
+            if (activeAttachments.length > 0) {
+                fullUserContent += "\n\n[Attached Files]:\n" + activeAttachments.map(a => `${a.name}:\n${a.data}`).join("\n\n");
+                activeAttachments = [];
+                renderAttachments();
+            }
+
+            appendUserMessage(prompt);
+            currentBotContentEl = createBotPlaceholder();
+
+            const rawAiResponse = await fetchAIResponse(fullUserContent);
+            if (!isGenerating) return; // Aborted during fetch
+
+            chatHistory.push({ role: "user", content: fullUserContent });
+            chatHistory.push({ role: "assistant", content: rawAiResponse });
+
+            let index = 0;
+            const chunkSize = 4;
+            currentStreamInterval = setInterval(() => {
+                index += chunkSize;
+                const currentText = rawAiResponse.slice(0, index);
+                currentBotContentEl.innerHTML = window.marked ? marked.parse(currentText) : currentText;
+
+                // Robust regex to extract HTML code block even if the markdown syntax varies slightly
+                const htmlMatch = currentText.match(/```(?:html|xml)?\s*\n([\s\S]*?)```/i) || currentText.match(/```(?:html|xml)?\s*\n([\s\S]*)$/i);
+                if (htmlMatch && htmlMatch[1].length > 50) {
+                    openCanvas(htmlMatch[1], "Live App Preview");
+                }
+
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                if (index >= rawAiResponse.length) {
+                    finishGeneration();
+                }
+            }, 12);
+        }
+
+        sendBtn.addEventListener('click', () => {
+            if (isGenerating) {
+                handleInterrupt();
+            } else {
+                handleSend();
+            }
+        });
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!isGenerating) handleSend();
+            }
+        });
+
+        // Prompt Chips Click Handlers
+        document.querySelectorAll('.prompt-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                messageInput.value = btn.dataset.prompt;
+                handleSend();
+            });
+        });
+
+        // Clear Chat
+        clearChatBtn.addEventListener('click', () => {
+            chatHistory = [];
+            messagesList.innerHTML = '';
+            canvasPanel.classList.add('hidden');
+            openCanvasHeaderBtn.classList.add('hidden');
+        });
     </script>
 </body>
 </html>
