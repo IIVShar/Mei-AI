@@ -1,0 +1,288 @@
+<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mei: {
+                            bg: '#131314',
+                            sidebar: '#1e1e20',
+                            card: '#282a2c',
+                            accent: '#a8c7fa'
+                        }
+                    },
+                    keyframes: {
+                        bibbybitPulse: {
+                            '0%, 100%': { transform: 'scale(1) rotate(0deg)', filter: 'brightness(1) hue-rotate(0deg)' },
+                            '50%': { transform: 'scale(1.15) rotate(3deg)', filter: 'brightness(1.3) hue-rotate(45deg)' }
+                        },
+                        bibbybitGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '1', transform: 'scale(1.4)' }
+                        }
+                    },
+                    animation: {
+                        'bibbybit-pulse': 'bibbybitPulse 2s ease-in-out infinite',
+                        'bibbybit-glow': 'bibbybitGlow 2s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-mei-bg text-gray-100 min-h-screen flex flex-col justify-between font-sans m-0 p-0 overflow-x-hidden selection:bg-purple-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="h-16 border-b border-gray-800/80 bg-[#18181a]/80 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6 lg:px-12">
+        <a href="explore.html" class="flex items-center gap-3 group">
+            <div class="relative flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+            </div>
+            <span class="font-bold text-base text-gray-100 tracking-wide group-hover:text-purple-400 transition">Explore</span>
+        </a>
+
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium text-xs transition border border-gray-700 cursor-pointer">
+                <i class="fa-solid fa-arrow-left"></i> Back to Studio
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Explore Container -->
+    <main class="flex-1 max-w-6xl mx-auto w-full px-6 py-10">
+        
+        <!-- Header Banner Section -->
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/60 border border-purple-800/60 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
+                <i class="fa-solid fa-compass"></i> Ecosystem Directory
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
+                Explore Applications
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-400">
+                Discover pre-built web apps, generative canvas animations, editing suites, and productivity dashboards.
+            </p>
+
+            <!-- Search Input Bar -->
+            <div class="mt-6 relative max-w-md mx-auto">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500 text-sm"></i>
+                <input 
+                    type="text" 
+                    id="appSearchInput" 
+                    placeholder="Search apps by name or category..." 
+                    class="w-full bg-mei-card border border-gray-700 rounded-2xl py-3 pl-11 pr-4 text-xs text-gray-200 outline-none focus:border-purple-500 transition shadow-inner">
+            </div>
+        </div>
+
+        <!-- Apps Grid -->
+        <div id="appsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            
+            <!-- Dumbo -->
+            <a href="dumbo.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-blue-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="dumbo notes productivity" data-category="productivity">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/80 text-blue-400 flex items-center justify-center border border-blue-800/50 text-base">
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-blue-400 transition">Dumbo</h3>
+                    </div>
+                    <span class="text-[10px] bg-blue-950 text-blue-300 px-2.5 py-1 rounded-full border border-blue-800 font-medium">Productivity</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-blue-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- Matix -->
+            <a href="matix.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-green-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="matix matrix green code rain animation" data-category="animation">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-green-950/80 text-green-400 flex items-center justify-center border border-green-800/50 text-base">
+                            <i class="fa-solid fa-code-commit"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-green-400 transition">Matix</h3>
+                    </div>
+                    <span class="text-[10px] bg-green-950 text-green-300 px-2.5 py-1 rounded-full border border-green-800 font-medium">Canvas</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-green-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- MediaStudio -->
+            <a href="mediastudio.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-purple-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="mediastudio media editor video timeline" data-category="studio">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-950/80 text-purple-400 flex items-center justify-center border border-purple-800/50 text-base">
+                            <i class="fa-solid fa-photo-film"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-purple-400 transition">MediaStudio</h3>
+                    </div>
+                    <span class="text-[10px] bg-purple-950 text-purple-300 px-2.5 py-1 rounded-full border border-purple-800 font-medium">Media Studio</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-purple-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- Meizero -->
+            <a href="meizero.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-blue-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="meizero futuristic ai dashboard" data-category="dashboard">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/80 text-blue-400 flex items-center justify-center border border-blue-800/50 text-base">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-blue-400 transition">Meizero</h3>
+                    </div>
+                    <span class="text-[10px] bg-blue-950 text-blue-300 px-2.5 py-1 rounded-full border border-blue-800 font-medium">Dashboard</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-blue-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- Modlix -->
+            <a href="modlix.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-cyan-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="modlix model hub ai playground" data-category="models">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-950/80 text-cyan-400 flex items-center justify-center border border-cyan-800/50 text-base">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-cyan-400 transition">Modlix</h3>
+                    </div>
+                    <span class="text-[10px] bg-cyan-950 text-cyan-300 px-2.5 py-1 rounded-full border border-cyan-800 font-medium">Models</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-cyan-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- Movix -->
+            <a href="movix.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-pink-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="movix movie streaming catalog" data-category="streaming">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-pink-950/80 text-pink-400 flex items-center justify-center border border-pink-800/50 text-base">
+                            <i class="fa-solid fa-film"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-pink-400 transition">Movix</h3>
+                    </div>
+                    <span class="text-[10px] bg-pink-950 text-pink-300 px-2.5 py-1 rounded-full border border-pink-800 font-medium">Streaming</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-pink-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- Wbots -->
+            <a href="wbots.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-indigo-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="wbots WhatsApp bots automation assistant" data-category="bots">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-950/80 text-indigo-400 flex items-center justify-center border border-indigo-800/50 text-base">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-indigo-400 transition">Wbots</h3>
+                    </div>
+                    <span class="text-[10px] bg-indigo-950 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-800 font-medium">Bots</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-indigo-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- OpenAudio -->
+            <a href="openaudio.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-teal-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="openaudio music streaming platform player" data-category="music">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-teal-950/80 text-teal-400 flex items-center justify-center border border-teal-800/50 text-base">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-teal-400 transition">OpenAudio</h3>
+                    </div>
+                    <span class="text-[10px] bg-teal-950 text-teal-300 px-2.5 py-1 rounded-full border border-teal-800 font-medium">Music</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-teal-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+            <!-- Syntax -->
+            <a href="syntax.html" class="app-card group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-orange-500/50 p-5 rounded-2xl transition shadow-lg flex flex-col justify-between cursor-pointer" data-name="syntax code editor terminal ide" data-category="ide">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-orange-950/80 text-orange-400 flex items-center justify-center border border-orange-800/50 text-base">
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-orange-400 transition">Syntax</h3>
+                    </div>
+                    <span class="text-[10px] bg-orange-950 text-orange-300 px-2.5 py-1 rounded-full border border-orange-800 font-medium">Web IDE</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between text-xs text-orange-400 font-medium">
+                    <span>Launch App</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition"></i>
+                </div>
+            </a>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800/80 py-6 text-center text-xs text-gray-500 bg-[#141416]">
+        Explore &bull; Application Directory Hub
+    </footer>
+
+    <!-- Search Filtering Script -->
+    <script>
+        const searchInput = document.getElementById('appSearchInput');
+        const appCards = document.querySelectorAll('.app-card');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            appCards.forEach(card => {
+                const name = card.dataset.name || '';
+                if (name.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
