@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-
-     <link rel="icon" type="image/png" sizes="32x32" href=.matix.png>
-
+    <link rel="icon" type="image/png" sizes="32x32" href="matix.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matix AI Canvas Studio - Interactive Visual Synthesizer</title>
@@ -96,7 +94,7 @@
 <body class="bg-[#08090d] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-purple-500 selection:text-white">
 
     <!-- Header Navigation -->
-    <header class="glass-panel sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between border-b border-white/10">
+    <header class="glass-panel sticky top-0 z-50 px-4 lg:px-8 py-3.5 flex items-center justify-between border-b border-white/10">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
                 <i class="fa-solid fa-paintbrush text-white text-lg"></i>
@@ -108,12 +106,16 @@
                 <p class="text-xs text-slate-400">Interactive Generative AI Canvas & Drawing Suite</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <button onclick="downloadCanvasArtwork()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+        <div class="flex items-center gap-3 relative z-50">
+            <button onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-200 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span class="hidden sm:inline">API Key</span>
+            </button>
+            <button onclick="downloadCanvasArtwork()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 cursor-pointer">
                 <i class="fa-solid fa-download"></i>
                 <span>Download Artwork</span>
             </button>
-            <button onclick="clearCanvasBackground()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5">
+            <button onclick="clearCanvasBackground()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center gap-1.5 cursor-pointer">
                 <i class="fa-solid fa-rotate-right"></i>
                 <span class="hidden sm:inline">Reset</span>
             </button>
@@ -121,7 +123,7 @@
     </header>
 
     <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
 
         <!-- Controls Sidebar -->
         <section class="lg:col-span-4 flex flex-col gap-5">
@@ -130,15 +132,15 @@
                     <i class="fa-solid fa-pen-nib text-indigo-400"></i>
                     AI Prompt & Synthesizer
                 </label>
-                <textarea id="promptInput" rows="3" class="w-full glass-input rounded-xl p-3.5 text-sm resize-none focus:outline-none" placeholder="Describe your vision (e.g., Cyberpunk Neon Nexus Grid)...">Cyberpunk Neon Nexus Grid</textarea>
+                <textarea id="promptInput" rows="3" class="w-full glass-input rounded-xl p-3.5 text-sm resize-none focus:outline-none relative z-20" placeholder="Describe your vision (e.g., Cyberpunk Neon Nexus Grid)...">Cyberpunk Neon Nexus Grid</textarea>
                 
-                <button id="generateBtn" onclick="synthesizeAICanvas()" class="glow-button w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-sm tracking-wide shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                <button id="generateBtn" onclick="synthesizeAICanvas()" class="glow-button w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-sm tracking-wide shadow-lg flex items-center justify-center gap-2 cursor-pointer relative z-20">
                     <i class="fa-solid fa-bolt text-amber-300"></i>
                     <span>Generate & Paint AI Canvas</span>
                 </button>
             </div>
 
-            <!-- Drawing & FX Tools Panel (Initially Locked/Hidden until Edit Mode is toggled) -->
+            <!-- Drawing & FX Tools Panel -->
             <div id="editToolsPanel" class="glass-panel p-5 rounded-2xl flex flex-col gap-4 shadow-xl opacity-50 pointer-events-none transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-semibold text-slate-200 flex items-center gap-2">
@@ -147,16 +149,16 @@
                     </label>
                     <span id="editModeBadge" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30 font-bold">Locked</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setTool('brush')" id="tool-brush" class="tool-btn py-2 px-3 rounded-xl bg-indigo-500/20 border border-indigo-500 text-xs font-semibold text-white">AI Brush</button>
-                    <button onclick="setTool('neon')" id="tool-neon" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400">Neon Glow</button>
-                    <button onclick="setTool('glitch')" id="tool-glitch" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400">Cyber Glitch</button>
-                    <button onclick="setTool('eraser')" id="tool-eraser" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400">Eraser</button>
+                <div class="grid grid-cols-2 gap-2 relative z-20">
+                    <button onclick="setTool('brush')" id="tool-brush" class="tool-btn py-2 px-3 rounded-xl bg-indigo-500/20 border border-indigo-500 text-xs font-semibold text-white cursor-pointer">AI Brush</button>
+                    <button onclick="setTool('neon')" id="tool-neon" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400 cursor-pointer">Neon Glow</button>
+                    <button onclick="setTool('glitch')" id="tool-glitch" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400 cursor-pointer">Cyber Glitch</button>
+                    <button onclick="setTool('eraser')" id="tool-eraser" class="tool-btn py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-400 cursor-pointer">Eraser</button>
                 </div>
 
                 <div class="flex items-center justify-between pt-2 border-t border-white/10">
                     <span class="text-xs text-slate-400">Brush Size</span>
-                    <input type="range" id="brushSize" min="2" max="40" value="12" class="accent-indigo-500 cursor-pointer">
+                    <input type="range" id="brushSize" min="2" max="40" value="12" class="accent-indigo-500 cursor-pointer relative z-20">
                 </div>
             </div>
         </section>
@@ -164,17 +166,17 @@
         <!-- Interactive Canvas Viewport -->
         <section class="lg:col-span-8 flex flex-col gap-4">
             <div class="glass-panel p-3 rounded-2xl relative overflow-hidden shadow-2xl flex flex-col items-center justify-center min-h-[520px]">
-                <div class="absolute top-6 right-6 z-20">
-                    <button id="editToggleBtn" onclick="toggleEditMode()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/20 text-xs font-bold text-slate-200 transition-all shadow-xl flex items-center gap-2 backdrop-blur-md">
+                <div class="absolute top-6 right-6 z-30">
+                    <button id="editToggleBtn" onclick="toggleEditMode()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-white/20 text-xs font-bold text-slate-200 transition-all shadow-xl flex items-center gap-2 backdrop-blur-md cursor-pointer">
                         <i class="fa-solid fa-pen-to-square text-indigo-400" id="editIcon"></i>
                         <span id="editText">Enable Edit Mode</span>
                     </button>
                 </div>
 
-                <canvas id="studioCanvas" class="w-full h-[500px] rounded-xl cursor-default bg-slate-950 shadow-2xl border border-white/10"></canvas>
+                <canvas id="studioCanvas" class="w-full h-[500px] rounded-xl cursor-default bg-slate-950 shadow-2xl border border-white/10 relative z-10"></canvas>
                 
                 <!-- Status Overlay -->
-                <div class="absolute top-6 left-6 bg-slate-900/90 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-200 backdrop-blur-md pointer-events-none flex items-center gap-2" id="canvasStatus">
+                <div class="absolute top-6 left-6 bg-slate-900/90 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-200 backdrop-blur-md pointer-events-none flex items-center gap-2 z-20" id="canvasStatus">
                     <i class="fa-solid fa-circle-check text-emerald-400"></i>
                     <span>Status: Ready to Generate AI Art (Edit Mode Locked)</span>
                 </div>
@@ -183,8 +185,32 @@
 
     </main>
 
+    <!-- API Key Configuration Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+        <div class="glass-panel p-6 rounded-2xl max-w-md w-full mx-4 flex flex-col gap-4 shadow-2xl border border-white/15 relative z-50">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-400"></i>
+                    Gemini API Key Settings
+                </h3>
+                <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-300">Enter your Gemini API key for the <code class="text-indigo-400">gemini-2.5-flash-image</code> (free tier preview) engine. Keys are securely stored in your browser's local storage.</p>
+            <div class="flex flex-col gap-2">
+                <label class="text-xs font-semibold text-slate-300">Gemini API Key</label>
+                <input type="password" id="apiKeyInput" class="glass-input rounded-xl p-3 text-xs w-full relative z-20" placeholder="Enter Gemini API key...">
+            </div>
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 cursor-pointer">Cancel</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 cursor-pointer">Save Key</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-md bg-slate-900 border border-indigo-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-md bg-slate-900 border border-indigo-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-none">
         <i id="toastIcon" class="fa-solid fa-circle-check text-indigo-400"></i>
         <span id="toastMessage" class="text-xs font-medium">Notification</span>
     </div>
@@ -198,6 +224,24 @@
         let lastX = 0;
         let lastY = 0;
         let currentImageLoaded = false;
+
+        // API Key Management
+        function openApiKeyModal() {
+            const savedKey = localStorage.getItem('matix_gemini_api_key') || '';
+            document.getElementById('apiKeyInput').value = savedKey;
+            document.getElementById('apiKeyModal').classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            localStorage.setItem('matix_gemini_api_key', key);
+            closeApiKeyModal();
+            showToast("Gemini API Key saved successfully!", "success");
+        }
 
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth - 24;
@@ -348,6 +392,36 @@
             return true;
         }
 
+        async function fetchGeminiPreviewImage(prompt, w, h) {
+            const apiKey = localStorage.getItem('matix_gemini_api_key');
+            if (!apiKey) {
+                throw new Error("No Gemini API key configured");
+            }
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Generate image: ${prompt}` }]
+                }]
+            };
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                throw new Error("Gemini API request failed");
+            }
+
+            const data = await res.json();
+            const inlineData = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData;
+            if (inlineData) {
+                return await loadImageElement(`data:${inlineData.mimeType};base64,${inlineData.data}`, 8000);
+            }
+            throw new Error("No image returned from Gemini endpoint");
+        }
+
         async function fetchPollinationsImage(prompt, w, h, seed) {
             const cleanPrompt = encodeURIComponent(prompt.trim() + ", extremely accurate subject matter, high quality");
             const models = ['flux', 'turbo'];
@@ -393,21 +467,39 @@
                 return;
             }
 
-            document.getElementById('canvasStatus').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i><span>Synthesizing artwork via AI Engines & Stock fallback...</span>`;
+            const apiKey = localStorage.getItem('matix_gemini_api_key');
+            if (apiKey) {
+                document.getElementById('canvasStatus').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i><span>Synthesizing via Gemini gemini-2.5-flash-image preview...</span>`;
+            } else {
+                document.getElementById('canvasStatus').innerHTML = `<i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i><span>No API key provided. Synthesizing via free multi-engine fallbacks...</span>`;
+            }
             
             let loadedImg = null;
             const seed = Math.floor(Math.random() * 999999);
 
             try {
-                try {
-                    loadedImg = await fetchPollinationsImage(prompt, canvas.width, canvas.height, seed);
-                } catch (e) {
-                    console.warn("Pollinations failed, trying Lexica...");
+                // Try Gemini API first if key exists
+                if (apiKey) {
                     try {
-                        loadedImg = await fetchLexicaImage(prompt);
+                        loadedImg = await fetchGeminiPreviewImage(prompt, canvas.width, canvas.height);
                     } catch (err) {
-                        console.warn("Lexica failed, using stock photo fallback...");
-                        loadedImg = await fetchStockImage(prompt, canvas.width, canvas.height);
+                        console.warn("Gemini API generation failed, falling back to free engines...", err);
+                        showToast("Gemini API failed. Falling back to free engines...", "warning");
+                    }
+                }
+
+                // Fallbacks if Gemini wasn't used or failed
+                if (!loadedImg) {
+                    try {
+                        loadedImg = await fetchPollinationsImage(prompt, canvas.width, canvas.height, seed);
+                    } catch (e) {
+                        console.warn("Pollinations failed, trying Lexica...");
+                        try {
+                            loadedImg = await fetchLexicaImage(prompt);
+                        } catch (err) {
+                            console.warn("Lexica failed, using stock photo fallback...");
+                            loadedImg = await fetchStockImage(prompt, canvas.width, canvas.height);
+                        }
                     }
                 }
 
