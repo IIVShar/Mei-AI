@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full dark">
 <head>
-         <link rel="icon" type="image/png" sizes="32x32" href=.syntax.png>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syntax AI Coding Assistant</title>
@@ -511,13 +510,16 @@
             const geminiKey = localStorage.getItem('syntax_gemini_key') || '';
             const openrouterKey = localStorage.getItem('syntax_openrouter_key') || '';
 
-            // 1. Try Gemini API
+            // 1. Try Gemini API with system instructions for natural developer conversational flow
             if (geminiKey) {
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
+                            systemInstruction: {
+                                parts: [{ text: "You are Syntax, an expert AI coding assistant and software engineering peer. Whenever asked who you are or what your name is, explicitly identify as Syntax. Respond directly, naturally, and conversationally to developer questions. Provide clean code blocks only when relevant or specifically requested." }]
+                            },
                             contents: history.map(m => ({
                                 role: m.role === 'assistant' ? 'model' : 'user',
                                 parts: [{ text: m.content }]
@@ -578,13 +580,19 @@
 
         function generateSmartConversationalResponse(query, model) {
             const q = query.toLowerCase();
+            if (q.includes('who are you') || q.includes('your name') || q.includes('what are you')) {
+                return 'I am Syntax, your AI coding assistant and software engineering peer. I am here to help you write code, debug issues, design system architectures, and explore technical concepts. How can I help with your project today?';
+            }
             if (q.includes('roblox') || q.includes('luau') || q.includes('datastore')) {
-                return `When handling Roblox DataStore persistence in Luau, wrap your calls in \`pcall()\` to handle network failures gracefully:\n\n\`\`\`lua:DataStoreService.lua\nlocal DataStoreService = game:GetService("DataStoreService")\nlocal playerCoinsStore = DataStoreService:GetDataStore("PlayerCoins_v1")\n\nlocal function saveData(player)\n    local key = "Player_" .. player.UserId\n    local dataToSave = player.leaderstats.Coins.Value\n    \n    local success, err = pcall(function()\n        playerCoinsStore:SetAsync(key, dataToSave)\n    end)\n    \n    if not success then\n        warn("Failed to save data: " .. tostring(err))\n    end\nend\n\`\`\``;
+                return 'When handling Roblox DataStore persistence in Luau, wrap your calls in `pcall()` to handle network failures gracefully:\n\n```lua:DataStoreService.lua\nlocal DataStoreService = game:GetService("DataStoreService")\nlocal playerCoinsStore = DataStoreService:GetDataStore("PlayerCoins_v1")\n\nlocal function saveData(player)\n    local key = "Player_" .. player.UserId\n    local dataToSave = player.leaderstats.Coins.Value\n    \n    local success, err = pcall(function()\n        playerCoinsStore:SetAsync(key, dataToSave)\n    end)\n    \n    if not success then\n        warn("Failed to save data: " .. tostring(err))\n    end\nend\n```';
             }
             if (q.includes('react') || q.includes('hook') || q.includes('state')) {
-                return `In React, managing asynchronous effects cleanly requires cleanup handlers to prevent state updates on unmounted components:\n\n\`\`\`javascript:useFetch.jsx\nimport { useState, useEffect } from 'react';\n\nexport function useFetch(url) {\n    const [data, setData] = useState(null);\n    const [loading, setLoading] = useState(true);\n\n    useEffect(() => {\n        const controller = new AbortController();\n        \n        fetch(url, { signal: controller.signal })\n            .then(res => res.json())\n            .then(data => { setData(data); setLoading(false); })\n            .catch(err => {\n                if (err.name !== 'AbortError') setLoading(false);\n            });\n            \n        return () => controller.abort();\n    }, [url]);\n\n    return { data, loading };\n}\n\`\`\``;
+                return 'In React, managing asynchronous effects cleanly requires cleanup handlers to prevent state updates on unmounted components:\n\n```javascript:useFetch.jsx\nimport { useState, useEffect } from \'react\';\n\nexport function useFetch(url) {\n    const [data, setData] = useState(null);\n    const [loading, setLoading] = useState(true);\n\n    useEffect(() => {\n        const controller = new AbortController();\n        \n        fetch(url, { signal: controller.signal })\n            .then(res => res.json())\n            .then(data => { setData(data); setLoading(false); })\n            .catch(err => {\n                if (err.name !== \'AbortError\') setLoading(false);\n            });\n            \n        return () => controller.abort();\n    }, [url]);\n\n    return { data, loading };\n}\n```';
             }
-            return `That is a great point regarding software architecture and code maintainability. Depending on your tech stack and performance budget, we can structure this to be modular and scalable. Let me know what specific framework or language you are targeting, and we can write the precise implementation!`;
+            if (q.includes('architecture') || q.includes('maintainability') || q.includes('scale')) {
+                return 'That is a great point regarding software architecture and code maintainability! Depending on your tech stack and performance budget, we can structure this to be modular and decoupled. Would you like a step-by-step technical breakdown or a ready-to-run implementation file?';
+            }
+            return 'I can help you build, optimize, or debug that! Let me know what specific language or framework you are targeting, and we can dive straight into the implementation.';
         }
 
         function appendUserMessageToUI(text) {
