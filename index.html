@@ -175,7 +175,7 @@
                         <div class="relative w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
                     </a>
                     <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200"><a href="tilte.html" class="hover:text-purple-400 transition">Hello, I'm Mei!</a></h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with 1000+ open-source AI models, Mei Canvas live app editor, file attachments, and typewriter responses.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with 100+ Mei family AI models, Mei Canvas live app editor, file attachments, and typewriter responses.</p>
 
                     <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
@@ -185,7 +185,7 @@
                             Build live single-file HTML web applications, slide presentations, or code utilities right here!
                         </p>
                         <div class="flex flex-wrap gap-2 text-[11px] text-gray-400">
-                            <span class="bg-purple-500/20 px-2 py-0.5 rounded text-purple-300">🤖 1000+ AI Models</span>
+                            <span class="bg-purple-500/20 px-2 py-0.5 rounded text-purple-300">🤖 100+ Mei Models</span>
                             <span class="bg-pink-500/20 px-2 py-0.5 rounded text-pink-300">💻 Mei Canvas Preview</span>
                             <span class="bg-teal-500/20 px-2 py-0.5 rounded text-teal-300">⚡ Single-File Standard HTML</span>
                         </div>
@@ -241,7 +241,7 @@
                         </button>
                     </div>
                 </div>
-                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • 1000+ AI Models & Live Mei Canvas</p>
+                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • 100+ Mei Family Models & Live Mei Canvas</p>
             </div>
         </main>
 
@@ -304,15 +304,32 @@
                 <div>
                     <label class="block text-gray-400 mb-1 font-medium">Preferred AI Provider</label>
                     <select id="modelSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-purple-500">
-                        <option value="auto">Auto (Free Smart Multi-Routing)</option>
-                        <option value="meizero">Meizero</option>
-                        <option value="movix">Movix</option>
-                        <option value="matix">Matix</option>
-                        <option value="openai">OpenAI</option>
-                        <option value="groq">Groq</option>
-                        <option value="gemini">Google Gemini</option>
-                        <option value="openrouter">OpenRouter</option>
-                        <option value="pollen">Pollinations / Pollen API</option>
+                        <option value="auto">⚡ Auto (Smart Multi-Routing)</option>
+                        <optgroup label="Mei Flagship Models">
+                            <option value="meizero">Meizero (Omni Reasoning Core)</option>
+                            <option value="meizero-pro">Meizero Pro (Advanced Multi-Modal)</option>
+                            <option value="meizero-flash">Meizero Flash (Ultra-Fast Response)</option>
+                        </optgroup>
+                        <optgroup label="Mei Coder & Canvas">
+                            <option value="movix">Movix (Full-Stack Code & UI Master)</option>
+                            <option value="movix-canvas">Movix Canvas (Live Interactive Architecture)</option>
+                        </optgroup>
+                        <optgroup label="Mei Reasoning & Math">
+                            <option value="matix">Matix (Deep Logic & Math Core)</option>
+                            <option value="matix-omni">Matix Omni (Structured Analytics)</option>
+                        </optgroup>
+                        <optgroup label="Mei Specialized & Creative">
+                            <option value="meiverse">Meiverse 70B (General Creative & Lore)</option>
+                            <option value="meivision">Meivision (Visuals & Image Prompts)</option>
+                            <option value="meisecure">Meisecure (Secure Workspace Guard)</option>
+                        </optgroup>
+                        <optgroup label="External Gateway Fallbacks">
+                            <option value="openai">OpenAI (GPT-4o / GPT-3.5)</option>
+                            <option value="groq">Groq (Llama 3.3 / Mixtral)</option>
+                            <option value="gemini">Google Gemini 1.5 Pro</option>
+                            <option value="openrouter">OpenRouter (1000+ Models)</option>
+                            <option value="pollen">Pollinations API</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -625,20 +642,20 @@
             let isGemini = false;
 
             if (selectedModel === 'openai' && keys.openai) {
-                providerEndpoint = "https://api.openai.com/v1/chat/completions";
+                providerEndpoint = "[https://api.openai.com/v1/chat/completions](https://api.openai.com/v1/chat/completions)";
                 fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}`}, body: JSON.stringify({model: 'gpt-4o', messages: payloadMessages}) };
             } else if (selectedModel === 'groq' && keys.groq) {
-                providerEndpoint = "https://api.groq.com/openai/v1/chat/completions";
+                providerEndpoint = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
                 fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}`}, body: JSON.stringify({model: 'llama-3.3-70b-versatile', messages: payloadMessages}) };
             } else if (selectedModel === 'openrouter' && keys.openrouter) {
-                providerEndpoint = "https://openrouter.ai/api/v1/chat/completions";
+                providerEndpoint = "[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)";
                 fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openrouter}`}, body: JSON.stringify({model: 'openrouter/auto', messages: payloadMessages}) };
             } else if (selectedModel === 'pollen' && keys.pollen) {
-                providerEndpoint = "https://text.pollinations.ai/";
+                providerEndpoint = "[https://text.pollinations.ai/](https://text.pollinations.ai/)";
                 fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.pollen}`}, body: JSON.stringify({messages: payloadMessages, model: 'openai'}) };
             } else if (selectedModel === 'gemini' && keys.gemini) {
                 isGemini = true;
-                providerEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${keys.gemini}`;
+                providerEndpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$){keys.gemini}`;
                 
                 const geminiContents = payloadMessages.filter(m => m.role !== 'system').map(m => ({
                     role: m.role === 'assistant' ? 'model' : 'user',
@@ -668,12 +685,12 @@
             const pollenHeader = keys.pollen ? { 'Authorization': `Bearer ${keys.pollen}` } : {};
             const endpoints = [
                 {
-                    url: "https://text.pollinations.ai/",
+                    url: "[https://text.pollinations.ai/](https://text.pollinations.ai/)",
                     body: { messages: payloadMessages, model: 'openai' },
                     headers: pollenHeader
                 },
                 {
-                    url: "https://text.pollinations.ai/" + encodeURIComponent(userPrompt) + "?private=true&cache=false",
+                    url: "[https://text.pollinations.ai/](https://text.pollinations.ai/)" + encodeURIComponent(userPrompt) + "?private=true&cache=false",
                     isGet: true,
                     headers: pollenHeader
                 }
