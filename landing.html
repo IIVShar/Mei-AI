@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mei AI - Title & App Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mei: {
+                            bg: '#131314',
+                            sidebar: '#1e1e20',
+                            card: '#282a2c',
+                            accent: '#a8c7fa'
+                        }
+                    },
+                    keyframes: {
+                        bibbybitPulse: {
+                            '0%, 100%': { transform: 'scale(1) rotate(0deg)', filter: 'brightness(1) hue-rotate(0deg)' },
+                            '50%': { transform: 'scale(1.15) rotate(3deg)', filter: 'brightness(1.3) hue-rotate(45deg)' }
+                        },
+                        bibbybitGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '1', transform: 'scale(1.4)' }
+                        }
+                    },
+                    animation: {
+                        'bibbybit-pulse': 'bibbybitPulse 2s ease-in-out infinite',
+                        'bibbybit-glow': 'bibbybitGlow 2s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-mei-bg text-gray-100 min-h-screen flex flex-col justify-between font-sans m-0 p-0 overflow-x-hidden selection:bg-purple-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="h-16 border-b border-gray-800/80 bg-[#18181a]/80 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6 lg:px-12">
+        <a href="tilte.html" class="flex items-center gap-3 group">
+            <div class="relative flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+            </div>
+            <span class="font-bold text-lg text-gray-100 tracking-wide group-hover:text-purple-400 transition">Mei Workspace</span>
+        </a>
+
+        <div class="flex items-center gap-4">
+            <a href="about.html" class="text-xs font-medium text-gray-300 hover:text-white transition flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info text-pink-400"></i> About
+            </a>
+            <a href="explore.html" class="text-xs font-medium text-gray-300 hover:text-white transition flex items-center gap-1.5">
+                <i class="fa-solid fa-compass text-purple-400"></i> Explore Apps
+            </a>
+            <a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium text-xs shadow-lg transition">
+                <i class="fa-solid fa-comments"></i> Launch Workspace
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Hero Container -->
+    <main class="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-5xl mx-auto w-full text-center">
+        
+        <!-- Animated Brand Core Icon -->
+        <div class="relative flex items-center justify-center mb-6">
+            <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-2xl opacity-70 animate-bibbybit-glow"></div>
+            <div class="relative w-8 h-20 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_30px_rgba(168,85,247,0.9)] animate-bibbybit-pulse"></div>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-300 to-pink-400">
+            Mei AI Workspace
+        </h1>
+
+        <p class="text-base sm:text-lg text-gray-400 max-w-2xl mb-8 leading-relaxed">
+            Integrated AI directory engine, live HTML canvas previewer, and rapid web application prototype generator.
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-4 mb-14">
+            <a href="index.html" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-500 hover:to-pink-500 text-white font-semibold text-sm shadow-xl shadow-purple-900/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> Open AI Studio
+            </a>
+            <a href="explore.html" class="px-6 py-3.5 rounded-2xl bg-mei-card hover:bg-gray-800 border border-gray-700 text-gray-200 font-semibold text-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-compass text-purple-400"></i> Browse Apps Hub
+            </a>
+        </div>
+
+        <!-- Ecosystem Apps Grid -->
+        <div class="w-full text-left">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-purple-400"></i> Featured Mei Applications
+                </h2>
+                <a href="explore.html" class="text-xs text-purple-400 hover:text-purple-300 transition">View All &rarr;</a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <a href="explore.html" class="group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-blue-500/50 p-4 rounded-2xl transition shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fa-solid fa-code text-blue-400 text-lg"></i>
+                            <span class="text-[10px] bg-blue-950 text-blue-300 px-2 py-0.5 rounded border border-blue-800">HTML UI</span>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-blue-400 transition mb-1">Dumbo</h3>
+                        <p class="text-xs text-gray-400">Clean note-taking productivity interface with rich text editing toolbar.</p>
+                    </div>
+                </a>
+
+                <a href="explore.html" class="group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-green-500/50 p-4 rounded-2xl transition shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fa-solid fa-code-commit text-green-400 text-lg"></i>
+                            <span class="text-[10px] bg-green-950 text-green-300 px-2 py-0.5 rounded border border-green-800">Canvas</span>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-green-400 transition mb-1">Matix</h3>
+                        <p class="text-xs text-gray-400">Digital rain falling green code matrix animation generator.</p>
+                    </div>
+                </a>
+
+                <a href="explore.html" class="group bg-mei-card hover:bg-gray-800 border border-gray-800 hover:border-purple-500/50 p-4 rounded-2xl transition shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fa-solid fa-photo-film text-purple-400 text-lg"></i>
+                            <span class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded border border-purple-800">Studio</span>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-200 group-hover:text-purple-400 transition mb-1">MediaStudio</h3>
+                        <p class="text-xs text-gray-400">Multi-track browser media timeline and layout editing dashboard.</p>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800/80 py-6 text-center text-xs text-gray-500 bg-[#141416]">
+        Mei AI Workspace &bull; Single-File Application Architecture
+    </footer>
+
+</body>
+</html>
