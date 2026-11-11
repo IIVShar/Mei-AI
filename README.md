@@ -16,4 +16,6 @@ Pollination.ai - API Engine
 Google - Voice tts, flash image
 Openrouter - API Provider
 
+NO COPYING PLEASE 
+
 Enjoy!
