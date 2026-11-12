@@ -370,7 +370,7 @@
                 <button id="closeSettingsBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="space-y-4 text-xs max-h-[60vh] overflow-y-auto pr-2">
+            <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-2">
                 <!-- Light / Dark Theme Switcher -->
                 <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60">
                     <div class="flex items-center gap-2.5">
@@ -391,6 +391,7 @@
                     <label class="block text-gray-700 dark:text-gray-400 mb-1 font-medium">Preferred AI Provider & Model</label>
                     <select id="modelSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none focus:border-purple-500">
                         <option value="auto">⚡ Auto (Smart Multi-Routing)</option>
+                        <option value="custom">🛠️ Custom Model ID / Endpoint</option>
 
                         <!-- Mei Flagship Core Series -->
                         <optgroup label="Mei Flagship Core Series">
@@ -525,9 +526,25 @@
                     </select>
                 </div>
 
-                <div class="pt-2 border-t border-gray-800 space-y-2">
-                    <label class="block text-gray-400 mb-1 font-medium text-[10px] uppercase tracking-wider">API Keys (Single Key or Multi-Key Config)</label>
-                    <textarea id="multiApiKeyInput" rows="4" placeholder="Enter API Key(s) here. Format:&#10;openai=sk-proj-...&#10;anthropic=sk-ant-...&#10;groq=gsk_...&#10;gemini=AIza...&#10;openrouter=sk-or-..." class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px] resize-none"></textarea>
+                <!-- Custom Model ID & Endpoint Inputs -->
+                <div class="p-3 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60 space-y-2.5">
+                    <div class="flex items-center gap-1.5 text-purple-400 font-semibold text-[11px] uppercase tracking-wider">
+                        <i class="fa-solid fa-microchip"></i> Custom Model API Override
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 mb-1 font-medium text-[11px]">Model ID / Name</label>
+                        <input type="text" id="customModelIdInput" placeholder="e.g. gpt-4o, deepseek-chat, claude-3-5-sonnet-20241022" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-900 dark:text-gray-100 outline-none focus:border-purple-500 font-mono text-[11px]">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 mb-1 font-medium text-[11px]">Custom API Base URL (Optional)</label>
+                        <input type="text" id="customApiEndpointInput" placeholder="https://api.openai.com/v1/chat/completions" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-900 dark:text-gray-100 outline-none focus:border-purple-500 font-mono text-[11px]">
+                    </div>
+                    <p class="text-[10px] text-gray-500">Leave blank to use standard provider routing. If set, overrides the dropdown model ID.</p>
+                </div>
+
+                <div class="pt-2 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                    <label class="block text-gray-700 dark:text-gray-400 mb-1 font-medium text-[10px] uppercase tracking-wider">API Keys (Single Key or Multi-Key Config)</label>
+                    <textarea id="multiApiKeyInput" rows="4" placeholder="Enter API Key(s) here. Format:&#10;openai=sk-proj-...&#10;anthropic=sk-ant-...&#10;groq=gsk_...&#10;gemini=AIza...&#10;openrouter=sk-or-...&#10;custom=your-custom-api-key" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px] resize-none"></textarea>
                     <p class="text-[10px] text-gray-500 mt-1">Keys are saved in local storage inside your browser session.</p>
                 </div>
             </div>
@@ -596,6 +613,7 @@
         const newChatBtn = document.getElementById('newChatBtn');
         const homeBtn = document.getElementById('homeBtn');
         const emptyState = document.getElementById('emptyState');
+        const activeModelBadge = document.getElementById('activeModelBadge');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const messagesList = document.getElementById('messagesList');
@@ -624,6 +642,8 @@
         const themeToggleCheckbox = document.getElementById('themeToggleCheckbox');
         const multiApiKeyInput = document.getElementById('multiApiKeyInput');
         const modelSelect = document.getElementById('modelSelect');
+        const customModelIdInput = document.getElementById('customModelIdInput');
+        const customApiEndpointInput = document.getElementById('customApiEndpointInput');
 
         // AI Image Studio Elements
         const imageStudioModal = document.getElementById('imageStudioModal');
@@ -745,10 +765,25 @@
             if (isCanvasFullscreen) toggleCanvasFullscreen();
         });
 
+        function updateActiveModelBadge() {
+            const customModelId = (localStorage.getItem('mei_custom_model_id') || '').trim();
+            const savedModel = localStorage.getItem('mei_model') || 'auto';
+            if (customModelId) {
+                activeModelBadge.textContent = customModelId;
+            } else if (savedModel === 'auto') {
+                activeModelBadge.textContent = 'Auto (Smart Multi-Routing)';
+            } else {
+                const option = modelSelect.querySelector(`option[value="${savedModel}"]`);
+                activeModelBadge.textContent = option ? option.textContent : savedModel;
+            }
+        }
+
         // Settings Modal Controls
         const openSettingsHandler = () => {
             multiApiKeyInput.value = localStorage.getItem('mei_multi_api_keys') || '';
             modelSelect.value = localStorage.getItem('mei_model') || 'auto';
+            customModelIdInput.value = localStorage.getItem('mei_custom_model_id') || '';
+            customApiEndpointInput.value = localStorage.getItem('mei_custom_api_endpoint') || '';
             settingsModal.classList.remove('hidden');
             if (!overlay.classList.contains('hidden')) toggleSidebar();
         };
@@ -760,7 +795,10 @@
         saveSettingsBtn.addEventListener('click', () => {
             localStorage.setItem('mei_multi_api_keys', multiApiKeyInput.value.trim());
             localStorage.setItem('mei_model', modelSelect.value);
+            localStorage.setItem('mei_custom_model_id', customModelIdInput.value.trim());
+            localStorage.setItem('mei_custom_api_endpoint', customApiEndpointInput.value.trim());
             toggleTheme(themeToggleCheckbox.checked);
+            updateActiveModelBadge();
             settingsModal.classList.add('hidden');
         });
 
@@ -773,7 +811,7 @@
         // Helper to parse key input
         function getParsedKeys() {
             const raw = localStorage.getItem('mei_multi_api_keys') || '';
-            const keys = { openai: '', anthropic: '', groq: '', gemini: '', openrouter: '' };
+            const keys = { openai: '', anthropic: '', groq: '', gemini: '', openrouter: '', custom: '' };
             if (!raw) return keys;
 
             const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
@@ -789,9 +827,15 @@
                     else if (line.startsWith('sk-')) keys.openai = line;
                     else if (line.startsWith('gsk_')) keys.groq = line;
                     else if (line.startsWith('AIza')) keys.gemini = line;
-                    else keys.openai = line;
+                    else {
+                        keys.openai = line;
+                        keys.custom = line;
+                    }
                 }
             });
+            if (!keys.custom) {
+                keys.custom = keys.openai || keys.openrouter || keys.groq || keys.anthropic || keys.gemini;
+            }
             return keys;
         }
 
@@ -927,6 +971,8 @@
 
         async function fetchAIResponse(userPrompt) {
             const selectedModel = localStorage.getItem('mei_model') || 'auto';
+            const customModelId = (localStorage.getItem('mei_custom_model_id') || '').trim();
+            const customApiEndpoint = (localStorage.getItem('mei_custom_api_endpoint') || '').trim();
             const keys = getParsedKeys();
             
             currentAbortController = new AbortController();
@@ -942,19 +988,34 @@
             let fetchOptions = null;
             let isGemini = false;
 
-            if ((selectedModel === 'gpt-4o' || selectedModel === 'gpt-4o-mini' || selectedModel === 'openai') && keys.openai) {
-                const targetModel = selectedModel === 'gpt-4o-mini' ? 'gpt-4o-mini' : 'gpt-4o';
+            if (customApiEndpoint) {
+                providerEndpoint = customApiEndpoint;
+                const headers = { 'Content-Type': 'application/json' };
+                if (keys.custom) headers['Authorization'] = `Bearer ${keys.custom}`;
+                fetchOptions = {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        model: customModelId || (selectedModel !== 'auto' && selectedModel !== 'custom' ? selectedModel : 'gpt-4o'),
+                        messages: payloadMessages
+                    })
+                };
+            } else if ((selectedModel === 'gpt-4o' || selectedModel === 'gpt-4o-mini' || selectedModel === 'openai' || (customModelId && keys.openai && !keys.openrouter)) && keys.openai) {
+                const targetModel = customModelId || (selectedModel === 'gpt-4o-mini' ? 'gpt-4o-mini' : 'gpt-4o');
                 providerEndpoint = "[https://api.openai.com/v1/chat/completions](https://api.openai.com/v1/chat/completions)";
                 fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}`}, body: JSON.stringify({ model: targetModel, messages: payloadMessages }) };
             } else if ((selectedModel === 'llama-3-3-70b' || selectedModel === 'groq') && keys.groq) {
+                const targetModel = customModelId || 'llama-3.3-70b-versatile';
                 providerEndpoint = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
-                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}`}, body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: payloadMessages }) };
-            } else if ((selectedModel.startsWith('openrouter') || selectedModel === 'auto') && keys.openrouter) {
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}`}, body: JSON.stringify({ model: targetModel, messages: payloadMessages }) };
+            } else if ((selectedModel.startsWith('openrouter') || selectedModel === 'auto' || selectedModel === 'custom') && keys.openrouter) {
+                const targetModel = customModelId || 'openrouter/auto';
                 providerEndpoint = "[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)";
-                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openrouter}`}, body: JSON.stringify({ model: 'openrouter/auto', messages: payloadMessages }) };
+                fetchOptions = { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openrouter}`}, body: JSON.stringify({ model: targetModel, messages: payloadMessages }) };
             } else if ((selectedModel.startsWith('gemini') || selectedModel === 'gemini') && keys.gemini) {
                 isGemini = true;
-                providerEndpoint = `[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=$){keys.gemini}`;
+                const geminiModel = customModelId || 'gemini-1.5-pro';
+                providerEndpoint = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){geminiModel}:generateContent?key=${keys.gemini}`;
                 const geminiContents = payloadMessages.filter(m => m.role !== 'system').map(m => ({
                     role: m.role === 'assistant' ? 'model' : 'user',
                     parts: [{ text: m.content }]
@@ -1104,7 +1165,8 @@
             openCanvasHeaderBtn.classList.add('hidden');
         });
 
-        // Initialize default active navigation state
+        // Initialize default active navigation state & badge
+        updateActiveModelBadge();
         showChatHome();
     </script>
 </body>
