@@ -1,444 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About | Mei AI</title>
-  <style>
-    :root {
-      --bg-dark: #0a0c10;
-      --bg-surface: rgba(18, 22, 31, 0.65);
-      --border-accent: rgba(99, 102, 241, 0.25);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      
-      /* Mei AI Signature Gradient Palette */
-      --mei-indigo: #6366f1;
-      --mei-purple: #a855f7;
-      --mei-cyan: #06b6d4;
-      
-      --mei-gradient: linear-gradient(135deg, var(--mei-indigo), var(--mei-purple), var(--mei-cyan));
-      --mei-text-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #22d3ee 100%);
-      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: var(--font-family);
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 20% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
-    }
-
-    /* Header */
-    header {
-      width: 100%;
-      padding: 1.25rem 2rem;
-      border-bottom: 1px solid var(--border-subtle);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10, 12, 16, 0.75);
-    }
-
-    nav {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 1.2rem;
-    }
-
-    /* Mei AI Core Icon */
-    .mei-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: var(--mei-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
-    }
-
-    .mei-logo svg {
-      width: 18px;
-      height: 18px;
-      fill: #ffffff;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: var(--text-main);
-    }
-
-    /* Main Container */
-    main {
-      max-width: 1050px;
-      margin: 0 auto;
-      padding: 4rem 1.5rem;
-      flex: 1;
-    }
-
-    /* Hero Section */
-    .hero {
-      text-align: center;
-      margin-bottom: 5rem;
-      position: relative;
-    }
-
-    .pill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 1rem;
-      border-radius: 9999px;
-      background: rgba(168, 85, 247, 0.1);
-      border: 1px solid var(--border-accent);
-      color: #c084fc;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .hero h1 {
-      font-size: 3.25rem;
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 1.25rem;
-      background: var(--mei-text-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto;
-      font-weight: 400;
-    }
-
-    /* Cards Grid */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 5rem;
-    }
-
-    .card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 2.25rem 2rem;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 20px;
-      padding: 1px;
-      background: linear-gradient(135deg, transparent 40%, rgba(168, 85, 247, 0.3) 100%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 36px -12px rgba(99, 102, 241, 0.22);
-    }
-
-    .card:hover::before {
-      opacity: 1;
-    }
-
-    .card-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .card-icon svg {
-      width: 24px;
-      height: 24px;
-      stroke: #c084fc;
-      stroke-width: 1.8;
-      fill: none;
-    }
-
-    .card h3 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      color: var(--text-main);
-    }
-
-    .card p {
-      color: var(--text-muted);
-      font-size: 0.98rem;
-      line-height: 1.6;
-    }
-
-    /* Creator Card Section */
-    .creator-section {
-      margin-bottom: 5rem;
-    }
-
-    .creator-card {
-      background: linear-gradient(135deg, rgba(18, 22, 31, 0.8), rgba(99, 102, 241, 0.05));
-      border: 1px solid var(--border-accent);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
-      display: flex;
-      align-items: center;
-      gap: 2.5rem;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-    }
-
-    .creator-avatar {
-      width: 96px;
-      height: 96px;
-      min-width: 96px;
-      border-radius: 24px;
-      background: var(--mei-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
-    }
-
-    .creator-avatar svg {
-      width: 48px;
-      height: 48px;
-      stroke: #ffffff;
-      stroke-width: 1.8;
-      fill: none;
-    }
-
-    .creator-content h2 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-      color: var(--text-main);
-    }
-
-    .creator-tagline {
-      color: #22d3ee;
-      font-size: 0.95rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 1rem;
-    }
-
-    .creator-bio {
-      color: var(--text-muted);
-      font-size: 1rem;
-      line-height: 1.65;
-    }
-
-    /* Highlight Banner */
-    .banner {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
-      border: 1px solid var(--border-accent);
-      border-radius: 24px;
-      padding: 3rem 2.5rem;
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-
-    .banner h2 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: var(--mei-text-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .banner p {
-      color: var(--text-muted);
-      max-width: 650px;
-      margin: 0 auto;
-      font-size: 1.05rem;
-    }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border-subtle);
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 2.35rem;
-      }
-      .creator-card {
-        flex-direction: column;
-        text-align: center;
-        gap: 1.5rem;
-        padding: 2rem 1.5rem;
-      }
-      main {
-        padding: 2.5rem 1rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Mei AI Workspace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mei: {
+                            bg: '#131314',
+                            sidebar: '#1e1e20',
+                            card: '#282a2c',
+                            accent: '#a8c7fa'
+                        }
+                    },
+                    keyframes: {
+                        bibbybitPulse: {
+                            '0%, 100%': { transform: 'scale(1) rotate(0deg)', filter: 'brightness(1) hue-rotate(0deg)' },
+                            '50%': { transform: 'scale(1.15) rotate(3deg)', filter: 'brightness(1.3) hue-rotate(45deg)' }
+                        },
+                        bibbybitGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '1', transform: 'scale(1.4)' }
+                        }
+                    },
+                    animation: {
+                        'bibbybit-pulse': 'bibbybitPulse 2s ease-in-out infinite',
+                        'bibbybit-glow': 'bibbybitGlow 2s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 9999px; }
+    </style>
 </head>
-<body>
+<body class="bg-mei-bg text-gray-100 min-h-screen flex flex-col justify-between font-sans m-0 p-0 overflow-x-hidden">
 
-  <!-- Header -->
-  <header>
-    <nav>
-      <a href="#" class="brand">
-        <div class="mei-logo">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
+    <!-- Top Header -->
+    <header class="h-16 border-b border-gray-800/80 bg-[#18181a]/80 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6 lg:px-12">
+        <a href="tilte.html" class="flex items-center gap-3 group">
+            <div class="relative flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+            </div>
+            <span class="font-bold text-base text-gray-100 tracking-wide group-hover:text-purple-400 transition">Mei Workspace</span>
+        </a>
+
+        <div class="flex items-center gap-3">
+            <a href="https://github.com/yourusername/mei-workspace" target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-gray-300 hover:text-white transition flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-800/60">
+                <i class="fa-brands fa-github text-base"></i> <span class="hidden sm:inline">GitHub</span>
+            </a>
+            <a href="explore.html" class="text-xs font-medium text-gray-300 hover:text-white transition flex items-center gap-1.5">
+                <i class="fa-solid fa-compass text-purple-400"></i> Explore Apps
+            </a>
+            <a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs transition shadow-lg">
+                <i class="fa-solid fa-sparkles"></i> Try Mei
+            </a>
         </div>
-        <span>Mei AI</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="#">Directory</a></li>
-        <li><a href="#" class="active">About</a></li>
-        <li><a href="#">Settings</a></li>
-      </ul>
-    </nav>
-  </header>
+    </header>
 
-  <!-- Main Content -->
-  <main>
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="pill-tag">
-        <span>Adaptive Persona Directory</span>
-      </div>
-      <h1>Intelligent AI Assistants Tailored for Every Task</h1>
-      <p>Mei AI brings together specialized digital personas into a seamless, privacy-first workspace engineered for rapid execution, interactive learning, and continuous conversation state.</p>
-    </section>
-
-    <!-- Capabilities Grid -->
-    <section class="grid">
-      <div class="card">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <!-- Main About Content -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
+        <div class="text-center mb-12">
+            <div class="relative flex items-center justify-center mb-4">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-xl opacity-60 animate-bibbybit-glow"></div>
+                <div class="relative w-6 h-14 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">About Mei AI Workspace</h1>
+            <p class="text-sm text-gray-400 max-w-xl mx-auto">
+                Next-generation web-native AI workspace designed for single-file web app prototyping, instant canvas previews, and seamless ecosystem routing.
+            </p>
         </div>
-        <h3>Modular Persona Suite</h3>
-        <p>Switch seamlessly across focused AI personas customized for code creation, mathematical reasoning, narrative design, or real-time project management.</p>
-      </div>
 
-      <div class="card">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-mei-card border border-gray-800 p-6 rounded-2xl shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-purple-950 text-purple-400 flex items-center justify-center text-lg mb-4 border border-purple-800/50">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h3 class="text-base font-bold text-white mb-2">Mei Canvas Engine</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    Live split-screen and full-screen editor that renders standalone single-file HTML, CSS, and JS applications instantly with real-time DOM sandbox security.
+                </p>
+            </div>
+
+            <div class="bg-mei-card border border-gray-800 p-6 rounded-2xl shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg mb-4 border border-blue-800/50">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h3 class="text-base font-bold text-white mb-2">Universal Ecosystem</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    Seamless navigation across dedicated suite apps including Dumbo, Matix, MediaStudio, Meizero, Modlix, Movix, Wbots, OpenAudio, and Syntax.
+                </p>
+            </div>
         </div>
-        <h3>Local State Persistence</h3>
-        <p>Keep your conversations, customized prompts, and active persona configurations private and instant using secure client-side browser storage.</p>
-      </div>
 
-      <div class="card">
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        <!-- About the Creator Section -->
+        <div class="bg-mei-card border border-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg mb-8 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center text-xl text-purple-400 flex-shrink-0">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2.5 mb-1.5">
+                            <h3 class="text-base font-bold text-white">About the Creator</h3>
+                            <span class="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-purple-950/90 text-purple-300 border border-purple-700/50">
+                                11-Year-Old Developer
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed max-w-xl">
+                            Mei AI Workspace was built from scratch by an 11-year-old kid passionate about web development, artificial intelligence, and creative coding—proving that big ideas and full ecosystems can be built at any age.
+                        </p>
+                    </div>
+                </div>
+                <a href="https://github.com/yourusername/mei-workspace" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#18181a] hover:bg-gray-800 text-gray-200 font-medium text-xs border border-gray-700/80 transition flex-shrink-0 shadow-sm">
+                    <i class="fa-brands fa-github text-base"></i> View GitHub Repository
+                </a>
+            </div>
         </div>
-        <h3>API Failover Resilience</h3>
-        <p>Built with intelligent fallback logic and endpoint retry capabilities to guarantee high availability and steady conversational throughput.</p>
-      </div>
-    </section>
 
-    <!-- About the Creator Section -->
-    <section class="creator-section">
-      <div class="creator-card">
-        <div class="creator-avatar">
-          <svg viewBox="0 0 24 24">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
+        <!-- CTA Section -->
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">
+            <h3 class="text-sm font-bold text-gray-200 mb-2">Ready to explore?</h3>
+            <div class="flex flex-wrap justify-center gap-3 mt-4">
+                <a href="index.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition text-white font-medium text-xs shadow-md">Try Mei</a>
+                <a href="explore.html" class="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 transition text-gray-200 font-medium text-xs border border-gray-700">Explore Hub</a>
+                <a href="https://github.com/yourusername/mei-workspace" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 transition text-gray-200 font-medium text-xs border border-gray-700 flex items-center gap-2">
+                    <i class="fa-brands fa-github"></i> View GitHub Repository
+                </a>
+            </div>
         </div>
-        <div class="creator-content">
-          <h2>About the Creator</h2>
-          <div class="creator-tagline">11-Year-Old Creator & Developer</div>
-          <p class="creator-bio">
-            Mei AI was designed and built by an 11-year-old creator passionate about coding, game development, and modern user interface design. Built to make exploring dynamic AI personas simpler and faster, Mei AI combines custom dark-mode aesthetics, responsive client-side storage, and intelligent workspace tools into one unified platform.
-          </p>
-        </div>
-      </div>
-    </section>
+    </main>
 
-    <!-- Highlight Banner -->
-    <section class="banner">
-      <h2>Transforming How You Interact With AI</h2>
-      <p>Designed around a sleek dark-mode glassmorphic interface, Mei AI delivers high-contrast readability and effortless persona orchestration for modern power users.</p>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 Mei AI Workspace. Engineered for Modular Intelligence.</p>
-  </footer>
+    <footer class="border-t border-gray-800/80 py-6 text-center text-xs text-gray-500 bg-[#141416]">
+        Mei AI Workspace; Created by an 11-Year-Old Developer &bull; 
+        <a href="https://github.com/IIVShar/Mei-AI" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-purple-400 transition underline underline-offset-2">GitHub</a>
+    </footer>
 
 </body>
 </html>
