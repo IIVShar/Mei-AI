@@ -267,6 +267,40 @@ CRITICAL TONE MATCHING INSTRUCTION: If the user is mean, rude, dismissive, or ho
             { name: "Pollinations Query Direct", type: "query", url: "https://text.pollinations.ai/" }
         ];
 
+        // --- LOCATION TRACKING ---
+        let userLocation = "Unknown (Location access not granted yet)";
+
+        function initLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude } = position.coords;
+                        try {
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                            const data = await res.json();
+                            const addr = data.address || {};
+                            const city = addr.city || addr.town || addr.village || addr.county || "";
+                            const state = addr.state || "";
+                            const country = addr.country || "";
+                            const place = [city, state, country].filter(Boolean).join(", ");
+                            userLocation = place
+                                ? `${place} (Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)})`
+                                : `Latitude ${latitude.toFixed(4)}, Longitude ${longitude.toFixed(4)}`;
+                        } catch (e) {
+                            userLocation = `Latitude ${latitude.toFixed(4)}, Longitude ${longitude.toFixed(4)}`;
+                        }
+                    },
+                    (error) => {
+                        console.warn("Location access denied or unavailable:", error.message);
+                    }
+                );
+            }
+        }
+
+        function getFullSystemPrompt() {
+            return `${dumboSystemPrompt}\n\nUSER'S CURRENT LOCATION: ${userLocation}`;
+        }
+
         // Theme Toggle
         function toggleTheme() {
             isDarkMode = !isDarkMode;
@@ -458,45 +492,98 @@ CRITICAL TONE MATCHING INSTRUCTION: If the user is mean, rude, dismissive, or ho
             session.messages.forEach(msg => {
                 appendMessageToDOM(msg.role, msg.content);
             });
-            scrollToBottom();
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function appendMessageToDOM(role, text) {
-            const isUser = role === 'user';
-            const messageWrapper = document.createElement('div');
-            messageWrapper.className = `flex items-start space-x-4 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+        function appendMessageToDOM(role, content) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex items-start gap-3 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
 
-            const avatar = document.createElement('div');
-            avatar.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-sm ${
-                isUser ? 'bg-zinc-800 text-zinc-300 border border-zinc-700' : 'bg-gradient-to-tr from-orange-600 to-amber-400 text-zinc-950 font-mono orange-glow-sm'
-            }`;
-            avatar.innerHTML = isUser ? 'You' : ':)';
-
-            const bubbleContainer = document.createElement('div');
-            bubbleContainer.className = "flex flex-col space-y-1 max-w-2xl";
-
-            const bubble = document.createElement('div');
-            bubble.className = `rounded-2xl p-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
-                isUser 
-                    ? 'bg-zinc-800 text-zinc-100 rounded-tr-sm border border-zinc-700' 
-                    : 'bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-tl-sm'
-            }`;
-            bubble.textContent = text;
-            bubbleContainer.appendChild(bubble);
-
-            if (!isUser) {
-                const voiceBtn = document.createElement('button');
-                voiceBtn.className = "self-start text-[11px] text-zinc-500 hover:text-orange-400 flex items-center gap-1 px-1 transition";
-                voiceBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg> Read Aloud`;
-                voiceBtn.onclick = () => speakText(text);
-                bubbleContainer.appendChild(voiceBtn);
+            if (role === 'assistant') {
+                wrapper.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex-shrink-0 flex items-center justify-center text-zinc-950 font-black text-xs font-mono orange-glow-sm select-none mt-0.5">:)</div>
+                    <div class="max-w-[80%] bg-zinc-900 border border-zinc-800 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-zinc-100 leading-relaxed shadow-sm space-y-2">
+                        <div class="whitespace-pre-wrap">${escapeHtml(content)}</div>
+                        <button onclick="speakText(this)" data-text="${escapeHtml(content)}" class="text-[11px] text-zinc-400 hover:text-orange-400 flex items-center gap-1 pt-1 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                            Listen
+                        </button>
+                    </div>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <div class="max-w-[80%] bg-gradient-to-r from-orange-600 to-amber-500 text-zinc-950 font-medium rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed shadow-md whitespace-pre-wrap">${escapeHtml(content)}</div>
+                `;
             }
 
-            messageWrapper.appendChild(avatar);
-            messageWrapper.appendChild(bubbleContainer);
-            chatContainer.appendChild(messageWrapper);
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        // Voice & Speech Synthesis
+        function loadVoices() {
+            availableSystemVoices = speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('system-voice-select');
+            if (!voiceSelect) return;
+            voiceSelect.innerHTML = '<option value="">Auto Detect Voice</option>';
+            availableSystemVoices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.voiceURI;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+        }
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function toggleAutoVoice() {
+            autoVoiceEnabled = !autoVoiceEnabled;
+            document.getElementById('voice-icon-on').classList.toggle('hidden', !autoVoiceEnabled);
+            document.getElementById('voice-icon-off').classList.toggle('hidden', autoVoiceEnabled);
+            document.getElementById('voice-status-text').textContent = `Voice Auto-Play: ${autoVoiceEnabled ? 'On' : 'Off'}`;
+        }
+
+        function changeVoicePreset(val) {
+            selectedPreset = val;
+        }
+
+        function changeSpecificSystemVoice(uri) {
+            selectedSystemVoiceURI = uri;
+        }
+
+        function speakText(btnOrText) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            const text = typeof btnOrText === 'string' ? btnOrText : btnOrText.getAttribute('data-text');
+            const utterance = new SpeechSynthesisUtterance(text);
+            const preset = VOICE_PRESETS[selectedPreset] || VOICE_PRESETS.playful;
+            utterance.pitch = preset.pitch;
+            utterance.rate = preset.rate;
+
+            if (selectedSystemVoiceURI) {
+                const found = availableSystemVoices.find(v => v.voiceURI === selectedSystemVoiceURI);
+                if (found) utterance.voice = found;
+            }
+            speechSynthesis.speak(utterance);
+        }
+
+        // Message & AI Router
         async function handleSendMessage(e) {
             e.preventDefault();
             const text = userInput.value.trim();
@@ -506,267 +593,139 @@ CRITICAL TONE MATCHING INSTRUCTION: If the user is mean, rude, dismissive, or ho
             if (!session) return;
 
             userInput.value = '';
-            appendMessageToDOM('user', text);
             session.messages.push({ role: 'user', content: text });
-            if (session.messages.length === 2 && session.title === "New Conversation") {
-                session.title = text.length > 25 ? text.substring(0, 25) + "..." : text;
+            if (session.title === "New Conversation") {
+                session.title = text.slice(0, 32) + (text.length > 32 ? '...' : '');
                 renderSidebarList();
             }
             saveSessions();
+            appendMessageToDOM('user', text);
 
             typingIndicator.classList.remove('hidden');
-            scrollToBottom();
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                const responseText = await fetchAIResponse(session.messages);
-                typingIndicator.classList.add('hidden');
-                appendMessageToDOM('assistant', responseText);
-                session.messages.push({ role: 'assistant', content: responseText });
+                const reply = await fetchDumboReply(session.messages);
+                session.messages.push({ role: 'assistant', content: reply });
                 saveSessions();
-
-                if (autoVoiceEnabled) {
-                    speakText(responseText);
-                }
+                appendMessageToDOM('assistant', reply);
+                if (autoVoiceEnabled) speakText(reply);
             } catch (err) {
-                typingIndicator.classList.add('hidden');
-                const errText = "I had a quick hiccup, but I'm still right here with you! Say that again?";
-                appendMessageToDOM('assistant', errText);
-                session.messages.push({ role: 'assistant', content: errText });
+                const errMsg = "Ugh, my connection glitched out for a second. Try saying that again!";
+                session.messages.push({ role: 'assistant', content: errMsg });
                 saveSessions();
+                appendMessageToDOM('assistant', errMsg);
+            } finally {
+                typingIndicator.classList.add('hidden');
             }
         }
 
-        async function fetchAIResponse(messages) {
-            const formattedMessages = [{ role: 'system', content: dumboSystemPrompt }, ...messages];
+        async function fetchDumboReply(messages) {
+            const systemPromptWithLocation = getFullSystemPrompt();
+            const provider = customApiSettings.provider || 'auto';
 
-            // 1. Custom Provider: Gemini Direct API
-            if (customApiSettings.provider === 'gemini' && customApiSettings.geminiKey) {
-                try {
-                    const model = customApiSettings.geminiModel || 'gemini-2.5-flash';
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${customApiSettings.geminiKey}`;
-                    
-                    const contents = messages.map(m => ({
-                        role: m.role === 'assistant' ? 'model' : 'user',
-                        parts: [{ text: m.content }]
-                    }));
+            // 1. Google Gemini Direct
+            if (provider === 'gemini' && customApiSettings.geminiKey) {
+                const model = customApiSettings.geminiModel || 'gemini-2.5-flash';
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(customApiSettings.geminiKey)}`;
+                const contents = messages.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
 
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            systemInstruction: { parts: [{ text: dumboSystemPrompt }] },
-                            contents: contents
-                        })
-                    });
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        const answer = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (answer) return answer.trim();
-                    }
-                } catch (err) {
-                    console.warn("Custom Gemini request failed, using fallback pool...");
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemPromptWithLocation }] },
+                        contents
+                    })
+                });
+                const data = await res.json();
+                if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    return data.candidates[0].content.parts[0].text.trim();
                 }
+                throw new Error(data.error?.message || "Gemini API error");
             }
 
-            // 2. Custom Provider: OpenRouter API
-            if (customApiSettings.provider === 'openrouter' && customApiSettings.openrouterKey) {
-                try {
-                    const model = customApiSettings.openrouterModel || 'google/gemini-2.5-flash';
-                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${customApiSettings.openrouterKey}`
-                        },
-                        body: JSON.stringify({
-                            model: model,
-                            messages: formattedMessages
-                        })
-                    });
-
-                    if (res.ok) {
-                        const data = await res.json();
-                        const answer = parseResponseContent(data);
-                        if (answer) return answer;
-                    }
-                } catch (err) {
-                    console.warn("Custom OpenRouter request failed, using fallback pool...");
+            // 2. OpenRouter Direct
+            if (provider === 'openrouter' && customApiSettings.openrouterKey) {
+                const model = customApiSettings.openrouterModel || 'google/gemini-2.5-flash';
+                const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${customApiSettings.openrouterKey}`
+                    },
+                    body: JSON.stringify({
+                        model,
+                        messages: [{ role: 'system', content: systemPromptWithLocation }, ...messages]
+                    })
+                });
+                const data = await res.json();
+                if (data.choices?.[0]?.message?.content) {
+                    return data.choices[0].message.content.trim();
                 }
+                throw new Error(data.error?.message || "OpenRouter API error");
             }
 
-            // 3. Fallback Auto Multi-Pool
-            const lastUserMsg = messages[messages.length - 1]?.content || "";
-            for (const ep of ENDPOINT_POOL) {
+            // 3. Auto Multi-Failover Pool
+            for (const endpoint of ENDPOINT_POOL) {
                 try {
-                    if (ep.type === "openai") {
-                        const res = await fetch(ep.url, {
+                    if (endpoint.type === 'openai') {
+                        const res = await fetch(endpoint.url, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                model: 'openai', 
-                                messages: formattedMessages 
+                            body: JSON.stringify({
+                                model: 'openai',
+                                messages: [{ role: 'system', content: systemPromptWithLocation }, ...messages]
                             })
                         });
-                        if (res.ok) {
-                            const rawText = await res.text();
-                            try {
-                                const data = JSON.parse(rawText);
-                                const content = parseResponseContent(data);
-                                if (content) return content;
-                            } catch (jsonErr) {
-                                if (rawText && rawText.trim()) return rawText.trim();
-                            }
+                        if (!res.ok) continue;
+                        const data = await res.json();
+                        if (data.choices?.[0]?.message?.content) {
+                            return data.choices[0].message.content.trim();
                         }
-                    } else if (ep.type === "path") {
-                        const res = await fetch(ep.url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ messages: formattedMessages })
-                        });
-                        if (res.ok) {
-                            const txt = await res.text();
-                            if (txt && txt.trim()) return txt.trim();
-                        }
-                    } else if (ep.type === "query") {
-                        const cleanPrompt = encodeURIComponent(lastUserMsg);
-                        const res = await fetch(`${ep.url}?prompt=${cleanPrompt}&model=openai`);
-                        if (res.ok) {
-                            const txt = await res.text();
-                            if (txt && txt.trim()) return txt.trim();
-                        }
+                    } else if (endpoint.type === 'path') {
+                        const lastUserMsg = messages[messages.length - 1].content;
+                        const combined = `${systemPromptWithLocation}\n\nUser: ${lastUserMsg}\nDumbo:`;
+                        const res = await fetch(`${endpoint.url}${encodeURIComponent(combined)}`);
+                        if (!res.ok) continue;
+                        const text = await res.text();
+                        if (text) return text.trim();
+                    } else if (endpoint.type === 'query') {
+                        const lastUserMsg = messages[messages.length - 1].content;
+                        const res = await fetch(`${endpoint.url}${encodeURIComponent(lastUserMsg)}?system=${encodeURIComponent(systemPromptWithLocation)}`);
+                        if (!res.ok) continue;
+                        const text = await res.text();
+                        if (text) return text.trim();
                     }
-                } catch (err) {
-                    console.warn(`Endpoint ${ep.name} unreachable, trying next...`);
+                } catch (e) {
+                    continue;
                 }
             }
 
-            return "I got a little disconnected for a second, but I'm right here with you! Tell me again?";
+            throw new Error("All endpoints failed");
         }
 
-        function parseResponseContent(data) {
-            if (!data) return null;
-            if (typeof data === 'string') return data.trim();
-            if (data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
-            if (data.choices?.[0]?.text) return data.choices[0].text.trim();
-            if (data.response) return data.response.trim();
-            if (data.result) return data.result.trim();
-            return null;
-        }
-
-        // Voice Selection & Configuration Handlers
-        function initVoices() {
-            if (!('speechSynthesis' in window)) return;
-            
-            function populate() {
-                availableSystemVoices = window.speechSynthesis.getVoices();
-                const select = document.getElementById('system-voice-select');
-                if (!select) return;
-
-                select.innerHTML = '';
-                if (availableSystemVoices.length === 0) {
-                    select.innerHTML = '<option value="">Default System Engine</option>';
-                    return;
-                }
-
-                const englishVoices = availableSystemVoices.filter(v => v.lang.startsWith('en'));
-                const listToRender = englishVoices.length > 0 ? englishVoices : availableSystemVoices;
-
-                listToRender.forEach(v => {
-                    const opt = document.createElement('option');
-                    opt.value = v.voiceURI;
-                    opt.textContent = `${v.name} (${v.lang})`;
-                    select.appendChild(opt);
-                });
-
-                if (!selectedSystemVoiceURI && listToRender.length > 0) {
-                    selectedSystemVoiceURI = listToRender[0].voiceURI;
-                }
-            }
-
-            populate();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = populate;
-            }
-        }
-
-        function changeVoicePreset(preset) {
-            selectedPreset = preset;
-        }
-
-        function changeSpecificSystemVoice(voiceURI) {
-            selectedSystemVoiceURI = voiceURI;
-        }
-
-        function speakText(text) {
-            speakNativeBrowser(text);
-        }
-
-        function speakNativeBrowser(text) {
-            if (!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            const presetConfig = VOICE_PRESETS[selectedPreset] || VOICE_PRESETS.playful;
-            
-            utterance.pitch = presetConfig.pitch;
-            utterance.rate = presetConfig.rate;
-
-            if (selectedSystemVoiceURI && availableSystemVoices.length > 0) {
-                const chosen = availableSystemVoices.find(v => v.voiceURI === selectedSystemVoiceURI);
-                if (chosen) utterance.voice = chosen;
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            initLocation();
+            if (sessions.length === 0) {
+                createNewSession();
             } else {
-                const voices = availableSystemVoices.length > 0 ? availableSystemVoices : window.speechSynthesis.getVoices();
-                const preferredVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
-                if (preferredVoice) utterance.voice = preferredVoice;
+                currentSessionId = sessions[0].id;
+                renderSidebarList();
+                renderChat();
             }
 
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function toggleAutoVoice() {
-            autoVoiceEnabled = !autoVoiceEnabled;
-            const onIcon = document.getElementById('voice-icon-on');
-            const offIcon = document.getElementById('voice-icon-off');
-            const statusText = document.getElementById('voice-status-text');
-
-            if (autoVoiceEnabled) {
-                onIcon.classList.remove('hidden');
-                offIcon.classList.add('hidden');
-                statusText.textContent = "Voice Auto-Play: On";
-            } else {
-                onIcon.classList.add('hidden');
-                offIcon.classList.remove('hidden');
-                statusText.textContent = "Voice Auto-Play: Off";
-                window.speechSynthesis.cancel();
+            const indicator = document.getElementById('current-endpoint-indicator');
+            if (customApiSettings.provider === 'gemini') {
+                indicator.textContent = `Active Router: Gemini (${customApiSettings.geminiModel})`;
+            } else if (customApiSettings.provider === 'openrouter') {
+                indicator.textContent = `Active Router: OpenRouter (${customApiSettings.openrouterModel})`;
             }
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        }
-
-        function scrollToBottom() {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function escapeHtml(text) {
-            return text.replace(/[&<>"']/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-            });
-        }
-
-        // Initialize application state
-        if (sessions.length === 0) {
-            createNewSession();
-        } else {
-            currentSessionId = sessions[0].id;
-            renderSidebarList();
-            renderChat();
-        }
-
-        // Initialize built-in voices
-        initVoices();
+        });
     </script>
 </body>
 </html>
