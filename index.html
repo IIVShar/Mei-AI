@@ -47,6 +47,21 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+        @keyframes meiLogoThinking {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.18) rotate(8deg);
+                box-shadow: 0 0 22px rgba(236, 72, 153, 0.95);
+                filter: brightness(1.25);
+            }
+        }
+        .mei-logo-thinking {
+            animation: meiLogoThinking 1.2s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
@@ -70,9 +85,6 @@
             <button id="newChatBtn" type="button" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium shadow-md transition cursor-pointer">
                 <i class="fa-solid fa-plus"></i> New Chat
             </button>
-            <button id="openCanvasBuilderNavBtn" type="button" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium transition cursor-pointer text-xs">
-                <i class="fa-solid fa-code text-purple-400"></i> Canvas App Builder
-            </button>
         </div>
 
         <div class="px-3 py-1 space-y-1 border-b border-gray-200 dark:border-gray-800/60 pb-3">
@@ -81,7 +93,7 @@
             </button>
             
             <a href="./explore.html" id="exploreAppsBtn" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium no-underline">
-                <i class="fa-solid fa-compass text-purple-400"></i> Explore Apps
+                <i class="fa-solid fa-compass text-purple-400"></i> Explore
             </a>
 
             <button id="openImageStudioNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
@@ -113,7 +125,7 @@
                     </button>
 
                     <a href="#" class="flex items-center gap-2.5 group">
-                        <div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0"></div>
+                        <div id="headerMeiLogo" class="w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 transition-transform"></div>
                         <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-purple-400 transition">Mei AI</h1>
                     </a>
 
@@ -146,11 +158,11 @@
                 <div id="emptyState" class="m-auto flex flex-col items-center justify-center text-center max-w-2xl w-full">
                     <div class="w-5 h-12 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_20px_rgba(168,85,247,0.8)] mb-3"></div>
                     <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Upgraded Mei v3 Family Models, Multi-Provider API support, AI Image Studio, and Canvas App Builder.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Mei v1 Family Models, Multi-Provider API support, AI Image Studio, and Canvas App Builder.</p>
 
                     <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-                            <span>✨ Canvas App Builder & v3 Models Active! 🚀</span>
+                            <span>✨ Canvas App Builder & Mei v1 Models Active! 🚀</span>
                         </div>
                         <p class="text-xs text-gray-300 leading-relaxed">
                             Generate interactive web apps, preview live in Mei Canvas, or open the standalone Canvas App Builder to craft custom tools.
@@ -362,8 +374,8 @@
 
                 <!-- Family Model Selection -->
                 <div class="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60 space-y-2">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-sm">Active Mei v3 Model</label>
-                    <p class="text-[11px] text-gray-500">Select your preferred model variant (up to v3).</p>
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-sm">Active Mei Model</label>
+                    <p class="text-[11px] text-gray-500">Select your preferred Mei model variant (Mei v1 default).</p>
                     <select id="settingsModelSelect" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
                         <!-- Populated dynamically -->
                     </select>
@@ -377,8 +389,18 @@
                         <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
                         <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
                         <option value="groq">Groq (Ultra-Fast Llama)</option>
+                        <option value="gemini">Google Gemini (Gemini 2.5 Flash)</option>
+                        <option value="together">Together AI (Llama 3.1 70B)</option>
+                        <option value="mistral">Mistral AI (Mistral Small)</option>
+                        <option value="ollama">Ollama (Local Server)</option>
                         <option value="custom">Custom Endpoint & Model</option>
                     </select>
+                </div>
+
+                <!-- Custom Model ID Input -->
+                <div class="space-y-1.5">
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">Custom Model ID</label>
+                    <input type="text" id="customModelInput" placeholder="e.g. gpt-4o-mini, claude-3-5-sonnet-latest, gemini-2.5-flash" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
                 </div>
 
                 <!-- API Base URL Input -->
@@ -415,19 +437,31 @@
         }
         initTheme();
 
-        // Mei v3 Family Models Registry
+        // Mei Family Models Registry (Mei v1 Default)
         const MEI_FAMILY_MODELS = [
-            { id: "mei-v3-ultra", name: "✨ Mei v3 Ultra (Flagship)" },
-            { id: "mei-v3-pro", name: "⚡ Mei v3 Pro (Balanced)" },
-            { id: "mei-v3-flash", name: "🚀 Mei v3 Flash (Lightning Fast)" },
-            { id: "mei-v3-code", name: "💻 Mei v3 Code Canvas Max" },
-            { id: "mei-v3-html", name: "🎨 Mei v3 HTML Master" },
-            { id: "mei-v3-think", name: "🧠 Mei v3 Think Heavy (Deep Reasoning)" },
-            { id: "mei-v3-vision", name: "👁️ Mei v3 Vision Ultra" },
-            { id: "mei-v3-polyglot", name: "🌐 Mei v3 Polyglot 70B" },
-            { id: "gpt-4o", name: "🤖 OpenAI GPT-4o" },
-            { id: "anthropic/claude-3-5-sonnet", name: "🧠 Claude 3.5 Sonnet" }
+            { id: "mei-v1-ultra", name: "✨ Mei v1 Ultra (Flagship)" },
+            { id: "mei-v1-pro", name: "⚡ Mei v1 Pro (Balanced)" },
+            { id: "mei-v1-flash", name: "🚀 Mei v1 Flash (Lightning Fast)" },
+            { id: "mei-v1-code", name: "💻 Mei v1 Code Canvas Max" },
+            { id: "mei-v2-ultra", name: "💠 Mei v2 Ultra" },
+            { id: "mei-v2-5-pro", name: "🔹 Mei v2.5 Pro" },
+            { id: "mei-v3-ultra", name: "🌟 Mei v3 Ultra" },
+            { id: "mei-v3-pro", name: "⚡ Mei v3 Pro" },
+            { id: "mei-v3-flash", name: "🚀 Mei v3 Flash" },
+            { id: "mei-v3-code", name: "💻 Mei v3 Code Canvas Max" }
         ];
+
+        const PROVIDER_PRESETS = {
+            openrouter: { url: "https://openrouter.ai/api/v1", model: "openai/gpt-4o-mini" },
+            openai: { url: "https://api.openai.com/v1", model: "gpt-4o-mini" },
+            anthropic: { url: "https://api.anthropic.com/v1", model: "claude-3-5-sonnet-latest" },
+            groq: { url: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile" },
+            gemini: { url: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-2.5-flash" },
+            together: { url: "https://api.together.xyz/v1", model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
+            mistral: { url: "https://api.mistral.ai/v1", model: "mistral-small-latest" },
+            ollama: { url: "http://localhost:11434/v1", model: "llama3.2" },
+            custom: { url: "", model: "" }
+        };
 
         const modelDropdownSelect = document.getElementById('modelDropdownSelect');
         const settingsModelSelect = document.getElementById('settingsModelSelect');
@@ -440,653 +474,673 @@
         populateModelDropdowns();
 
         let chatHistory = [];
+        let savedSessions = [];
+        let activeSessionId = null;
         let activeAttachments = [];
         let galleryImages = [];
         let currentCanvasCode = "";
         let isCanvasFullscreen = false;
-        let currentStreamInterval = null;
-        let currentBotContentEl = null;
+        let isGenerating = false;
+
+        // Thinking Logo Animation Helper
+        function setLogoThinking(thinking) {
+            const headerLogo = document.getElementById('headerMeiLogo');
+            const activeBubbleLogo = document.getElementById('activeThinkingLogo');
+            if (thinking) {
+                headerLogo?.classList.add('mei-logo-thinking');
+                activeBubbleLogo?.classList.add('mei-logo-thinking');
+            } else {
+                headerLogo?.classList.remove('mei-logo-thinking');
+                document.querySelectorAll('.mei-logo-thinking').forEach(el => el.classList.remove('mei-logo-thinking'));
+            }
+        }
+
+        function updateThemeButtonsUI() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const lightBtn = document.getElementById('lightModeBtn');
+            const darkBtn = document.getElementById('darkModeBtn');
+            if (!lightBtn || !darkBtn) return;
+            if (isDark) {
+                darkBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white';
+                lightBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900';
+            } else {
+                lightBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white';
+                darkBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900';
+            }
+        }
 
         function syncSettingsToUI() {
-            const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v3-ultra';
+            const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v1-ultra';
+            const savedProvider = localStorage.getItem('mei_provider_preset') || 'openrouter';
+            const savedCustomModel = localStorage.getItem('mei_custom_model_id') || PROVIDER_PRESETS[savedProvider]?.model || '';
+            const savedBaseUrl = localStorage.getItem('mei_api_base_url') || PROVIDER_PRESETS[savedProvider]?.url || 'https://openrouter.ai/api/v1';
+            const savedApiKey = localStorage.getItem('mei_api_key') || '';
+
             if (modelDropdownSelect) modelDropdownSelect.value = savedModel;
             if (settingsModelSelect) settingsModelSelect.value = savedModel;
 
-            const preset = localStorage.getItem('mei_provider_preset') || 'openrouter';
-            const providerSelect = document.getElementById('providerPresetSelect');
-            if (providerSelect) providerSelect.value = preset;
+            const providerEl = document.getElementById('providerPresetSelect');
+            const customModelEl = document.getElementById('customModelInput');
+            const baseUrlEl = document.getElementById('apiBaseUrlInput');
+            const apiKeyEl = document.getElementById('apiKeyInput');
 
-            const baseUrlInput = document.getElementById('apiBaseUrlInput');
-            const apiKeyInput = document.getElementById('apiKeyInput');
-            if (baseUrlInput) baseUrlInput.value = localStorage.getItem('mei_api_base_url') || '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
-            if (apiKeyInput) apiKeyInput.value = localStorage.getItem('mei_api_key') || '';
+            if (providerEl) providerEl.value = savedProvider;
+            if (customModelEl) customModelEl.value = savedCustomModel;
+            if (baseUrlEl) baseUrlEl.value = savedBaseUrl;
+            if (apiKeyEl) apiKeyEl.value = savedApiKey;
+            updateThemeButtonsUI();
         }
+        syncSettingsToUI();
 
-        // DOM elements & handlers
+        // Sidebar Mobile Toggle
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
-        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        const newChatBtn = document.getElementById('newChatBtn');
-        const homeBtn = document.getElementById('homeBtn');
-        const emptyState = document.getElementById('emptyState');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const messagesList = document.getElementById('messagesList');
-        const chatContainer = document.getElementById('chatContainer');
-        const clearChatBtn = document.getElementById('clearChatBtn');
-        const fileInput = document.getElementById('fileInput');
-        const attachBtn = document.getElementById('attachBtn');
-        const imageStudioBtn = document.getElementById('imageStudioBtn');
-        const openImageStudioNavBtn = document.getElementById('openImageStudioNavBtn');
-        const imageStudioModal = document.getElementById('imageStudioModal');
-        const closeImageStudioBtn = document.getElementById('closeImageStudioBtn');
-        const generateImageBtn = document.getElementById('generateImageBtn');
-        const imagePromptInput = document.getElementById('imagePromptInput');
-        const imageStyleSelect = document.getElementById('imageStyleSelect');
-        const imageAspectSelect = document.getElementById('imageAspectSelect');
-        const imageGalleryGrid = document.getElementById('imageGalleryGrid');
-        const emptyGalleryState = document.getElementById('emptyGalleryState');
-        const attachmentPreview = document.getElementById('attachmentPreview');
-        const canvasPanel = document.getElementById('canvasPanel');
-        const mainChatArea = document.getElementById('mainChatArea');
-        const canvasIframe = document.getElementById('canvasIframe');
-        const canvasCodeElement = document.getElementById('canvasCodeElement');
-        const canvasCodeContainer = document.getElementById('canvasCodeContainer');
-        const canvasPreviewTab = document.getElementById('canvasPreviewTab');
-        const canvasCodeTab = document.getElementById('canvasCodeTab');
-        const toggleCanvasFullscreenBtn = document.getElementById('toggleCanvasFullscreenBtn');
-        const canvasFullscreenIcon = document.getElementById('canvasFullscreenIcon');
-        const closeCanvasBtn = document.getElementById('closeCanvasBtn');
-        const downloadCanvasCodeBtn = document.getElementById('downloadCanvasCodeBtn');
-        const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+        document.getElementById('sidebarToggleBtn').addEventListener('click', openSidebar);
+        document.getElementById('closeSidebarBtn').addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
 
-        // Canvas App Builder Modal Elements
-        const canvasBuilderModal = document.getElementById('canvasBuilderModal');
-        const openCanvasBuilderNavBtn = document.getElementById('openCanvasBuilderNavBtn');
-        const closeCanvasBuilderBtn = document.getElementById('closeCanvasBuilderBtn');
-        const builderCodeInput = document.getElementById('builderCodeInput');
-        const builderPreviewIframe = document.getElementById('builderPreviewIframe');
-        const builderRunBtn = document.getElementById('builderRunBtn');
-        const builderDownloadBtn = document.getElementById('builderDownloadBtn');
-        const builderPresetCounterBtn = document.getElementById('builderPresetCounterBtn');
-        const builderPresetTodoBtn = document.getElementById('builderPresetTodoBtn');
-
-        function openCanvasBuilder() {
-            if (canvasBuilderModal) canvasBuilderModal.classList.remove('hidden');
-            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
-            if (builderCodeInput && !builderCodeInput.value.trim()) {
-                builderCodeInput.value = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter App</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"><\/script>
-</head>
-<body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-6">
-    <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl text-center space-y-4 max-w-sm w-full">
-        <h2 class="text-xl font-bold text-purple-400">Mei Interactive Counter</h2>
-        <div id="count" class="text-5xl font-ext500 font-mono">0</div>
-        <div class="flex gap-2 justify-center">
-            <button onclick="decrement()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg font-bold">-</button>
-            <button onclick="increment()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold">+</button>
-        </div>
-    </div>
-    <script>
-        let n = 0;
-        function increment() { n++; document.getElementById('count').innerText = n; }
-        function decrement() { n--; document.getElementById('count').innerText = n; }
-    <\/script>
-</body>
-</html>`;
+        // Sessions Persistence
+        function loadSessions() {
+            try {
+                savedSessions = JSON.parse(localStorage.getItem('mei_saved_sessions') || '[]');
+            } catch (e) {
+                savedSessions = [];
             }
-            runBuilderPreview();
+            renderSessionHistory();
         }
 
-        function closeCanvasBuilder() {
-            if (canvasBuilderModal) canvasBuilderModal.classList.add('hidden');
+        function saveCurrentSession() {
+            if (chatHistory.length === 0) return;
+            const firstUserMsg = chatHistory.find(m => m.role === 'user')?.content || 'New Session';
+            const title = firstUserMsg.slice(0, 32) + (firstUserMsg.length > 32 ? '...' : '');
+            if (!activeSessionId) activeSessionId = 'sess_' + Date.now();
+            const existingIdx = savedSessions.findIndex(s => s.id === activeSessionId);
+            const sessionData = { id: activeSessionId, title, messages: [...chatHistory] };
+            if (existingIdx >= 0) savedSessions[existingIdx] = sessionData;
+            else savedSessions.unshift(sessionData);
+            try {
+                localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions.slice(0, 25)));
+            } catch (e) {}
+            renderSessionHistory();
         }
 
-        function runBuilderPreview() {
-            if (builderCodeInput && builderPreviewIframe) {
-                builderPreviewIframe.srcdoc = builderCodeInput.value;
-            }
-        }
-
-        if (openCanvasBuilderNavBtn) openCanvasBuilderNavBtn.addEventListener('click', openCanvasBuilder);
-        if (closeCanvasBuilderBtn) closeCanvasBuilderBtn.addEventListener('click', closeCanvasBuilder);
-        if (builderRunBtn) builderRunBtn.addEventListener('click', runBuilderPreview);
-
-        if (builderDownloadBtn) {
-            builderDownloadBtn.addEventListener('click', () => {
-                if (!builderCodeInput) return;
-                const blob = new Blob([builderCodeInput.value], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'mei-canvas-app.html';
-                a.click();
-                URL.revokeObjectURL(url);
-            });
-        }
-
-        if (builderPresetCounterBtn) {
-            builderPresetCounterBtn.addEventListener('click', () => {
-                builderCodeInput.value = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter App</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"><\/script>
-</head>
-<body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-6">
-    <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-xl text-center space-y-4 max-w-sm w-full">
-        <h2 class="text-xl font-bold text-purple-400">Mei Interactive Counter</h2>
-        <div id="count" class="text-5xl font-mono">0</div>
-        <div class="flex gap-2 justify-center">
-            <button onclick="decrement()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg font-bold cursor-pointer">-</button>
-            <button onclick="increment()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold cursor-pointer">+</button>
-        </div>
-    </div>
-    <script>
-        let n = 0;
-        function increment() { n++; document.getElementById('count').innerText = n; }
-        function decrement() { n--; document.getElementById('count').innerText = n; }
-    <\/script>
-</body>
-</html>`;
-                runBuilderPreview();
-            });
-        }
-
-        if (builderPresetTodoBtn) {
-            builderPresetTodoBtn.addEventListener('click', () => {
-                builderCodeInput.value = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"><\/script>
-</head>
-<body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-6 font-sans">
-    <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl max-w-md w-full space-y-4">
-        <h2 class="text-xl font-bold text-purple-400">Mei Todo Workspace</h2>
-        <div class="flex gap-2">
-            <input id="taskInput" type="text" placeholder="Add new task..." class="flex-1 bg-gray-800 border border-gray-700 px-3 py-2 rounded-lg text-sm outline-none">
-            <button onclick="addTask()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium">Add</button>
-        </div>
-        <ul id="taskList" class="space-y-2 max-h-60 overflow-y-auto"></ul>
-    </div>
-    <script>
-        const tasks = [];
-        function addTask() {
-            const input = document.getElementById('taskInput');
-            if(!input.value.trim()) return;
-            tasks.push(input.value);
-            input.value = '';
-            render();
-        }
-        function removeTask(i) {
-            tasks.splice(i, 1);
-            render();
-        }
-        function render() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = tasks.map((t, i) => \`<li class="flex justify-between items-center bg-gray-800 px-3 py-2 rounded-lg text-sm"><span>\${t}</span><button onclick="removeTask(\${i})" class="text-red-400 hover:text-red-300">✕</button></li>\`).join('');
-        }
-    <\/script>
-</body>
-</html>`;
-                runBuilderPreview();
-            });
-        }
-
-        // Settings Modal Elements
-        const settingsModal = document.getElementById('settingsModal');
-        const openSettingsNavBtn = document.getElementById('openSettingsNavBtn');
-        const headerSettingsBtn = document.getElementById('headerSettingsBtn');
-        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-        const lightModeBtn = document.getElementById('lightModeBtn');
-        const darkModeBtn = document.getElementById('darkModeBtn');
-        const providerPresetSelect = document.getElementById('providerPresetSelect');
-
-        let selectedTheme = localStorage.getItem('mei_theme') || 'dark';
-
-        function updateThemeButtons() {
-            if (!lightModeBtn || !darkModeBtn) return;
-            if (selectedTheme === 'dark') {
-                darkModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white";
-                lightModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900";
-            } else {
-                lightModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white";
-                darkModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900";
-            }
-        }
-
-        if (lightModeBtn) lightModeBtn.addEventListener('click', () => { selectedTheme = 'light'; updateThemeButtons(); });
-        if (darkModeBtn) darkModeBtn.addEventListener('click', () => { selectedTheme = 'dark'; updateThemeButtons(); });
-
-        if (providerPresetSelect) {
-            providerPresetSelect.addEventListener('change', (e) => {
-                const val = e.target.value;
-                const urlInput = document.getElementById('apiBaseUrlInput');
-                if (urlInput) {
-                    if (val === 'openrouter') urlInput.value = '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
-                    else if (val === 'openai') urlInput.value = '[https://api.openai.com/v1](https://api.openai.com/v1)';
-                    else if (val === 'anthropic') urlInput.value = '[https://api.anthropic.com/v1](https://api.anthropic.com/v1)';
-                    else if (val === 'groq') urlInput.value = '[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)';
-                }
-            });
-        }
-
-        function openSettings() {
-            if (settingsModal) settingsModal.classList.remove('hidden');
-            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
-            selectedTheme = localStorage.getItem('mei_theme') || 'dark';
-            updateThemeButtons();
-            syncSettingsToUI();
-        }
-        function closeSettings() {
-            if (settingsModal) settingsModal.classList.add('hidden');
-        }
-
-        if (openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettings);
-        if (headerSettingsBtn) headerSettingsBtn.addEventListener('click', openSettings);
-        if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', closeSettings);
-
-        if (saveSettingsBtn) {
-            saveSettingsBtn.addEventListener('click', () => {
-                localStorage.setItem('mei_theme', selectedTheme);
-                if (selectedTheme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-
-                if (providerPresetSelect) localStorage.setItem('mei_provider_preset', providerPresetSelect.value);
-                const baseUrlInput = document.getElementById('apiBaseUrlInput');
-                const apiKeyInput = document.getElementById('apiKeyInput');
-                if (baseUrlInput) localStorage.setItem('mei_api_base_url', baseUrlInput.value.trim());
-                if (apiKeyInput) localStorage.setItem('mei_api_key', apiKeyInput.value.trim());
-                
-                if (settingsModelSelect) {
-                    const chosenModel = settingsModelSelect.value;
-                    localStorage.setItem('mei_active_family_model', chosenModel);
-                    if (modelDropdownSelect) modelDropdownSelect.value = chosenModel;
-                }
-
-                closeSettings();
-            });
-        }
-
-        // Image Studio Controls
-        function openImageStudio() {
-            if (imageStudioModal) imageStudioModal.classList.remove('hidden');
-            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
-        }
-        function closeImageStudio() {
-            if (imageStudioModal) imageStudioModal.classList.add('hidden');
-        }
-
-        if (imageStudioBtn) imageStudioBtn.addEventListener('click', openImageStudio);
-        if (openImageStudioNavBtn) openImageStudioNavBtn.addEventListener('click', openImageStudio);
-        if (closeImageStudioBtn) closeImageStudioBtn.addEventListener('click', closeImageStudio);
-
-        if (generateImageBtn) {
-            generateImageBtn.addEventListener('click', () => {
-                const prompt = imagePromptInput ? imagePromptInput.value.trim() : '';
-                if (!prompt) return;
-
-                const style = imageStyleSelect ? imageStyleSelect.value : 'photorealistic';
-                const aspect = imageAspectSelect ? imageAspectSelect.value : '1:1';
-                let width = 1024, height = 1024;
-                if (aspect === '16:9') { width = 1280; height = 720; }
-
-                const imageUrl = `[https://image.pollinations.ai/prompt/$](https://image.pollinations.ai/prompt/$){encodeURIComponent(prompt + ", " + style)}?width=${width}&height=${height}&nologo=true`;
-                
-                generateImageBtn.disabled = true;
-                generateImageBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generating...';
-
-                const img = new Image();
-                img.onload = () => {
-                    galleryImages.unshift({ url: imageUrl, prompt, style });
-                    renderGallery();
-                    generateImageBtn.disabled = false;
-                    generateImageBtn.innerHTML = 'Generate Artwork';
-                };
-                img.onerror = () => {
-                    galleryImages.unshift({ url: imageUrl, prompt, style });
-                    renderGallery();
-                    generateImageBtn.disabled = false;
-                    generateImageBtn.innerHTML = 'Generate Artwork';
-                };
-                img.src = imageUrl;
-            });
-        }
-
-        function renderGallery() {
-            if (!imageGalleryGrid || !emptyGalleryState) return;
-            if (galleryImages.length === 0) {
-                emptyGalleryState.classList.remove('hidden');
+        function renderSessionHistory() {
+            const list = document.getElementById('chatHistoryList');
+            if (!savedSessions.length) {
+                list.innerHTML = '<div class="px-3 py-2 text-xs text-gray-500 italic">No previous chats</div>';
                 return;
             }
-            emptyGalleryState.classList.add('hidden');
-            imageGalleryGrid.innerHTML = galleryImages.map((imgItem, idx) => `
-                <div class="group relative rounded-xl overflow-hidden border border-gray-700 bg-gray-900 shadow-md">
-                    <img src="${imgItem.url}" alt="${imgItem.prompt}" class="w-full h-36 object-cover">
-                    <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition p-2 flex flex-col justify-end text-white">
-                        <p class="text-[10px] line-clamp-2 mb-1">${imgItem.prompt}</p>
-                        <a href="${imgItem.url}" target="_blank" download="artwork-${idx}.jpg" class="text-[10px] bg-white text-gray-900 py-1 rounded text-center font-medium">Download</a>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        if (modelDropdownSelect) {
-            modelDropdownSelect.addEventListener('change', (e) => {
-                const val = e.target.value;
-                localStorage.setItem('mei_active_family_model', val);
-                if (settingsModelSelect) settingsModelSelect.value = val;
-            });
-        }
-
-        function toggleSidebar() {
-            if (sidebar) sidebar.classList.toggle('-translate-x-full');
-            if (overlay) overlay.classList.toggle('hidden');
-        }
-
-        if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
-        if (overlay) overlay.addEventListener('click', toggleSidebar);
-
-        function showChatHome() {
-            if (emptyState) emptyState.style.display = chatHistory.length === 0 ? 'flex' : 'none';
-            if (messagesList) messagesList.style.display = 'block';
-            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
-        }
-
-        if (homeBtn) homeBtn.addEventListener('click', showChatHome);
-
-        if (newChatBtn) {
-            newChatBtn.addEventListener('click', () => {
-                chatHistory = [];
-                if (messagesList) messagesList.innerHTML = '';
-                showChatHome();
-                if (canvasPanel) canvasPanel.classList.add('hidden');
-                if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.add('hidden');
-            });
-        }
-
-        // Attachments
-        if (attachBtn && fileInput) {
-            attachBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                files.forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (evt) => {
-                        activeAttachments.push({ name: file.name, type: file.type, data: evt.target.result });
-                        renderAttachments();
-                    };
-                    if (file.type.startsWith('image/')) reader.readAsDataURL(file);
-                    else reader.readAsText(file);
+            list.innerHTML = '';
+            savedSessions.forEach(sess => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs truncate transition cursor-pointer flex items-center justify-between gap-2 ${
+                    sess.id === activeSessionId
+                        ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white font-medium'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60'
+                }`;
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'truncate';
+                titleSpan.textContent = sess.title;
+                btn.appendChild(titleSpan);
+                btn.addEventListener('click', () => {
+                    activeSessionId = sess.id;
+                    chatHistory = [...sess.messages];
+                    renderFullConversation();
+                    renderSessionHistory();
+                    closeSidebar();
                 });
-                fileInput.value = '';
+                list.appendChild(btn);
             });
         }
 
-        window.removeAttachment = function(idx) {
-            activeAttachments.splice(idx, 1);
-            renderAttachments();
-        };
+        // Markdown & Code Extraction
+        function renderMarkdownSafe(text) {
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({ breaks: true, gfm: true });
+                return marked.parse(String(text || ''));
+            }
+            return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+        }
 
-        function renderAttachments() {
-            if (!attachmentPreview) return;
+        function extractExecutableWebsiteCode(text) {
+            const match = String(text || '').match(/```(?:html)?\s*\n([\s\S]*?)```/i);
+            if (match && /<!DOCTYPE html|<html|<body|<script/i.test(match[1])) {
+                return match[1].trim();
+            }
+            return null;
+        }
+
+        // Mei Canvas Functions
+        const canvasPanel = document.getElementById('canvasPanel');
+        const canvasIframe = document.getElementById('canvasIframe');
+        const canvasCodeContainer = document.getElementById('canvasCodeContainer');
+        const canvasCodeElement = document.getElementById('canvasCodeElement');
+        const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+
+        function openMeiCanvas(code, title = 'App Preview') {
+            if (!code) return;
+            currentCanvasCode = code;
+            document.getElementById('canvasTitle').textContent = title;
+            canvasIframe.srcdoc = code;
+            canvasCodeElement.textContent = code;
+            if (typeof hljs !== 'undefined') hljs.highlightElement(canvasCodeElement);
+            canvasPanel.classList.remove('hidden');
+            openCanvasHeaderBtn.classList.remove('hidden');
+            switchCanvasTab('preview');
+        }
+
+        function switchCanvasTab(tab) {
+            const previewTab = document.getElementById('canvasPreviewTab');
+            const codeTab = document.getElementById('canvasCodeTab');
+            if (tab === 'preview') {
+                canvasIframe.classList.remove('hidden');
+                canvasCodeContainer.classList.add('hidden');
+                previewTab.className = 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
+                codeTab.className = 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
+            } else {
+                canvasIframe.classList.add('hidden');
+                canvasCodeContainer.classList.remove('hidden');
+                codeTab.className = 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
+                previewTab.className = 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
+            }
+        }
+
+        document.getElementById('canvasPreviewTab').addEventListener('click', () => switchCanvasTab('preview'));
+        document.getElementById('canvasCodeTab').addEventListener('click', () => switchCanvasTab('code'));
+        openCanvasHeaderBtn.addEventListener('click', () => canvasPanel.classList.remove('hidden'));
+        document.getElementById('closeCanvasBtn').addEventListener('click', () => {
+            canvasPanel.classList.add('hidden');
+            if (isCanvasFullscreen) toggleCanvasFullscreen();
+        });
+
+        function toggleCanvasFullscreen() {
+            const mainArea = document.getElementById('mainChatArea');
+            const icon = document.getElementById('canvasFullscreenIcon');
+            isCanvasFullscreen = !isCanvasFullscreen;
+            if (isCanvasFullscreen) {
+                mainArea.classList.add('hidden');
+                canvasPanel.classList.remove('lg:w-1/2');
+                canvasPanel.classList.add('w-full');
+                icon.className = 'fa-solid fa-compress';
+            } else {
+                mainArea.classList.remove('hidden');
+                canvasPanel.classList.remove('w-full');
+                canvasPanel.classList.add('lg:w-1/2');
+                icon.className = 'fa-solid fa-expand';
+            }
+        }
+        document.getElementById('toggleCanvasFullscreenBtn').addEventListener('click', toggleCanvasFullscreen);
+
+        function downloadHtmlFile(code, filename = 'mei-app.html') {
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        document.getElementById('downloadCanvasCodeBtn').addEventListener('click', () => {
+            if (currentCanvasCode) downloadHtmlFile(currentCanvasCode, 'mei-canvas-app.html');
+        });
+
+        // Message Rendering
+        const messagesList = document.getElementById('messagesList');
+        const emptyState = document.getElementById('emptyState');
+        const chatContainer = document.getElementById('chatContainer');
+
+        function appendMessageBubble(role, content, isThinking = false) {
+            emptyState.classList.add('hidden');
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex items-start gap-3.5 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            if (role === 'user') {
+                const bubble = document.createElement('div');
+                bubble.className = 'max-w-[82%] bg-blue-600 dark:bg-mei-userBubble text-white dark:text-gray-100 px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed shadow-sm whitespace-pre-wrap';
+                bubble.textContent = content;
+                wrapper.appendChild(bubble);
+            } else {
+                const logo = document.createElement('div');
+                logo.className = `w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 mt-1 ${isThinking ? 'mei-logo-thinking' : ''}`;
+                if (isThinking) logo.id = 'activeThinkingLogo';
+
+                const contentBox = document.createElement('div');
+                contentBox.className = 'flex-1 min-w-0 text-sm text-gray-800 dark:text-gray-200 leading-relaxed prose dark:prose-invert max-w-none overflow-x-auto';
+
+                if (isThinking) {
+                    contentBox.innerHTML = '<span class="text-xs text-gray-400 italic">Mei is thinking...</span>';
+                } else {
+                    contentBox.innerHTML = renderMarkdownSafe(content);
+                    enhanceCodeBlocks(contentBox);
+                }
+
+                wrapper.appendChild(logo);
+                wrapper.appendChild(contentBox);
+            }
+
+            messagesList.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return wrapper;
+        }
+
+        function enhanceCodeBlocks(container) {
+            container.querySelectorAll('pre code').forEach(block => {
+                if (typeof hljs !== 'undefined') hljs.highlightElement(block);
+                const codeText = block.textContent || '';
+                if (/<!DOCTYPE html|<html|<body|<script/i.test(codeText) && !block.parentElement.querySelector('.canvas-open-pill')) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'canvas-open-pill mt-2 mb-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium cursor-pointer transition';
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i> Open in Mei Canvas';
+                    btn.addEventListener('click', () => openMeiCanvas(codeText, 'Generated App'));
+                    block.parentElement.insertBefore(btn, block);
+                }
+            });
+        }
+
+        function renderFullConversation() {
+            messagesList.innerHTML = '';
+            if (chatHistory.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            chatHistory.forEach(m => appendMessageBubble(m.role, m.content, false));
+        }
+
+        async function typewriteResponse(wrapperEl, fullText) {
+            const contentBox = wrapperEl.querySelector('div:last-child');
+            const logo = wrapperEl.querySelector('#activeThinkingLogo');
+            if (logo) {
+                logo.classList.remove('mei-logo-thinking');
+                logo.removeAttribute('id');
+            }
+            setLogoThinking(false);
+
+            contentBox.classList.add('typing-cursor');
+            const step = fullText.length > 1200 ? 45 : fullText.length > 400 ? 22 : 10;
+            let idx = 0;
+
+            await new Promise(resolve => {
+                const timer = setInterval(() => {
+                    idx += step;
+                    if (idx >= fullText.length) {
+                        clearInterval(timer);
+                        contentBox.classList.remove('typing-cursor');
+                        contentBox.innerHTML = renderMarkdownSafe(fullText);
+                        enhanceCodeBlocks(contentBox);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        resolve();
+                    } else {
+                        contentBox.textContent = fullText.slice(0, idx);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }
+                }, 16);
+            });
+        }
+
+        // Network & Multi-Provider API Engine
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 18000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                return await fetch(url, { ...options, signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function queryCustomProvider(messages) {
+            const apiKey = (localStorage.getItem('mei_api_key') || '').trim();
+            const provider = localStorage.getItem('mei_provider_preset') || 'openrouter';
+            if (!apiKey && provider !== 'ollama') return null;
+
+            const baseUrl = (localStorage.getItem('mei_api_base_url') || PROVIDER_PRESETS[provider]?.url || '').replace(/\/+$/, '');
+            const modelId = (localStorage.getItem('mei_custom_model_id') || PROVIDER_PRESETS[provider]?.model || 'gpt-4o-mini').trim();
+            if (!baseUrl) return null;
+
+            const cleanHistory = messages.slice(-8).map(m => ({
+                role: m.role === 'assistant' ? 'assistant' : 'user',
+                content: String(m.content || '').slice(0, 3000)
+            }));
+
+            if (provider === 'anthropic') {
+                const endpoint = baseUrl.endsWith('/messages') ? baseUrl : `${baseUrl}/messages`;
+                const res = await fetchWithTimeout(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    },
+                    body: JSON.stringify({
+                        model: modelId,
+                        max_tokens: 4096,
+                        system: MEI_SYSTEM_PROMPT,
+                        messages: cleanHistory
+                    })
+                }, 25000);
+                if (!res.ok) throw new Error(`Anthropic API error (${res.status})`);
+                const data = await res.json();
+                return data?.content?.[0]?.text || null;
+            }
+
+            const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+            const headers = { 'Content-Type': 'application/json' };
+            if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+            if (provider === 'openrouter') {
+                headers['HTTP-Referer'] = window.location.origin;
+                headers['X-Title'] = 'Mei AI Workspace';
+            }
+
+            const res = await fetchWithTimeout(endpoint, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    model: modelId,
+                    messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...cleanHistory],
+                    temperature: 0.7
+                })
+            }, 25000);
+
+            if (!res.ok) throw new Error(`Provider API error (${res.status})`);
+            const data = await res.json();
+            return data?.choices?.[0]?.message?.content || null;
+        }
+
+        async function queryFreeEngine(messages) {
+            const cleanHistory = messages.slice(-6).map(m => ({
+                role: m.role === 'assistant' ? 'assistant' : 'user',
+                content: String(m.content || '').slice(0, 2000)
+            }));
+            const res = await fetchWithTimeout('https://text.pollinations.ai/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...cleanHistory],
+                    model: 'openai',
+                    seed: Math.floor(Math.random() * 99999)
+                })
+            }, 12000);
+            if (!res.ok) return null;
+            const txt = await res.text();
+            if (!txt || (txt.trim().startsWith('{') && txt.includes('"error"'))) return null;
+            return txt.trim();
+        }
+
+        // Natural Fallback Reply Engine (No rate-limit error copy)
+        function generateLocalMeiReply(prompt) {
+            const q = String(prompt || '').trim();
+            const lower = q.toLowerCase();
+            const activeId = localStorage.getItem('mei_active_family_model') || 'mei-v1-ultra';
+            const modelName = MEI_FAMILY_MODELS.find(m => m.id === activeId)?.name || '✨ Mei v1 Ultra';
+
+            if (/^(hi|hello|hey|yo|sup)\b/i.test(lower)) {
+                return `Hello! 👋 **${modelName}** is ready. What would you like to build or explore today?`;
+            }
+
+            if (lower.includes('slide') || lower.includes('presentation') || lower.includes('space exploration')) {
+                const slidesHtml = [
+                    '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Space Exploration Deck</title>',
+                    '<script src="https://cdn.tailwindcss.com"></' + 'script></head>',
+                    '<body class="bg-slate-950 text-white h-screen flex flex-col items-center justify-center p-6 select-none">',
+                    '<div id="slide" class="max-w-3xl w-full aspect-video bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 rounded-3xl p-10 flex flex-col justify-between border border-purple-500/30 shadow-2xl">',
+                    '<div class="text-xs uppercase tracking-widest text-purple-300" id="tag">Slide 1 / 4</div>',
+                    '<div><h1 id="title" class="text-4xl font-bold mb-3">Space Exploration</h1><p id="desc" class="text-slate-200 text-lg">Humanity\'s journey beyond Earth into the cosmos.</p></div>',
+                    '<div class="flex justify-between items-center"><button onclick="nav(-1)" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm">← Prev</button><button onclick="nav(1)" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-sm font-semibold">Next →</button></div>',
+                    '</div>',
+                    '<script>const slides=[{t:"Space Exploration",d:"Humanity\'s journey beyond Earth into the cosmos."},{t:"Artemis & Lunar Bases",d:"Establishing sustainable habitats on the Moon."},{t:"Mission to Mars",d:"Interplanetary propulsion and robotic pathfinders."},{t:"Deep Space Telescopes",d:"Imaging exoplanets and the earliest galaxies."}];let i=0;function nav(s){i=(i+s+slides.length)%slides.length;document.getElementById("tag").textContent=`Slide ${i+1} / ${slides.length}`;document.getElementById("title").textContent=slides[i].t;document.getElementById("desc").textContent=slides[i].d}</' + 'script></body></html>'
+                ].join('\n');
+                return `Here is your 4-slide **Space Exploration** presentation deck in **Mei Canvas**:\n\n\`\`\`html\n${slidesHtml}\n\`\`\``;
+            }
+
+            if (lower.includes('pomodoro') || lower.includes('timer')) {
+                const pomoHtml = [
+                    '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pomodoro Timer</title>',
+                    '<script src="https://cdn.tailwindcss.com"></' + 'script></head>',
+                    '<body class="bg-zinc-950 text-white h-screen flex items-center justify-center">',
+                    '<div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl text-center w-80 shadow-2xl">',
+                    '<div class="text-xs uppercase tracking-widest text-purple-400 mb-2">Focus Timer</div>',
+                    '<div id="time" class="text-6xl font-bold my-4 tabular-nums">25:00</div>',
+                    '<div class="flex justify-center gap-3"><button id="btn" onclick="toggle()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 font-semibold text-sm">Start</button><button onclick="reset()" class="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm">Reset</button></div>',
+                    '</div>',
+                    '<script>let sec=1500,iv=null;function render(){document.getElementById("time").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}function toggle(){const b=document.getElementById("btn");if(iv){clearInterval(iv);iv=null;b.textContent="Start";return}b.textContent="Pause";iv=setInterval(()=>{if(sec>0){sec--;render()}else{clearInterval(iv);iv=null;b.textContent="Done"}},1000)}function reset(){clearInterval(iv);iv=null;document.getElementById("btn").textContent="Start";sec=1500;render()}</' + 'script></body></html>'
+                ].join('\n');
+                return `Here is your interactive **Pomodoro Timer** app in **Mei Canvas**:\n\n\`\`\`html\n${pomoHtml}\n\`\`\``;
+            }
+
+            return `**${modelName}** is ready! Ask me to build an interactive website, presentation deck, or mini-game to preview it live in **Mei Canvas**, or configure a custom AI provider and Model ID in **Settings & Models**.`;
+        }
+
+        // Send Message Handler
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        async function handleSendMessage(overrideText = null) {
+            const rawText = overrideText !== null ? overrideText : messageInput.value;
+            const text = String(rawText || '').trim();
+            if (!text || isGenerating) return;
+
+            isGenerating = true;
+            sendBtn.disabled = true;
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            let displayPrompt = text;
+            if (activeAttachments.length > 0) {
+                const names = activeAttachments.map(a => a.name).join(', ');
+                displayPrompt += `\n[Attached: ${names}]`;
+                activeAttachments = [];
+                renderAttachmentChips();
+            }
+
+            chatHistory.push({ role: 'user', content: displayPrompt });
+            appendMessageBubble('user', displayPrompt, false);
+            saveCurrentSession();
+
+            const thinkingEl = appendMessageBubble('assistant', '', true);
+            setLogoThinking(true);
+
+            let reply = null;
+            try {
+                reply = await queryCustomProvider(chatHistory);
+                if (!reply && !/slide|presentation|pomodoro/i.test(text)) {
+                    reply = await queryFreeEngine(chatHistory);
+                }
+            } catch (err) {
+                reply = `⚠️ **Provider Notice**: ${err.message}\n\n` + generateLocalMeiReply(text);
+            }
+
+            if (!reply) reply = generateLocalMeiReply(text);
+
+            chatHistory.push({ role: 'assistant', content: reply });
+            saveCurrentSession();
+
+            await typewriteResponse(thinkingEl, reply);
+
+            const webCode = extractExecutableWebsiteCode(reply);
+            if (webCode) openMeiCanvas(webCode, 'Live App Preview');
+
+            isGenerating = false;
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+
+        sendBtn.addEventListener('click', () => handleSendMessage());
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        });
+        messageInput.addEventListener('input', () => {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 192) + 'px';
+        });
+
+        // Prompt Chips
+        document.querySelectorAll('.prompt-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const prompt = chip.getAttribute('data-prompt');
+                if (prompt) handleSendMessage(prompt);
+            });
+        });
+
+        // File Attachments
+        const fileInput = document.getElementById('fileInput');
+        const attachmentPreview = document.getElementById('attachmentPreview');
+        document.getElementById('attachBtn').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => {
+            Array.from(fileInput.files || []).forEach(f => activeAttachments.push({ name: f.name }));
+            fileInput.value = '';
+            renderAttachmentChips();
+        });
+
+        function renderAttachmentChips() {
             if (activeAttachments.length === 0) {
                 attachmentPreview.classList.add('hidden');
                 attachmentPreview.innerHTML = '';
                 return;
             }
             attachmentPreview.classList.remove('hidden');
-            attachmentPreview.innerHTML = activeAttachments.map((att, idx) => `
-                <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg text-xs text-gray-300 border border-gray-700">
-                    <span class="truncate max-w-[120px]">${att.name}</span>
-                    <button type="button" onclick="window.removeAttachment(${idx})" class="text-gray-400 hover:text-red-400 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-                </div>
+            attachmentPreview.innerHTML = activeAttachments.map((a, i) => `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs">
+                    <i class="fa-solid fa-file"></i> ${a.name}
+                    <button type="button" data-idx="${i}" class="remove-att-btn hover:text-white ml-1 cursor-pointer">×</button>
+                </span>
             `).join('');
-        }
-
-        // Canvas
-        function openCanvas(code, title = "App Preview") {
-            currentCanvasCode = code;
-            const canvasTitleEl = document.getElementById('canvasTitle');
-            if (canvasTitleEl) canvasTitleEl.textContent = title;
-            if (canvasPanel) canvasPanel.classList.remove('hidden');
-            if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.remove('hidden');
-            if (canvasIframe) canvasIframe.srcdoc = code;
-            if (canvasCodeElement) canvasCodeElement.textContent = code;
-            if (window.hljs && canvasCodeElement) hljs.highlightElement(canvasCodeElement);
-        }
-
-        if (openCanvasHeaderBtn && canvasPanel) {
-            openCanvasHeaderBtn.addEventListener('click', () => {
-                canvasPanel.classList.toggle('hidden');
+            attachmentPreview.querySelectorAll('.remove-att-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeAttachments.splice(Number(btn.getAttribute('data-idx')), 1);
+                    renderAttachmentChips();
+                });
             });
         }
 
-        if (toggleCanvasFullscreenBtn) {
-            toggleCanvasFullscreenBtn.addEventListener('click', () => {
-                isCanvasFullscreen = !isCanvasFullscreen;
-                if (isCanvasFullscreen) {
-                    if (canvasPanel) {
-                        canvasPanel.classList.remove('lg:w-1/2');
-                        canvasPanel.classList.add('w-full', 'absolute', 'inset-0', 'z-50');
-                    }
-                    if (mainChatArea) mainChatArea.classList.add('hidden');
-                    if (canvasFullscreenIcon) canvasFullscreenIcon.className = "fa-solid fa-compress";
-                } else {
-                    if (canvasPanel) {
-                        canvasPanel.classList.remove('w-full', 'absolute', 'inset-0', 'z-50');
-                        canvasPanel.classList.add('lg:w-1/2');
-                    }
-                    if (mainChatArea) mainChatArea.classList.remove('hidden');
-                    if (canvasFullscreenIcon) canvasFullscreenIcon.className = "fa-solid fa-expand";
-                }
-            });
+        // New Chat, Home, Clear
+        function resetToHome() {
+            activeSessionId = null;
+            chatHistory = [];
+            renderFullConversation();
+            renderSessionHistory();
+            closeSidebar();
         }
+        document.getElementById('newChatBtn').addEventListener('click', resetToHome);
+        document.getElementById('homeBtn').addEventListener('click', resetToHome);
+        document.getElementById('clearChatBtn').addEventListener('click', resetToHome);
 
-        if (closeCanvasBtn) {
-            closeCanvasBtn.addEventListener('click', () => {
-                if (isCanvasFullscreen && toggleCanvasFullscreenBtn) toggleCanvasFullscreenBtn.click();
-                if (canvasPanel) canvasPanel.classList.add('hidden');
-            });
-        }
-
-        if (canvasPreviewTab && canvasCodeTab && canvasIframe && canvasCodeContainer) {
-            canvasPreviewTab.addEventListener('click', () => {
-                canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
-                canvasCodeTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
-                canvasIframe.classList.remove('hidden');
-                canvasCodeContainer.classList.add('hidden');
-            });
-
-            canvasCodeTab.addEventListener('click', () => {
-                canvasCodeTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
-                canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
-                canvasCodeContainer.classList.remove('hidden');
-                canvasIframe.classList.add('hidden');
-            });
-        }
-
-        if (downloadCanvasCodeBtn) {
-            downloadCanvasCodeBtn.addEventListener('click', () => {
-                if (!currentCanvasCode) return;
-                const blob = new Blob([currentCanvasCode], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'mei-app.html';
-                a.click();
-                URL.revokeObjectURL(url);
-            });
-        }
-
-        function appendUserMessage(text) {
-            if (emptyState) emptyState.style.display = 'none';
-            if (messagesList) messagesList.style.display = 'block';
-            const userBubble = document.createElement('div');
-            userBubble.className = "flex justify-end mb-4";
-            userBubble.innerHTML = `<div class="max-w-2xl bg-white dark:bg-mei-userBubble border border-gray-200 dark:border-gray-700/60 text-gray-900 dark:text-gray-100 p-4 rounded-2xl shadow-sm text-sm">${window.marked ? marked.parse(text) : text}</div>`;
-            if (messagesList) messagesList.appendChild(userBubble);
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function createBotPlaceholder() {
-            const botContainer = document.createElement('div');
-            botContainer.className = "flex items-start gap-3 mb-6";
-            botContainer.innerHTML = `
-                <div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 mt-1"></div>
-                <div class="flex-1 bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-2xl text-sm leading-relaxed overflow-hidden shadow-sm">
-                    <div class="bot-content typing-cursor"><span class="text-gray-400 italic">Connecting to API provider...</span></div>
-                </div>
-            `;
-            if (messagesList) messagesList.appendChild(botContainer);
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-            return botContainer.querySelector('.bot-content');
-        }
-
-        async function fetchAIResponse(userPrompt) {
-            const apiKey = (localStorage.getItem('mei_api_key') || '').trim();
-            const baseUrl = (localStorage.getItem('mei_api_base_url') || '[https://openrouter.ai/api/v1').trim](https://openrouter.ai/api/v1').trim)();
-            const activeModel = (localStorage.getItem('mei_active_family_model') || 'mei-v3-ultra').trim();
-
-            const messagesPayload = [
-                { role: "system", content: MEI_SYSTEM_PROMPT },
-                ...chatHistory,
-                { role: "user", content: userPrompt }
-            ];
-
-            if (apiKey) {
-                try {
-                    const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
-                    const res = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: activeModel.startsWith('mei-v3-') ? 'anthropic/claude-3-5-sonnet' : activeModel,
-                            messages: messagesPayload
-                        })
-                    });
-                    if (res.ok) {
-                        const json = await res.json();
-                        const answer = json.choices?.[0]?.message?.content || json.content?.[0]?.text;
-                        if (answer) return answer;
-                    }
-                } catch (e) {}
-            }
-
-            // Fallback intelligence / app generator if API key is not configured or fails
-            if (/app|timer|game|code|html|build|create|presentation|slide/i.test(userPrompt)) {
-                return `Here is your requested application processed via **${activeModel}** and rendered live in **Mei Canvas**:\n\n` +
-                "```html\n" +
-                "<!DOCTYPE html>\n" +
-                "<html lang=\"en\">\n" +
-                "<head>\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "    <title>Mei Canvas App</title>\n" +
-                "    <script src=\"https://cdn.tailwindcss.com\"><\/script>\n" +
-                "</head>\n" +
-                "<body class=\"bg-gray-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans\">\n" +
-                "    <div class=\"max-w-md w-full bg-gray-900 border border-purple-500/30 rounded-2xl p-6 shadow-2xl text-center space-y-4\">\n" +
-                "        <div class=\"w-12 h-12 bg-purple-600/20 text-purple-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold\">✨</div>\n" +
-                "        <h2 class=\"text-xl font-bold text-gray-100\">Mei v3 Multi-Provider App</h2>\n" +
-                "        <p class=\"text-xs text-gray-400 leading-relaxed\">Active Model: <code class=\"text-purple-300\">" + activeModel + "</code></p>\n" +
-                "        <button onclick=\"alert('Interactive Mei Model Event Fired!')\" class=\"w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs transition cursor-pointer\">Test App</button>\n" +
-                "    </div>\n" +
-                "</body>\n" +
-                "</html>\n" +
-                "```";
-            }
-
-            return `Hello! I am **Mei**, operating on **${activeModel}**. To connect to live cloud APIs, please configure your API key in **Settings** (supporting OpenAI, OpenRouter, Anthropic, Groq, and custom endpoints).`;
-        }
-
-        async function handleSend() {
-            if (!messageInput) return;
-            const prompt = messageInput.value.trim();
-            if (!prompt) return;
-
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-
-            let fullUserContent = prompt;
-            if (activeAttachments.length > 0) {
-                fullUserContent += "\n\n[Attachments]:\n" + activeAttachments.map(a => a.name).join(", ");
-                activeAttachments = [];
-                renderAttachments();
-            }
-
-            appendUserMessage(prompt);
-            currentBotContentEl = createBotPlaceholder();
-
-            const rawAiResponse = await fetchAIResponse(fullUserContent);
-            chatHistory.push({ role: "user", content: fullUserContent });
-            chatHistory.push({ role: "assistant", content: rawAiResponse });
-
-            let index = 0;
-            currentStreamInterval = setInterval(() => {
-                index += 4;
-                const currentText = rawAiResponse.slice(0, index);
-                if (currentBotContentEl) currentBotContentEl.innerHTML = window.marked ? marked.parse(currentText) : currentText;
-
-                const htmlMatch = currentText.match(/```(?:html|xml)?\s*\n([\s\S]*?)```/i) || currentText.match(/```(?:html|xml)?\s*\n([\s\S]*)$/i);
-                if (htmlMatch && htmlMatch[1].length > 40) openCanvas(htmlMatch[1], "Live App Preview");
-
-                if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-                if (index >= rawAiResponse.length) {
-                    clearInterval(currentStreamInterval);
-                    if (currentBotContentEl) currentBotContentEl.classList.remove('typing-cursor');
-                }
-            }, 10);
-        }
-
-        if (sendBtn) sendBtn.addEventListener('click', handleSend);
-        if (messageInput) {
-            messageInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                }
-            });
-        }
-
-        document.querySelectorAll('.prompt-chip').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (messageInput) messageInput.value = btn.dataset.prompt;
-                handleSend();
-            });
+        // Model Dropdown Sync
+        modelDropdownSelect.addEventListener('change', (e) => {
+            localStorage.setItem('mei_active_family_model', e.target.value);
+            syncSettingsToUI();
         });
 
-        if (clearChatBtn) {
-            clearChatBtn.addEventListener('click', () => {
-                chatHistory = [];
-                if (messagesList) messagesList.innerHTML = '';
-                showChatHome();
-                if (canvasPanel) canvasPanel.classList.add('hidden');
-                if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.add('hidden');
-            });
+        // Settings Modal
+        const settingsModal = document.getElementById('settingsModal');
+        function openSettingsModal() {
+            syncSettingsToUI();
+            settingsModal.classList.remove('hidden');
+            closeSidebar();
+        }
+        document.getElementById('openSettingsNavBtn').addEventListener('click', openSettingsModal);
+        document.getElementById('headerSettingsBtn').addEventListener('click', openSettingsModal);
+        document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+        document.getElementById('lightModeBtn').addEventListener('click', () => {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('mei_theme', 'light');
+            updateThemeButtonsUI();
+        });
+        document.getElementById('darkModeBtn').addEventListener('click', () => {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('mei_theme', 'dark');
+            updateThemeButtonsUI();
+        });
+
+        document.getElementById('providerPresetSelect').addEventListener('change', (e) => {
+            const preset = PROVIDER_PRESETS[e.target.value];
+            if (preset) {
+                document.getElementById('apiBaseUrlInput').value = preset.url;
+                document.getElementById('customModelInput').value = preset.model;
+            }
+        });
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+            localStorage.setItem('mei_active_family_model', settingsModelSelect.value || 'mei-v1-ultra');
+            localStorage.setItem('mei_provider_preset', document.getElementById('providerPresetSelect').value);
+            localStorage.setItem('mei_custom_model_id', document.getElementById('customModelInput').value.trim());
+            localStorage.setItem('mei_api_base_url', document.getElementById('apiBaseUrlInput').value.trim());
+            localStorage.setItem('mei_api_key', document.getElementById('apiKeyInput').value.trim());
+            syncSettingsToUI();
+            settingsModal.classList.add('hidden');
+        });
+
+        // Canvas App Builder Modal
+        const canvasBuilderModal = document.getElementById('canvasBuilderModal');
+        const builderCodeInput = document.getElementById('builderCodeInput');
+        const builderPreviewIframe = document.getElementById('builderPreviewIframe');
+
+        const PRESET_COUNTER = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"><\/script></head><body class="bg-slate-900 text-white h-screen flex items-center justify-center"><div class="bg-slate-800 p-8 rounded-2xl text-center space-y-4"><h1 class="text-xl font-bold">Mei Counter</h1><div id="c" class="text-5xl font-bold text-purple-400">0</div><div class="flex gap-2 justify-center"><button onclick="u(-1)" class="px-4 py-2 bg-slate-700 rounded-lg">-</button><button onclick="u(1)" class="px-4 py-2 bg-purple-600 rounded-lg">+</button></div></div><script>let n=0;function u(d){n+=d;document.getElementById('c').textContent=n}<\/script></body></html>`;
+        const PRESET_TODO = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"><\/script></head><body class="bg-slate-900 text-white p-8 flex justify-center"><div class="w-full max-w-md bg-slate-800 p-6 rounded-2xl space-y-4"><h1 class="text-lg font-bold">Mei Tasks</h1><div class="flex gap-2"><input id="i" class="flex-1 bg-slate-900 px-3 py-2 rounded-lg text-sm" placeholder="New task..."><button onclick="add()" class="px-4 py-2 bg-purple-600 rounded-lg text-sm">Add</button></div><ul id="l" class="space-y-2 text-sm"></ul></div><script>function add(){const i=document.getElementById('i');if(!i.value.trim())return;const li=document.createElement('li');li.className='bg-slate-900 px-3 py-2 rounded-lg flex justify-between';li.innerHTML='<span>'+i.value+'</span><button onclick="this.parentElement.remove()" class="text-rose-400">✕</button>';document.getElementById('l').appendChild(li);i.value=''}<\/script></body></html>`;
+
+        function runBuilderPreview() {
+            builderPreviewIframe.srcdoc = builderCodeInput.value;
         }
 
-        syncSettingsToUI();
-        showChatHome();
+        document.getElementById('openCanvasBuilderNavBtn')?.addEventListener('click', () => {
+            if (!builderCodeInput.value.trim()) builderCodeInput.value = PRESET_COUNTER;
+            runBuilderPreview();
+            canvasBuilderModal.classList.remove('hidden');
+            closeSidebar();
+        });
+        document.getElementById('closeCanvasBuilderBtn').addEventListener('click', () => canvasBuilderModal.classList.add('hidden'));
+        document.getElementById('builderRunBtn').addEventListener('click', runBuilderPreview);
+        document.getElementById('builderDownloadBtn').addEventListener('click', () => downloadHtmlFile(builderCodeInput.value, 'mei-builder-app.html'));
+        document.getElementById('builderPresetCounterBtn').addEventListener('click', () => { builderCodeInput.value = PRESET_COUNTER; runBuilderPreview(); });
+        document.getElementById('builderPresetTodoBtn').addEventListener('click', () => { builderCodeInput.value = PRESET_TODO; runBuilderPreview(); });
+
+        // AI Image Studio Modal
+        const imageStudioModal = document.getElementById('imageStudioModal');
+        function openImageStudio() {
+            imageStudioModal.classList.remove('hidden');
+            closeSidebar();
+        }
+        document.getElementById('openImageStudioNavBtn').addEventListener('click', openImageStudio);
+        document.getElementById('imageStudioBtn').addEventListener('click', openImageStudio);
+        document.getElementById('closeImageStudioBtn').addEventListener('click', () => imageStudioModal.classList.add('hidden'));
+
+        document.getElementById('generateImageBtn').addEventListener('click', () => {
+            const prompt = document.getElementById('imagePromptInput').value.trim();
+            if (!prompt) return;
+            const style = document.getElementById('imageStyleSelect').value;
+            const aspect = document.getElementById('imageAspectSelect').value;
+            const w = aspect === '16:9' ? 1024 : 768;
+            const h = aspect === '16:9' ? 576 : 768;
+            const fullPrompt = encodeURIComponent(`${prompt}, ${style} style, high detail`);
+            const url = `https://image.pollinations.ai/prompt/${fullPrompt}?width=${w}&height=${h}&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
+
+            const grid = document.getElementById('imageGalleryGrid');
+            const empty = document.getElementById('emptyGalleryState');
+            if (empty) empty.remove();
+
+            const card = document.createElement('div');
+            card.className = 'rounded-xl overflow-hidden border border-gray-700 bg-gray-900 flex flex-col';
+            card.innerHTML = `<img src="${url}" alt="${prompt}" class="w-full h-40 object-cover" onerror="this.src='https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio'"><div class="p-2 text-[11px] text-gray-300 truncate">${prompt}</div>`;
+            grid.prepend(card);
+        });
+
+        // Init
+        loadSessions();
     </script>
 </body>
 </html>
