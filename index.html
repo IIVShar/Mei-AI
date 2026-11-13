@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mei AI</title>
@@ -247,7 +246,7 @@
                 <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                     <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> AI Image Studio
                 </h3>
-                <button id="closeImageStudioBtn" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button id="closeImageStudioBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
@@ -296,7 +295,7 @@
                 <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                     <i class="fa-solid fa-gear text-purple-400"></i> Settings & Model Selection
                 </h3>
-                <button id="closeSettingsBtn" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
             <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
@@ -395,7 +394,6 @@
         let activeAttachments = [];
         let galleryImages = [];
         let currentCanvasCode = "";
-        let isGenerating = false;
         let isCanvasFullscreen = false;
         let currentStreamInterval = null;
         let currentBotContentEl = null;
@@ -405,9 +403,14 @@
             if (modelDropdownSelect) modelDropdownSelect.value = savedModel;
             if (settingsModelSelect) settingsModelSelect.value = savedModel;
 
-            document.getElementById('providerPresetSelect').value = localStorage.getItem('mei_provider_preset') || 'openrouter';
-            document.getElementById('apiBaseUrlInput').value = localStorage.getItem('mei_api_base_url') || '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
-            document.getElementById('apiKeyInput').value = localStorage.getItem('mei_api_key') || '';
+            const preset = localStorage.getItem('mei_provider_preset') || 'openrouter';
+            const providerSelect = document.getElementById('providerPresetSelect');
+            if (providerSelect) providerSelect.value = preset;
+
+            const baseUrlInput = document.getElementById('apiBaseUrlInput');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            if (baseUrlInput) baseUrlInput.value = localStorage.getItem('mei_api_base_url') || '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
+            if (apiKeyInput) apiKeyInput.value = localStorage.getItem('mei_api_key') || '';
         }
 
         // DOM elements & handlers
@@ -462,6 +465,7 @@
         let selectedTheme = localStorage.getItem('mei_theme') || 'dark';
 
         function updateThemeButtons() {
+            if (!lightModeBtn || !darkModeBtn) return;
             if (selectedTheme === 'dark') {
                 darkModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white";
                 lightModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900";
