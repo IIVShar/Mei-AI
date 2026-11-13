@@ -347,7 +347,7 @@
             </div>
 
             <div class="pt-2 flex justify-end gap-2">
-                <button id="saveSettingsBtn" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Save Preferences</button>
+                <button id="saveSettingsBtn" type="button" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Save Preferences</button>
             </div>
         </div>
     </div>
@@ -437,6 +437,7 @@
         const emptyGalleryState = document.getElementById('emptyGalleryState');
         const attachmentPreview = document.getElementById('attachmentPreview');
         const canvasPanel = document.getElementById('canvasPanel');
+        const mainChatArea = document.getElementById('mainChatArea');
         const canvasIframe = document.getElementById('canvasIframe');
         const canvasCodeElement = document.getElementById('canvasCodeElement');
         const canvasCodeContainer = document.getElementById('canvasCodeContainer');
@@ -470,96 +471,109 @@
             }
         }
 
-        lightModeBtn.addEventListener('click', () => { selectedTheme = 'light'; updateThemeButtons(); });
-        darkModeBtn.addEventListener('click', () => { selectedTheme = 'dark'; updateThemeButtons(); });
+        if (lightModeBtn) lightModeBtn.addEventListener('click', () => { selectedTheme = 'light'; updateThemeButtons(); });
+        if (darkModeBtn) darkModeBtn.addEventListener('click', () => { selectedTheme = 'dark'; updateThemeButtons(); });
 
-        providerPresetSelect.addEventListener('change', (e) => {
-            const val = e.target.value;
-            const urlInput = document.getElementById('apiBaseUrlInput');
-            if (val === 'openrouter') urlInput.value = '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
-            else if (val === 'openai') urlInput.value = '[https://api.openai.com/v1](https://api.openai.com/v1)';
-            else if (val === 'anthropic') urlInput.value = '[https://api.anthropic.com/v1](https://api.anthropic.com/v1)';
-            else if (val === 'groq') urlInput.value = '[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)';
-        });
+        if (providerPresetSelect) {
+            providerPresetSelect.addEventListener('change', (e) => {
+                const val = e.target.value;
+                const urlInput = document.getElementById('apiBaseUrlInput');
+                if (urlInput) {
+                    if (val === 'openrouter') urlInput.value = '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
+                    else if (val === 'openai') urlInput.value = '[https://api.openai.com/v1](https://api.openai.com/v1)';
+                    else if (val === 'anthropic') urlInput.value = '[https://api.anthropic.com/v1](https://api.anthropic.com/v1)';
+                    else if (val === 'groq') urlInput.value = '[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)';
+                }
+            });
+        }
 
         function openSettings() {
-            settingsModal.classList.remove('hidden');
-            if (!overlay.classList.contains('hidden')) toggleSidebar();
+            if (settingsModal) settingsModal.classList.remove('hidden');
+            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
             selectedTheme = localStorage.getItem('mei_theme') || 'dark';
             updateThemeButtons();
             syncSettingsToUI();
         }
         function closeSettings() {
-            settingsModal.classList.add('hidden');
+            if (settingsModal) settingsModal.classList.add('hidden');
         }
 
         if (openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettings);
         if (headerSettingsBtn) headerSettingsBtn.addEventListener('click', openSettings);
         if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', closeSettings);
 
-        saveSettingsBtn.addEventListener('click', () => {
-            localStorage.setItem('mei_theme', selectedTheme);
-            if (selectedTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', () => {
+                localStorage.setItem('mei_theme', selectedTheme);
+                if (selectedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
 
-            localStorage.setItem('mei_provider_preset', providerPresetSelect.value);
-            localStorage.setItem('mei_api_base_url', document.getElementById('apiBaseUrlInput').value.trim());
-            localStorage.setItem('mei_api_key', document.getElementById('apiKeyInput').value.trim());
-            
-            const chosenModel = settingsModelSelect.value;
-            localStorage.setItem('mei_active_family_model', chosenModel);
-            if (modelDropdownSelect) modelDropdownSelect.value = chosenModel;
+                if (providerPresetSelect) localStorage.setItem('mei_provider_preset', providerPresetSelect.value);
+                const baseUrlInput = document.getElementById('apiBaseUrlInput');
+                const apiKeyInput = document.getElementById('apiKeyInput');
+                if (baseUrlInput) localStorage.setItem('mei_api_base_url', baseUrlInput.value.trim());
+                if (apiKeyInput) localStorage.setItem('mei_api_key', apiKeyInput.value.trim());
+                
+                if (settingsModelSelect) {
+                    const chosenModel = settingsModelSelect.value;
+                    localStorage.setItem('mei_active_family_model', chosenModel);
+                    if (modelDropdownSelect) modelDropdownSelect.value = chosenModel;
+                }
 
-            closeSettings();
-        });
+                closeSettings();
+            });
+        }
 
         // Image Studio Controls
         function openImageStudio() {
-            imageStudioModal.classList.remove('hidden');
-            if (!overlay.classList.contains('hidden')) toggleSidebar();
+            if (imageStudioModal) imageStudioModal.classList.remove('hidden');
+            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
         }
         function closeImageStudio() {
-            imageStudioModal.classList.add('hidden');
+            if (imageStudioModal) imageStudioModal.classList.add('hidden');
         }
 
         if (imageStudioBtn) imageStudioBtn.addEventListener('click', openImageStudio);
         if (openImageStudioNavBtn) openImageStudioNavBtn.addEventListener('click', openImageStudio);
         if (closeImageStudioBtn) closeImageStudioBtn.addEventListener('click', closeImageStudio);
 
-        generateImageBtn.addEventListener('click', () => {
-            const prompt = imagePromptInput.value.trim();
-            if (!prompt) return;
+        if (generateImageBtn) {
+            generateImageBtn.addEventListener('click', () => {
+                const prompt = imagePromptInput ? imagePromptInput.value.trim() : '';
+                if (!prompt) return;
 
-            const style = imageStyleSelect.value;
-            const aspect = imageAspectSelect.value;
-            let width = 1024, height = 1024;
-            if (aspect === '16:9') { width = 1280; height = 720; }
+                const style = imageStyleSelect ? imageStyleSelect.value : 'photorealistic';
+                const aspect = imageAspectSelect ? imageAspectSelect.value : '1:1';
+                let width = 1024, height = 1024;
+                if (aspect === '16:9') { width = 1280; height = 720; }
 
-            const imageUrl = `[https://image.pollinations.ai/prompt/$](https://image.pollinations.ai/prompt/$){encodeURIComponent(prompt + ", " + style)}?width=${width}&height=${height}&nologo=true`;
-            
-            generateImageBtn.disabled = true;
-            generateImageBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generating...';
+                const imageUrl = `[https://image.pollinations.ai/prompt/$](https://image.pollinations.ai/prompt/$){encodeURIComponent(prompt + ", " + style)}?width=${width}&height=${height}&nologo=true`;
+                
+                generateImageBtn.disabled = true;
+                generateImageBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Generating...';
 
-            const img = new Image();
-            img.onload = () => {
-                galleryImages.unshift({ url: imageUrl, prompt, style });
-                renderGallery();
-                generateImageBtn.disabled = false;
-                generateImageBtn.innerHTML = 'Generate Artwork';
-            };
-            img.onerror = () => {
-                galleryImages.unshift({ url: imageUrl, prompt, style });
-                renderGallery();
-                generateImageBtn.disabled = false;
-                generateImageBtn.innerHTML = 'Generate Artwork';
-            };
-            img.src = imageUrl;
-        });
+                const img = new Image();
+                img.onload = () => {
+                    galleryImages.unshift({ url: imageUrl, prompt, style });
+                    renderGallery();
+                    generateImageBtn.disabled = false;
+                    generateImageBtn.innerHTML = 'Generate Artwork';
+                };
+                img.onerror = () => {
+                    galleryImages.unshift({ url: imageUrl, prompt, style });
+                    renderGallery();
+                    generateImageBtn.disabled = false;
+                    generateImageBtn.innerHTML = 'Generate Artwork';
+                };
+                img.src = imageUrl;
+            });
+        }
 
         function renderGallery() {
+            if (!imageGalleryGrid || !emptyGalleryState) return;
             if (galleryImages.length === 0) {
                 emptyGalleryState.classList.remove('hidden');
                 return;
@@ -576,15 +590,17 @@
             `).join('');
         }
 
-        modelDropdownSelect.addEventListener('change', (e) => {
-            const val = e.target.value;
-            localStorage.setItem('mei_active_family_model', val);
-            if (settingsModelSelect) settingsModelSelect.value = val;
-        });
+        if (modelDropdownSelect) {
+            modelDropdownSelect.addEventListener('change', (e) => {
+                const val = e.target.value;
+                localStorage.setItem('mei_active_family_model', val);
+                if (settingsModelSelect) settingsModelSelect.value = val;
+            });
+        }
 
         function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            if (sidebar) sidebar.classList.toggle('-translate-x-full');
+            if (overlay) overlay.classList.toggle('hidden');
         }
 
         if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
@@ -592,36 +608,40 @@
         if (overlay) overlay.addEventListener('click', toggleSidebar);
 
         function showChatHome() {
-            emptyState.style.display = chatHistory.length === 0 ? 'flex' : 'none';
-            messagesList.style.display = 'block';
-            if (!overlay.classList.contains('hidden')) toggleSidebar();
+            if (emptyState) emptyState.style.display = chatHistory.length === 0 ? 'flex' : 'none';
+            if (messagesList) messagesList.style.display = 'block';
+            if (overlay && !overlay.classList.contains('hidden')) toggleSidebar();
         }
 
         if (homeBtn) homeBtn.addEventListener('click', showChatHome);
 
-        newChatBtn.addEventListener('click', () => {
-            chatHistory = [];
-            messagesList.innerHTML = '';
-            showChatHome();
-            canvasPanel.classList.add('hidden');
-            openCanvasHeaderBtn.classList.add('hidden');
-        });
+        if (newChatBtn) {
+            newChatBtn.addEventListener('click', () => {
+                chatHistory = [];
+                if (messagesList) messagesList.innerHTML = '';
+                showChatHome();
+                if (canvasPanel) canvasPanel.classList.add('hidden');
+                if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.add('hidden');
+            });
+        }
 
         // Attachments
-        attachBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    activeAttachments.push({ name: file.name, type: file.type, data: evt.target.result });
-                    renderAttachments();
-                };
-                if (file.type.startsWith('image/')) reader.readAsDataURL(file);
-                else reader.readAsText(file);
+        if (attachBtn && fileInput) {
+            attachBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        activeAttachments.push({ name: file.name, type: file.type, data: evt.target.result });
+                        renderAttachments();
+                    };
+                    if (file.type.startsWith('image/')) reader.readAsDataURL(file);
+                    else reader.readAsText(file);
+                });
+                fileInput.value = '';
             });
-            fileInput.value = '';
-        });
+        }
 
         window.removeAttachment = function(idx) {
             activeAttachments.splice(idx, 1);
@@ -629,6 +649,7 @@
         };
 
         function renderAttachments() {
+            if (!attachmentPreview) return;
             if (activeAttachments.length === 0) {
                 attachmentPreview.classList.add('hidden');
                 attachmentPreview.innerHTML = '';
@@ -646,67 +667,86 @@
         // Canvas
         function openCanvas(code, title = "App Preview") {
             currentCanvasCode = code;
-            document.getElementById('canvasTitle').textContent = title;
-            canvasPanel.classList.remove('hidden');
-            openCanvasHeaderBtn.classList.remove('hidden');
-            canvasIframe.srcdoc = code;
-            canvasCodeElement.textContent = code;
-            if (window.hljs) hljs.highlightElement(canvasCodeElement);
+            const canvasTitleEl = document.getElementById('canvasTitle');
+            if (canvasTitleEl) canvasTitleEl.textContent = title;
+            if (canvasPanel) canvasPanel.classList.remove('hidden');
+            if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.remove('hidden');
+            if (canvasIframe) canvasIframe.srcdoc = code;
+            if (canvasCodeElement) canvasCodeElement.textContent = code;
+            if (window.hljs && canvasCodeElement) hljs.highlightElement(canvasCodeElement);
         }
 
-        toggleCanvasFullscreenBtn.addEventListener('click', () => {
-            isCanvasFullscreen = !isCanvasFullscreen;
-            if (isCanvasFullscreen) {
-                canvasPanel.classList.remove('lg:w-1/2');
-                canvasPanel.classList.add('w-full', 'absolute', 'inset-0', 'z-50');
-                mainChatArea.classList.add('hidden');
-                canvasFullscreenIcon.className = "fa-solid fa-compress";
-            } else {
-                canvasPanel.classList.remove('w-full', 'absolute', 'inset-0', 'z-50');
-                canvasPanel.classList.add('lg:w-1/2');
-                mainChatArea.classList.remove('hidden');
-                canvasFullscreenIcon.className = "fa-solid fa-expand";
-            }
-        });
+        if (openCanvasHeaderBtn && canvasPanel) {
+            openCanvasHeaderBtn.addEventListener('click', () => {
+                canvasPanel.classList.toggle('hidden');
+            });
+        }
 
-        closeCanvasBtn.addEventListener('click', () => {
-            if (isCanvasFullscreen) toggleCanvasFullscreen();
-            canvasPanel.classList.add('hidden');
-        });
+        if (toggleCanvasFullscreenBtn) {
+            toggleCanvasFullscreenBtn.addEventListener('click', () => {
+                isCanvasFullscreen = !isCanvasFullscreen;
+                if (isCanvasFullscreen) {
+                    if (canvasPanel) {
+                        canvasPanel.classList.remove('lg:w-1/2');
+                        canvasPanel.classList.add('w-full', 'absolute', 'inset-0', 'z-50');
+                    }
+                    if (mainChatArea) mainChatArea.classList.add('hidden');
+                    if (canvasFullscreenIcon) canvasFullscreenIcon.className = "fa-solid fa-compress";
+                } else {
+                    if (canvasPanel) {
+                        canvasPanel.classList.remove('w-full', 'absolute', 'inset-0', 'z-50');
+                        canvasPanel.classList.add('lg:w-1/2');
+                    }
+                    if (mainChatArea) mainChatArea.classList.remove('hidden');
+                    if (canvasFullscreenIcon) canvasFullscreenIcon.className = "fa-solid fa-expand";
+                }
+            });
+        }
 
-        canvasPreviewTab.addEventListener('click', () => {
-            canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
-            canvasCodeTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
-            canvasIframe.classList.remove('hidden');
-            canvasCodeContainer.classList.add('hidden');
-        });
+        if (closeCanvasBtn) {
+            closeCanvasBtn.addEventListener('click', () => {
+                if (isCanvasFullscreen && toggleCanvasFullscreenBtn) toggleCanvasFullscreenBtn.click();
+                if (canvasPanel) canvasPanel.classList.add('hidden');
+            });
+        }
 
-        canvasCodeTab.addEventListener('click', () => {
-            canvasCodeTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
-            canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
-            canvasCodeContainer.classList.remove('hidden');
-            canvasIframe.classList.add('hidden');
-        });
+        if (canvasPreviewTab && canvasCodeTab && canvasIframe && canvasCodeContainer) {
+            canvasPreviewTab.addEventListener('click', () => {
+                canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
+                canvasCodeTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
+                canvasIframe.classList.remove('hidden');
+                canvasCodeContainer.classList.add('hidden');
+            });
 
-        downloadCanvasCodeBtn.addEventListener('click', () => {
-            if (!currentCanvasCode) return;
-            const blob = new Blob([currentCanvasCode], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'mei-app.html';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
+            canvasCodeTab.addEventListener('click', () => {
+                canvasCodeTab.className = "px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer";
+                canvasPreviewTab.className = "px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer";
+                canvasCodeContainer.classList.remove('hidden');
+                canvasIframe.classList.add('hidden');
+            });
+        }
+
+        if (downloadCanvasCodeBtn) {
+            downloadCanvasCodeBtn.addEventListener('click', () => {
+                if (!currentCanvasCode) return;
+                const blob = new Blob([currentCanvasCode], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'mei-app.html';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
 
         function appendUserMessage(text) {
-            emptyState.style.display = 'none';
-            messagesList.style.display = 'block';
+            if (emptyState) emptyState.style.display = 'none';
+            if (messagesList) messagesList.style.display = 'block';
             const userBubble = document.createElement('div');
             userBubble.className = "flex justify-end mb-4";
             userBubble.innerHTML = `<div class="max-w-2xl bg-white dark:bg-mei-userBubble border border-gray-200 dark:border-gray-700/60 text-gray-900 dark:text-gray-100 p-4 rounded-2xl shadow-sm text-sm">${window.marked ? marked.parse(text) : text}</div>`;
-            messagesList.appendChild(userBubble);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            if (messagesList) messagesList.appendChild(userBubble);
+            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function createBotPlaceholder() {
@@ -718,8 +758,8 @@
                     <div class="bot-content typing-cursor"><span class="text-gray-400 italic">Connecting to API provider...</span></div>
                 </div>
             `;
-            messagesList.appendChild(botContainer);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            if (messagesList) messagesList.appendChild(botContainer);
+            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
             return botContainer.querySelector('.bot-content');
         }
 
@@ -784,6 +824,7 @@
         }
 
         async function handleSend() {
+            if (!messageInput) return;
             const prompt = messageInput.value.trim();
             if (!prompt) return;
 
@@ -808,41 +849,45 @@
             currentStreamInterval = setInterval(() => {
                 index += 4;
                 const currentText = rawAiResponse.slice(0, index);
-                currentBotContentEl.innerHTML = window.marked ? marked.parse(currentText) : currentText;
+                if (currentBotContentEl) currentBotContentEl.innerHTML = window.marked ? marked.parse(currentText) : currentText;
 
                 const htmlMatch = currentText.match(/```(?:html|xml)?\s*\n([\s\S]*?)```/i) || currentText.match(/```(?:html|xml)?\s*\n([\s\S]*)$/i);
                 if (htmlMatch && htmlMatch[1].length > 40) openCanvas(htmlMatch[1], "Live App Preview");
 
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
                 if (index >= rawAiResponse.length) {
                     clearInterval(currentStreamInterval);
-                    currentBotContentEl.classList.remove('typing-cursor');
+                    if (currentBotContentEl) currentBotContentEl.classList.remove('typing-cursor');
                 }
             }, 10);
         }
 
-        sendBtn.addEventListener('click', handleSend);
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-            }
-        });
+        if (sendBtn) sendBtn.addEventListener('click', handleSend);
+        if (messageInput) {
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            });
+        }
 
         document.querySelectorAll('.prompt-chip').forEach(btn => {
             btn.addEventListener('click', () => {
-                messageInput.value = btn.dataset.prompt;
+                if (messageInput) messageInput.value = btn.dataset.prompt;
                 handleSend();
             });
         });
 
-        clearChatBtn.addEventListener('click', () => {
-            chatHistory = [];
-            messagesList.innerHTML = '';
-            showChatHome();
-            canvasPanel.classList.add('hidden');
-            openCanvasHeaderBtn.classList.add('hidden');
-        });
+        if (clearChatBtn) {
+            clearChatBtn.addEventListener('click', () => {
+                chatHistory = [];
+                if (messagesList) messagesList.innerHTML = '';
+                showChatHome();
+                if (canvasPanel) canvasPanel.classList.add('hidden');
+                if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.add('hidden');
+            });
+        }
 
         syncSettingsToUI();
         showChatHome();
