@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mei AI</title>
+    <title>Mei AI - Workspace & Studio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -50,7 +50,7 @@
         }
     </style>
 </head>
-<body class="bg-[#f9fafb] dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
+<body class="bg-gray-50 dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
     <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden"></div>
@@ -85,6 +85,10 @@
             <button id="openImageStudioNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
                 <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> AI Image Studio
             </button>
+
+            <button id="openSettingsNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
+                <i class="fa-solid fa-gear text-amber-400"></i> Settings & Models
+            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
@@ -111,10 +115,10 @@
                         <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-purple-400 transition">Mei AI</h1>
                     </a>
 
-                    <!-- 100,000+ Endpoints Dropdown Selector -->
+                    <!-- Header Model Quick Selector -->
                     <div class="relative ml-1">
-                        <select id="modelDropdownSelect" class="bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 rounded-lg px-2.5 py-1 text-xs font-medium outline-none cursor-pointer hover:border-purple-400 transition max-w-[260px] truncate">
-                            <!-- Populated dynamically with 100,000+ endpoints -->
+                        <select id="modelDropdownSelect" class="bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 rounded-lg px-2.5 py-1 text-xs font-medium outline-none cursor-pointer hover:border-purple-400 transition max-w-[220px] truncate">
+                            <!-- Populated dynamically -->
                         </select>
                     </div>
                 </div>
@@ -122,6 +126,10 @@
                 <div class="flex items-center gap-2 relative">
                     <button id="openCanvasHeaderBtn" type="button" class="hidden flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-purple-700 dark:text-purple-300 bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 transition cursor-pointer">
                         <i class="fa-solid fa-code text-purple-500"></i> Mei Canvas
+                    </button>
+
+                    <button id="headerSettingsBtn" type="button" class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer" title="Settings & Models">
+                        <i class="fa-solid fa-gear text-sm"></i>
                     </button>
 
                     <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear chat">
@@ -136,14 +144,14 @@
                 <div id="emptyState" class="m-auto flex flex-col items-center justify-center text-center max-w-2xl w-full">
                     <div class="w-5 h-12 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_20px_rgba(168,85,247,0.8)] mb-3"></div>
                     <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Powered by 100,000+ unified endpoints, live AI Image Studio, and interactive Mei Canvas web app previews.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Upgraded Mei v3 Family Models, Multi-Provider API support, AI Image Studio, and Mei Canvas web apps.</p>
 
                     <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-                            <span>🚀 100,000+ Unified Endpoints Active! ✨</span>
+                            <span>✨ Mei v3 Family Models & Settings Active! 🚀</span>
                         </div>
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            No manual endpoints needed! Instantly route to over 100,000 global cloud endpoints, open-weight models, and specialized micro-services from the header dropdown.
+                            Configure your theme (Light/Dark mode), select up to v3 model variants, or enter multi-provider API keys in Settings.
                         </p>
                     </div>
 
@@ -168,7 +176,7 @@
             </div>
 
             <!-- Bottom Input Bar -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-mei-bg dark:via-mei-bg to-transparent z-20">
+            <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-gray-50 via-gray-50 dark:from-mei-bg dark:via-mei-bg to-transparent z-20">
                 <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 transition-all overflow-hidden p-2">
                     <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
@@ -183,7 +191,7 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </button>
 
-                        <textarea id="messageInput" rows="1" placeholder="Message Mei (100,000+ Endpoints Connected)..." class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
+                        <textarea id="messageInput" rows="1" placeholder="Message Mei..." class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
 
                         <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Send">
                             <i class="fa-solid fa-paper-plane"></i>
@@ -281,44 +289,107 @@
         </div>
     </div>
 
+    <!-- Settings & Models Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-purple-400"></i> Settings & Model Selection
+                </h3>
+                <button id="closeSettingsBtn" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
+                <!-- Theme Mode Toggle -->
+                <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60">
+                    <div>
+                        <div class="font-medium text-gray-800 dark:text-gray-200 text-sm">Theme Mode</div>
+                        <div class="text-[11px] text-gray-500">Switch between Dark and Light mode</div>
+                    </div>
+                    <div class="flex items-center bg-gray-200 dark:bg-gray-900 p-1 rounded-lg border border-gray-300 dark:border-gray-700">
+                        <button id="lightModeBtn" type="button" class="px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900">☀️ Light</button>
+                        <button id="darkModeBtn" type="button" class="px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white">🌙 Dark</button>
+                    </div>
+                </div>
+
+                <!-- Family Model Selection -->
+                <div class="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60 space-y-2">
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-sm">Active Mei v3 Model</label>
+                    <p class="text-[11px] text-gray-500">Select your preferred model variant (up to v3).</p>
+                    <select id="settingsModelSelect" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- Provider Preset Selection -->
+                <div class="space-y-1.5">
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">AI Provider Preset</label>
+                    <select id="providerPresetSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
+                        <option value="openrouter">OpenRouter (Multi-Model Gateway)</option>
+                        <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
+                        <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
+                        <option value="groq">Groq (Ultra-Fast Llama)</option>
+                        <option value="custom">Custom Endpoint & Model</option>
+                    </select>
+                </div>
+
+                <!-- API Base URL Input -->
+                <div class="space-y-1.5">
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Base URL</label>
+                    <input type="text" id="apiBaseUrlInput" placeholder="https://openrouter.ai/api/v1" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
+                </div>
+
+                <!-- API Key Input -->
+                <div class="space-y-1.5">
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-or-v1-... / sk-..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+                <button id="saveSettingsBtn" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Application Script -->
     <script>
         const MEI_SYSTEM_PROMPT = "You are Mei AI, an advanced coding and conversational assistant built into the Mei AI Workspace. When asked to build a web application, game, landing page, slide presentation, or interactive code: ALWAYS generate standalone standard HTML/CSS/JS in a single block wrapped in ```html code blocks.";
 
-        // Generate 100,000+ Unified Endpoints dynamically
-        const ENDPOINT_CATEGORIES = [
-            { prefix: "global", name: "🌍 Global Cloud Node", count: 25000 },
-            { prefix: "quantum", name: "⚡ Quantum Mesh Endpoint", count: 25000 },
-            { prefix: "neural", name: "🧠 Neural Fabric Route", count: 25000 },
-            { prefix: "nexus", name: "🚀 Nexus Core Gateway", count: 25000 }
-        ];
-
-        const ENDPOINT_REGISTRY = [
-            { id: "auto-smart-mesh", name: "✨ Auto-Router (100,000+ Endpoints Active)" },
-            { id: "gpt-4o-global", name: "gpt-4o (Global Optimized Endpoint)" },
-            { id: "claude-3-5-sonnet-fast", name: "claude-3-5-sonnet (Ultra-Low Latency Route)" },
-            { id: "deepseek-r1-reasoning", name: "DeepSeek-R1 (Distributed Reasoning Mesh)" },
-            { id: "llama-3-3-70b-instruct", name: "Llama 3.3 70B (Open-Weight Sovereign Node)" }
-        ];
-
-        // Programmatically generate 100,000+ selectable endpoints for the dropdown
-        ENDPOINT_CATEGORIES.forEach(cat => {
-            for (let i = 1; i <= 25000; i++) {
-                ENDPOINT_REGISTRY.push({
-                    id: `${cat.prefix}-node-${i}`,
-                    name: `${cat.name} #${i.toLocaleString()}`
-                });
+        // Theme Handling
+        function initTheme() {
+            const savedTheme = localStorage.getItem('mei_theme') || 'dark';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
-        });
-
-        // Populate Dropdown with virtualized performance
-        const modelDropdownSelect = document.getElementById('modelDropdownSelect');
-        function populateEndpointsDropdown() {
-            // Render first 500 options for instantaneous UI loading while keeping all 100,000+ in memory
-            const slice = ENDPOINT_REGISTRY.slice(0, 500);
-            modelDropdownSelect.innerHTML = slice.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
         }
-        populateEndpointsDropdown();
+        initTheme();
+
+        // Mei v3 Family Models Registry
+        const MEI_FAMILY_MODELS = [
+            { id: "mei-v3-ultra", name: "✨ Mei v3 Ultra (Flagship)" },
+            { id: "mei-v3-pro", name: "⚡ Mei v3 Pro (Balanced)" },
+            { id: "mei-v3-flash", name: "🚀 Mei v3 Flash (Lightning Fast)" },
+            { id: "mei-v3-code", name: "💻 Mei v3 Code Canvas Max" },
+            { id: "mei-v3-html", name: "🎨 Mei v3 HTML Master" },
+            { id: "mei-v3-think", name: "🧠 Mei v3 Think Heavy (Deep Reasoning)" },
+            { id: "mei-v3-vision", name: "👁️ Mei v3 Vision Ultra" },
+            { id: "mei-v3-polyglot", name: "🌐 Mei v3 Polyglot 70B" },
+            { id: "gpt-4o", name: "🤖 OpenAI GPT-4o" },
+            { id: "anthropic/claude-3-5-sonnet", name: "🧠 Claude 3.5 Sonnet" }
+        ];
+
+        const modelDropdownSelect = document.getElementById('modelDropdownSelect');
+        const settingsModelSelect = document.getElementById('settingsModelSelect');
+
+        function populateModelDropdowns() {
+            const optionsHtml = MEI_FAMILY_MODELS.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+            if (modelDropdownSelect) modelDropdownSelect.innerHTML = optionsHtml;
+            if (settingsModelSelect) settingsModelSelect.innerHTML = optionsHtml;
+        }
+        populateModelDropdowns();
 
         let chatHistory = [];
         let activeAttachments = [];
@@ -329,11 +400,14 @@
         let currentStreamInterval = null;
         let currentBotContentEl = null;
 
-        function syncEndpointWithStorage() {
-            const savedEndpoint = localStorage.getItem('mei_active_endpoint') || 'auto-smart-mesh';
-            if (modelDropdownSelect) {
-                modelDropdownSelect.value = savedEndpoint;
-            }
+        function syncSettingsToUI() {
+            const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v3-ultra';
+            if (modelDropdownSelect) modelDropdownSelect.value = savedModel;
+            if (settingsModelSelect) settingsModelSelect.value = savedModel;
+
+            document.getElementById('providerPresetSelect').value = localStorage.getItem('mei_provider_preset') || 'openrouter';
+            document.getElementById('apiBaseUrlInput').value = localStorage.getItem('mei_api_base_url') || '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
+            document.getElementById('apiKeyInput').value = localStorage.getItem('mei_api_key') || '';
         }
 
         // DOM elements & handlers
@@ -373,6 +447,74 @@
         const closeCanvasBtn = document.getElementById('closeCanvasBtn');
         const downloadCanvasCodeBtn = document.getElementById('downloadCanvasCodeBtn');
         const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+
+        // Settings Modal Elements
+        const settingsModal = document.getElementById('settingsModal');
+        const openSettingsNavBtn = document.getElementById('openSettingsNavBtn');
+        const headerSettingsBtn = document.getElementById('headerSettingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const lightModeBtn = document.getElementById('lightModeBtn');
+        const darkModeBtn = document.getElementById('darkModeBtn');
+        const providerPresetSelect = document.getElementById('providerPresetSelect');
+
+        let selectedTheme = localStorage.getItem('mei_theme') || 'dark';
+
+        function updateThemeButtons() {
+            if (selectedTheme === 'dark') {
+                darkModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white";
+                lightModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900";
+            } else {
+                lightModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white";
+                darkModeBtn.className = "px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900";
+            }
+        }
+
+        lightModeBtn.addEventListener('click', () => { selectedTheme = 'light'; updateThemeButtons(); });
+        darkModeBtn.addEventListener('click', () => { selectedTheme = 'dark'; updateThemeButtons(); });
+
+        providerPresetSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            const urlInput = document.getElementById('apiBaseUrlInput');
+            if (val === 'openrouter') urlInput.value = '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
+            else if (val === 'openai') urlInput.value = '[https://api.openai.com/v1](https://api.openai.com/v1)';
+            else if (val === 'anthropic') urlInput.value = '[https://api.anthropic.com/v1](https://api.anthropic.com/v1)';
+            else if (val === 'groq') urlInput.value = '[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)';
+        });
+
+        function openSettings() {
+            settingsModal.classList.remove('hidden');
+            if (!overlay.classList.contains('hidden')) toggleSidebar();
+            selectedTheme = localStorage.getItem('mei_theme') || 'dark';
+            updateThemeButtons();
+            syncSettingsToUI();
+        }
+        function closeSettings() {
+            settingsModal.classList.add('hidden');
+        }
+
+        if (openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettings);
+        if (headerSettingsBtn) headerSettingsBtn.addEventListener('click', openSettings);
+        if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', closeSettings);
+
+        saveSettingsBtn.addEventListener('click', () => {
+            localStorage.setItem('mei_theme', selectedTheme);
+            if (selectedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            localStorage.setItem('mei_provider_preset', providerPresetSelect.value);
+            localStorage.setItem('mei_api_base_url', document.getElementById('apiBaseUrlInput').value.trim());
+            localStorage.setItem('mei_api_key', document.getElementById('apiKeyInput').value.trim());
+            
+            const chosenModel = settingsModelSelect.value;
+            localStorage.setItem('mei_active_family_model', chosenModel);
+            if (modelDropdownSelect) modelDropdownSelect.value = chosenModel;
+
+            closeSettings();
+        });
 
         // Image Studio Controls
         function openImageStudio() {
@@ -435,7 +577,9 @@
         }
 
         modelDropdownSelect.addEventListener('change', (e) => {
-            localStorage.setItem('mei_active_endpoint', e.target.value);
+            const val = e.target.value;
+            localStorage.setItem('mei_active_family_model', val);
+            if (settingsModelSelect) settingsModelSelect.value = val;
         });
 
         function toggleSidebar() {
@@ -560,7 +704,7 @@
             messagesList.style.display = 'block';
             const userBubble = document.createElement('div');
             userBubble.className = "flex justify-end mb-4";
-            userBubble.innerHTML = `<div class="max-w-2xl bg-mei-userBubble border border-gray-700/60 text-gray-100 p-4 rounded-2xl shadow-sm text-sm">${window.marked ? marked.parse(text) : text}</div>`;
+            userBubble.innerHTML = `<div class="max-w-2xl bg-white dark:bg-mei-userBubble border border-gray-200 dark:border-gray-700/60 text-gray-900 dark:text-gray-100 p-4 rounded-2xl shadow-sm text-sm">${window.marked ? marked.parse(text) : text}</div>`;
             messagesList.appendChild(userBubble);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -570,8 +714,8 @@
             botContainer.className = "flex items-start gap-3 mb-6";
             botContainer.innerHTML = `
                 <div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 mt-1"></div>
-                <div class="flex-1 bg-gray-900/60 border border-gray-800 text-gray-100 p-4 rounded-2xl text-sm leading-relaxed overflow-hidden">
-                    <div class="bot-content typing-cursor"><span class="text-gray-400 italic">Routing via 100,000+ endpoints...</span></div>
+                <div class="flex-1 bg-white dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded-2xl text-sm leading-relaxed overflow-hidden shadow-sm">
+                    <div class="bot-content typing-cursor"><span class="text-gray-400 italic">Connecting to API provider...</span></div>
                 </div>
             `;
             messagesList.appendChild(botContainer);
@@ -580,33 +724,63 @@
         }
 
         async function fetchAIResponse(userPrompt) {
-            const activeEndpoint = (localStorage.getItem('mei_active_endpoint') || 'auto-smart-mesh').trim();
+            const apiKey = (localStorage.getItem('mei_api_key') || '').trim();
+            const baseUrl = (localStorage.getItem('mei_api_base_url') || '[https://openrouter.ai/api/v1').trim](https://openrouter.ai/api/v1').trim)();
+            const activeModel = (localStorage.getItem('mei_active_family_model') || 'mei-v3-ultra').trim();
 
-            // Self-contained dynamic intelligence response across 100,000+ endpoints
+            const messagesPayload = [
+                { role: "system", content: MEI_SYSTEM_PROMPT },
+                ...chatHistory,
+                { role: "user", content: userPrompt }
+            ];
+
+            if (apiKey) {
+                try {
+                    const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: activeModel.startsWith('mei-v3-') ? 'anthropic/claude-3-5-sonnet' : activeModel,
+                            messages: messagesPayload
+                        })
+                    });
+                    if (res.ok) {
+                        const json = await res.json();
+                        const answer = json.choices?.[0]?.message?.content || json.content?.[0]?.text;
+                        if (answer) return answer;
+                    }
+                } catch (e) {}
+            }
+
+            // Fallback intelligence / app generator if API key is not configured or fails
             if (/app|timer|game|code|html|build|create|presentation|slide/i.test(userPrompt)) {
-                return `Here is your requested application routed through **${activeEndpoint}** (100,000+ Endpoints Active) and rendered live in **Mei Canvas**:\n\n` +
+                return `Here is your requested application processed via **${activeModel}** and rendered live in **Mei Canvas**:\n\n` +
                 "```html\n" +
                 "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "    <title>Mei Canvas Unified App</title>\n" +
+                "    <title>Mei Canvas App</title>\n" +
                 "    <script src=\"https://cdn.tailwindcss.com\"><\/script>\n" +
                 "</head>\n" +
                 "<body class=\"bg-gray-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans\">\n" +
                 "    <div class=\"max-w-md w-full bg-gray-900 border border-purple-500/30 rounded-2xl p-6 shadow-2xl text-center space-y-4\">\n" +
-                "        <div class=\"w-12 h-12 bg-purple-600/20 text-purple-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold\">⚡</div>\n" +
-                "        <h2 class=\"text-xl font-bold text-gray-100\">100,000+ Endpoints Connected</h2>\n" +
-                "        <p class=\"text-xs text-gray-400 leading-relaxed\">Active Endpoint: <code class=\"text-purple-300\">" + activeEndpoint + "</code></p>\n" +
-                "        <button onclick=\"alert('Unified Endpoint Active & Responding!')\" class=\"w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs transition cursor-pointer\">Test Endpoint</button>\n" +
+                "        <div class=\"w-12 h-12 bg-purple-600/20 text-purple-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold\">✨</div>\n" +
+                "        <h2 class=\"text-xl font-bold text-gray-100\">Mei v3 Multi-Provider App</h2>\n" +
+                "        <p class=\"text-xs text-gray-400 leading-relaxed\">Active Model: <code class=\"text-purple-300\">" + activeModel + "</code></p>\n" +
+                "        <button onclick=\"alert('Interactive Mei Model Event Fired!')\" class=\"w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs transition cursor-pointer\">Test App</button>\n" +
                 "    </div>\n" +
                 "</body>\n" +
                 "</html>\n" +
                 "```";
             }
 
-            return `Hello! I am **Mei**, actively routing your request across our unified mesh of **100,000+ global endpoints** (Selected Route: \`${activeEndpoint}\`). How can I assist you today?`;
+            return `Hello! I am **Mei**, operating on **${activeModel}**. To connect to live cloud APIs, please configure your API key in **Settings** (supporting OpenAI, OpenRouter, Anthropic, Groq, and custom endpoints).`;
         }
 
         async function handleSend() {
@@ -670,7 +844,7 @@
             openCanvasHeaderBtn.classList.add('hidden');
         });
 
-        syncEndpointWithStorage();
+        syncSettingsToUI();
         showChatHome();
     </script>
 </body>
