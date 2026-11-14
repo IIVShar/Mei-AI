@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-        <link rel="icon" type="image/png" sizes="32x32" href="mei.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mei AI</title>
@@ -425,7 +424,7 @@
 
     <!-- Application Script -->
     <script>
-        const MEI_SYSTEM_PROMPT = "You are Mei AI, an advanced coding and conversational assistant built into the Mei AI Workspace. When asked to build a web application, game, landing page, slide presentation, or interactive code: ALWAYS generate standalone standard HTML/CSS/JS in a single block wrapped in ```html code blocks.";
+        const MEI_SYSTEM_PROMPT = "You are Mei (also known as Mei AI), a helpful, creative coding and conversational assistant built into the Mei AI Workspace. Always identify strictly as Mei—never refer to yourself as GPT, Claude, Gemini, Llama, OpenAI, or any other model or company. When asked to build a web application, game, landing page, slide presentation, or interactive code: ALWAYS generate standalone standard HTML/CSS/JS in a single block wrapped in ```html code blocks.";
 
         // Theme Handling
         function initTheme() {
@@ -581,26 +580,51 @@
             }
             list.innerHTML = '';
             savedSessions.forEach(sess => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs truncate transition cursor-pointer flex items-center justify-between gap-2 ${
+                const row = document.createElement('div');
+                row.className = `group w-full px-3 py-2 rounded-lg text-xs transition cursor-pointer flex items-center justify-between gap-2 ${
                     sess.id === activeSessionId
                         ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white font-medium'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60'
                 }`;
+
                 const titleSpan = document.createElement('span');
-                titleSpan.className = 'truncate';
+                titleSpan.className = 'truncate flex-1';
                 titleSpan.textContent = sess.title;
-                btn.appendChild(titleSpan);
-                btn.addEventListener('click', () => {
+                row.appendChild(titleSpan);
+
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.title = 'Delete chat';
+                delBtn.className = 'text-gray-400 hover:text-red-500 opacity-70 group-hover:opacity-100 px-1 py-0.5 rounded transition cursor-pointer flex-shrink-0';
+                delBtn.innerHTML = '<i class="fa-solid fa-trash-can text-[11px]"></i>';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteSession(sess.id);
+                });
+                row.appendChild(delBtn);
+
+                row.addEventListener('click', () => {
                     activeSessionId = sess.id;
                     chatHistory = [...sess.messages];
                     renderFullConversation();
                     renderSessionHistory();
                     closeSidebar();
                 });
-                list.appendChild(btn);
+                list.appendChild(row);
             });
+        }
+
+        function deleteSession(sessionId) {
+            savedSessions = savedSessions.filter(s => s.id !== sessionId);
+            try {
+                localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions));
+            } catch (e) {}
+            if (activeSessionId === sessionId) {
+                activeSessionId = null;
+                chatHistory = [];
+                renderFullConversation();
+            }
+            renderSessionHistory();
         }
 
         // Markdown & Code Extraction
@@ -883,11 +907,13 @@
         function generateLocalMeiReply(prompt) {
             const q = String(prompt || '').trim();
             const lower = q.toLowerCase();
-            const activeId = localStorage.getItem('mei_active_family_model') || 'mei-v1-ultra';
-            const modelName = MEI_FAMILY_MODELS.find(m => m.id === activeId)?.name || '✨ Mei v1 Ultra';
+
+            if (/(who are you|what is your name|what's your name|whats your name|your name|identify yourself)/i.test(lower)) {
+                return `I'm **Mei**, your AI assistant in the Mei AI Workspace! I can help you write code, build interactive apps and slide decks in **Mei Canvas**, generate artwork in **AI Image Studio**, or answer questions.`;
+            }
 
             if (/^(hi|hello|hey|yo|sup)\b/i.test(lower)) {
-                return `Hello! 👋 **${modelName}** is ready. What would you like to build or explore today?`;
+                return `Hello! 👋 I'm **Mei**. What would you like to build or explore today?`;
             }
 
             if (lower.includes('slide') || lower.includes('presentation') || lower.includes('space exploration')) {
@@ -920,7 +946,7 @@
                 return `Here is your interactive **Pomodoro Timer** app in **Mei Canvas**:\n\n\`\`\`html\n${pomoHtml}\n\`\`\``;
             }
 
-            return `**${modelName}** is ready! Ask me to build an interactive website, presentation deck, or mini-game to preview it live in **Mei Canvas**, or configure a custom AI provider and Model ID in **Settings & Models**.`;
+            return `I'm **Mei**! Ask me to build an interactive website, presentation deck, or mini-game to preview it live in **Mei Canvas**, or configure a custom AI provider and Model ID in **Settings & Models**.`;
         }
 
         // Send Message Handler
@@ -1038,15 +1064,15 @@
         }
         document.getElementById('newChatBtn').addEventListener('click', resetToHome);
         document.getElementById('homeBtn').addEventListener('click', resetToHome);
-        document.getElementById('clearChatBtn').addEventListener('click', resetToHome);
-
-        // Model Dropdown Sync
-        modelDropdownSelect.addEventListener('change', (e) => {
-            localStorage.setItem('mei_active_family_model', e.target.value);
-            syncSettingsToUI();
+        document.getElementById('clearChatBtn').addEventListener('click', () => {
+            if (activeSessionId) {
+                deleteSession(activeSessionId);
+            } else {
+                resetToHome();
+            }
         });
 
-        // Settings Modal
+        // Settings Modal & Model Sync
         const settingsModal = document.getElementById('settingsModal');
         function openSettingsModal() {
             syncSettingsToUI();
@@ -1066,6 +1092,11 @@
             document.documentElement.classList.add('dark');
             localStorage.setItem('mei_theme', 'dark');
             updateThemeButtonsUI();
+        });
+
+        modelDropdownSelect.addEventListener('change', () => {
+            localStorage.setItem('mei_active_family_model', modelDropdownSelect.value);
+            if (settingsModelSelect) settingsModelSelect.value = modelDropdownSelect.value;
         });
 
         document.getElementById('providerPresetSelect').addEventListener('change', (e) => {
