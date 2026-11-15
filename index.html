@@ -163,10 +163,10 @@
 
                     <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-                            <span>✨ Canvas App Builder & Mei v1 Models Active! 🚀</span>
+                            <span>✨ Canvas App Builder & Vision Support Active! 🚀</span>
                         </div>
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Generate interactive web apps, preview live in Mei Canvas, or open the standalone Canvas App Builder to craft custom tools.
+                            Upload or drag-and-drop images to let Mei "see" and analyze them, or generate interactive web apps in Mei Canvas.
                         </p>
                     </div>
 
@@ -191,14 +191,14 @@
             </div>
 
             <!-- Bottom Input Bar -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-gray-50 via-gray-50 dark:from-mei-bg dark:via-mei-bg to-transparent z-20">
+            <div id="dropZone" class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-gray-50 via-gray-50 dark:from-mei-bg dark:via-mei-bg to-transparent z-20 transition-all">
                 <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 transition-all overflow-hidden p-2">
                     <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
                     <div class="flex items-end">
                         <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json,.js,.py,.html,.css">
                         
-                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition cursor-pointer" title="Attach File">
+                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition cursor-pointer" title="Attach File or Image">
                             <i class="fa-solid fa-plus"></i>
                         </button>
 
@@ -206,7 +206,7 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </button>
 
-                        <textarea id="messageInput" rows="1" placeholder="Message Mei..." class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
+                        <textarea id="messageInput" rows="1" placeholder="Message Mei or drop images here..." class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
 
                         <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Send">
                             <i class="fa-solid fa-paper-plane"></i>
@@ -250,52 +250,6 @@
                 <iframe id="canvasIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
                 <div id="canvasCodeContainer" class="hidden w-full h-full overflow-auto p-4 bg-[#141416] text-gray-200 font-mono text-xs">
                     <pre><code id="canvasCodeElement" class="language-html"></code></pre>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Canvas App Builder Modal -->
-    <div id="canvasBuilderModal" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-3 lg:p-6">
-        <div class="bg-[#18181a] border border-gray-800 rounded-2xl max-w-6xl w-full h-[92vh] shadow-2xl flex flex-col overflow-hidden">
-            <div class="h-14 px-6 bg-[#1e1e20] border-b border-gray-800 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-3 h-6 rounded-full bg-gradient-to-b from-purple-500 to-pink-500"></div>
-                    <h3 class="text-sm font-bold text-gray-100">Mei Canvas App Builder & Workspace</h3>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button id="builderRunBtn" type="button" class="px-3.5 py-1.5 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium text-xs flex items-center gap-2 cursor-pointer transition shadow-md">
-                        <i class="fa-solid fa-play"></i> Run App
-                    </button>
-                    <button id="builderDownloadBtn" type="button" class="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs flex items-center gap-2 cursor-pointer transition shadow-md">
-                        <i class="fa-solid fa-download"></i> Export HTML
-                    </button>
-                    <button id="closeCanvasBuilderBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
-                <!-- Editor Pane -->
-                <div class="flex flex-col border-r border-gray-800 bg-[#141416] overflow-hidden">
-                    <div class="px-4 py-2 bg-[#1b1b1e] border-b border-gray-800 flex items-center justify-between text-xs text-gray-400">
-                        <span class="font-medium text-purple-400"><i class="fa-solid fa-code"></i> HTML / Tailwind / JS Editor</span>
-                        <div class="flex gap-2">
-                            <button id="builderPresetCounterBtn" type="button" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded transition cursor-pointer">Preset: Counter App</button>
-                            <button id="builderPresetTodoBtn" type="button" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded transition cursor-pointer">Preset: Todo App</button>
-                        </div>
-                    </div>
-                    <textarea id="builderCodeInput" class="flex-1 w-full p-4 bg-transparent text-gray-200 font-mono text-xs resize-none outline-none leading-relaxed" spellcheck="false"></textarea>
-                </div>
-
-                <!-- Preview Pane -->
-                <div class="flex flex-col bg-white overflow-hidden relative">
-                    <div class="px-4 py-2 bg-gray-100 border-b border-gray-200 flex items-center justify-between text-xs text-gray-700">
-                        <span class="font-medium flex items-center gap-1.5"><i class="fa-solid fa-eye text-blue-500"></i> Live App Preview</span>
-                        <span class="text-[11px] text-gray-400">Sandboxed Environment</span>
-                    </div>
-                    <iframe id="builderPreviewIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
                 </div>
             </div>
         </div>
@@ -453,13 +407,13 @@
         ];
 
         const PROVIDER_PRESETS = {
-            openrouter: { url: "https://openrouter.ai/api/v1", model: "openai/gpt-4o-mini" },
-            openai: { url: "https://api.openai.com/v1", model: "gpt-4o-mini" },
-            anthropic: { url: "https://api.anthropic.com/v1", model: "claude-3-5-sonnet-latest" },
-            groq: { url: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile" },
-            gemini: { url: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-2.5-flash" },
-            together: { url: "https://api.together.xyz/v1", model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
-            mistral: { url: "https://api.mistral.ai/v1", model: "mistral-small-latest" },
+            openrouter: { url: "[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)", model: "openai/gpt-4o-mini" },
+            openai: { url: "[https://api.openai.com/v1](https://api.openai.com/v1)", model: "gpt-4o-mini" },
+            anthropic: { url: "[https://api.anthropic.com/v1](https://api.anthropic.com/v1)", model: "claude-3-5-sonnet-latest" },
+            groq: { url: "[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)", model: "llama-3.3-70b-versatile" },
+            gemini: { url: "[https://generativelanguage.googleapis.com/v1beta/openai](https://generativelanguage.googleapis.com/v1beta/openai)", model: "gemini-2.5-flash" },
+            together: { url: "[https://api.together.xyz/v1](https://api.together.xyz/v1)", model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
+            mistral: { url: "[https://api.mistral.ai/v1](https://api.mistral.ai/v1)", model: "mistral-small-latest" },
             ollama: { url: "http://localhost:11434/v1", model: "llama3.2" },
             custom: { url: "", model: "" }
         };
@@ -514,7 +468,7 @@
             const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v1-ultra';
             const savedProvider = localStorage.getItem('mei_provider_preset') || 'openrouter';
             const savedCustomModel = localStorage.getItem('mei_custom_model_id') || PROVIDER_PRESETS[savedProvider]?.model || '';
-            const savedBaseUrl = localStorage.getItem('mei_api_base_url') || PROVIDER_PRESETS[savedProvider]?.url || 'https://openrouter.ai/api/v1';
+            const savedBaseUrl = localStorage.getItem('mei_api_base_url') || PROVIDER_PRESETS[savedProvider]?.url || '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
             const savedApiKey = localStorage.getItem('mei_api_key') || '';
 
             if (modelDropdownSelect) modelDropdownSelect.value = savedModel;
@@ -724,15 +678,34 @@
         const emptyState = document.getElementById('emptyState');
         const chatContainer = document.getElementById('chatContainer');
 
-        function appendMessageBubble(role, content, isThinking = false) {
+        function appendMessageBubble(role, content, images = [], isThinking = false) {
             emptyState.classList.add('hidden');
             const wrapper = document.createElement('div');
             wrapper.className = `flex items-start gap-3.5 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
 
             if (role === 'user') {
                 const bubble = document.createElement('div');
-                bubble.className = 'max-w-[82%] bg-blue-600 dark:bg-mei-userBubble text-white dark:text-gray-100 px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed shadow-sm whitespace-pre-wrap';
-                bubble.textContent = content;
+                bubble.className = 'max-w-[82%] bg-blue-600 dark:bg-mei-userBubble text-white dark:text-gray-100 px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed shadow-sm space-y-2';
+                
+                if (images && images.length > 0) {
+                    const imgGrid = document.createElement('div');
+                    imgGrid.className = 'flex flex-wrap gap-2 mb-2';
+                    images.forEach(img => {
+                        if (img.dataUrl) {
+                            const imageEl = document.createElement('img');
+                            imageEl.src = img.dataUrl;
+                            imageEl.className = 'w-24 h-24 object-cover rounded-xl border border-white/20';
+                            imgGrid.appendChild(imageEl);
+                        }
+                    });
+                    bubble.appendChild(imgGrid);
+                }
+
+                const textEl = document.createElement('div');
+                textEl.className = 'whitespace-pre-wrap';
+                textEl.textContent = content;
+                bubble.appendChild(textEl);
+
                 wrapper.appendChild(bubble);
             } else {
                 const logo = document.createElement('div');
@@ -780,7 +753,7 @@
                 return;
             }
             emptyState.classList.add('hidden');
-            chatHistory.forEach(m => appendMessageBubble(m.role, m.content, false));
+            chatHistory.forEach(m => appendMessageBubble(m.role, m.content, m.images || [], false));
         }
 
         async function typewriteResponse(wrapperEl, fullText) {
@@ -814,8 +787,8 @@
             });
         }
 
-        // Network & Multi-Provider API Engine
-        async function fetchWithTimeout(url, options = {}, timeoutMs = 18000) {
+        // Network & Multi-Provider API Engine (with Vision support)
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 25000) {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeoutMs);
             try {
@@ -834,32 +807,25 @@
             const modelId = (localStorage.getItem('mei_custom_model_id') || PROVIDER_PRESETS[provider]?.model || 'gpt-4o-mini').trim();
             if (!baseUrl) return null;
 
-            const cleanHistory = messages.slice(-8).map(m => ({
-                role: m.role === 'assistant' ? 'assistant' : 'user',
-                content: String(m.content || '').slice(0, 3000)
-            }));
-
-            if (provider === 'anthropic') {
-                const endpoint = baseUrl.endsWith('/messages') ? baseUrl : `${baseUrl}/messages`;
-                const res = await fetchWithTimeout(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': apiKey,
-                        'anthropic-version': '2023-06-01',
-                        'anthropic-dangerous-direct-browser-access': 'true'
-                    },
-                    body: JSON.stringify({
-                        model: modelId,
-                        max_tokens: 4096,
-                        system: MEI_SYSTEM_PROMPT,
-                        messages: cleanHistory
-                    })
-                }, 25000);
-                if (!res.ok) throw new Error(`Anthropic API error (${res.status})`);
-                const data = await res.json();
-                return data?.content?.[0]?.text || null;
-            }
+            // Build multi-modal formatted history
+            const formattedMessages = messages.slice(-8).map((m, idx, arr) => {
+                if (m.images && m.images.length > 0 && idx === arr.length - 1) {
+                    const contentParts = [{ type: "text", text: m.content || "Please analyze these images." }];
+                    m.images.forEach(img => {
+                        if (img.dataUrl) {
+                            contentParts.push({
+                                type: "image_url",
+                                image_url: { url: img.dataUrl }
+                            });
+                        }
+                    });
+                    return { role: m.role, content: contentParts };
+                }
+                return {
+                    role: m.role === 'assistant' ? 'assistant' : 'user',
+                    content: m.content
+                };
+            });
 
             const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
             const headers = { 'Content-Type': 'application/json' };
@@ -874,12 +840,15 @@
                 headers,
                 body: JSON.stringify({
                     model: modelId,
-                    messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...cleanHistory],
+                    messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...formattedMessages],
                     temperature: 0.7
                 })
-            }, 25000);
+            }, 30000);
 
-            if (!res.ok) throw new Error(`Provider API error (${res.status})`);
+            if (!res.ok) {
+                const errBody = await res.text();
+                throw new Error(`Provider API error (${res.status}): ${errBody.slice(0, 100)}`);
+            }
             const data = await res.json();
             return data?.choices?.[0]?.message?.content || null;
         }
@@ -889,7 +858,7 @@
                 role: m.role === 'assistant' ? 'assistant' : 'user',
                 content: String(m.content || '').slice(0, 2000)
             }));
-            const res = await fetchWithTimeout('https://text.pollinations.ai/', {
+            const res = await fetchWithTimeout('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -904,23 +873,23 @@
             return txt.trim();
         }
 
-        // Natural Fallback Reply Engine (No rate-limit error copy)
+        // Natural Fallback Reply Engine
         function generateLocalMeiReply(prompt) {
             const q = String(prompt || '').trim();
             const lower = q.toLowerCase();
 
             if (/(who are you|what is your name|what's your name|whats your name|your name|identify yourself)/i.test(lower)) {
-                return `I'm **Mei**, your AI assistant in the Mei AI Workspace! I can help you write code, build interactive apps and slide decks in **Mei Canvas**, generate artwork in **AI Image Studio**, or answer questions.`;
+                return `I'm **Mei**, your AI assistant in the Mei AI Workspace! I can analyze uploaded images, write code, build interactive apps and slide decks in **Mei Canvas**, or generate artwork in **AI Image Studio**.`;
             }
 
             if (/^(hi|hello|hey|yo|sup)\b/i.test(lower)) {
-                return `Hello! 👋 I'm **Mei**. What would you like to build or explore today?`;
+                return `Hello! 👋 I'm **Mei**. You can upload images for me to analyze or ask me to build something in Mei Canvas.`;
             }
 
             if (lower.includes('slide') || lower.includes('presentation') || lower.includes('space exploration')) {
                 const slidesHtml = [
                     '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Space Exploration Deck</title>',
-                    '<script src="https://cdn.tailwindcss.com"></' + 'script></head>',
+                    '<script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></' + 'script></head>',
                     '<body class="bg-slate-950 text-white h-screen flex flex-col items-center justify-center p-6 select-none">',
                     '<div id="slide" class="max-w-3xl w-full aspect-video bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 rounded-3xl p-10 flex flex-col justify-between border border-purple-500/30 shadow-2xl">',
                     '<div class="text-xs uppercase tracking-widest text-purple-300" id="tag">Slide 1 / 4</div>',
@@ -932,22 +901,7 @@
                 return `Here is your 4-slide **Space Exploration** presentation deck in **Mei Canvas**:\n\n\`\`\`html\n${slidesHtml}\n\`\`\``;
             }
 
-            if (lower.includes('pomodoro') || lower.includes('timer')) {
-                const pomoHtml = [
-                    '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pomodoro Timer</title>',
-                    '<script src="https://cdn.tailwindcss.com"></' + 'script></head>',
-                    '<body class="bg-zinc-950 text-white h-screen flex items-center justify-center">',
-                    '<div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl text-center w-80 shadow-2xl">',
-                    '<div class="text-xs uppercase tracking-widest text-purple-400 mb-2">Focus Timer</div>',
-                    '<div id="time" class="text-6xl font-bold my-4 tabular-nums">25:00</div>',
-                    '<div class="flex justify-center gap-3"><button id="btn" onclick="toggle()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 font-semibold text-sm">Start</button><button onclick="reset()" class="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm">Reset</button></div>',
-                    '</div>',
-                    '<script>let sec=1500,iv=null;function render(){document.getElementById("time").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}function toggle(){const b=document.getElementById("btn");if(iv){clearInterval(iv);iv=null;b.textContent="Start";return}b.textContent="Pause";iv=setInterval(()=>{if(sec>0){sec--;render()}else{clearInterval(iv);iv=null;b.textContent="Done"}},1000)}function reset(){clearInterval(iv);iv=null;document.getElementById("btn").textContent="Start";sec=1500;render()}</' + 'script></body></html>'
-                ].join('\n');
-                return `Here is your interactive **Pomodoro Timer** app in **Mei Canvas**:\n\n\`\`\`html\n${pomoHtml}\n\`\`\``;
-            }
-
-            return `I'm **Mei**! Ask me to build an interactive website, presentation deck, or mini-game to preview it live in **Mei Canvas**, or configure a custom AI provider and Model ID in **Settings & Models**.`;
+            return `I'm **Mei**! You can attach images for me to inspect, ask me to code apps in **Mei Canvas**, or configure your API key in **Settings & Models** for full multi-modal vision capabilities.`;
         }
 
         // Send Message Handler
@@ -957,32 +911,38 @@
         async function handleSendMessage(overrideText = null) {
             const rawText = overrideText !== null ? overrideText : messageInput.value;
             const text = String(rawText || '').trim();
-            if (!text || isGenerating) return;
+            if ((!text && activeAttachments.length === 0) || isGenerating) return;
 
             isGenerating = true;
             sendBtn.disabled = true;
             messageInput.value = '';
             messageInput.style.height = 'auto';
 
+            let currentAttachments = [...activeAttachments];
+            activeAttachments = [];
+            renderAttachmentChips();
+
             let displayPrompt = text;
-            if (activeAttachments.length > 0) {
-                const names = activeAttachments.map(a => a.name).join(', ');
-                displayPrompt += `\n[Attached: ${names}]`;
-                activeAttachments = [];
-                renderAttachmentChips();
+            if (currentAttachments.length > 0) {
+                const names = currentAttachments.map(a => a.name).join(', ');
+                if (!displayPrompt) displayPrompt = `[Attached images: ${names}]`;
             }
 
-            chatHistory.push({ role: 'user', content: displayPrompt });
-            appendMessageBubble('user', displayPrompt, false);
+            chatHistory.push({ 
+                role: 'user', 
+                content: displayPrompt, 
+                images: currentAttachments 
+            });
+            appendMessageBubble('user', displayPrompt, currentAttachments, false);
             saveCurrentSession();
 
-            const thinkingEl = appendMessageBubble('assistant', '', true);
+            const thinkingEl = appendMessageBubble('assistant', '', [], true);
             setLogoThinking(true);
 
             let reply = null;
             try {
                 reply = await queryCustomProvider(chatHistory);
-                if (!reply && !/slide|presentation|pomodoro/i.test(text)) {
+                if (!reply && currentAttachments.length === 0 && !/slide|presentation/i.test(text)) {
                     reply = await queryFreeEngine(chatHistory);
                 }
             } catch (err) {
@@ -1024,15 +984,60 @@
             });
         });
 
-        // File Attachments
+        // File Attachments & Drag-and-Drop Vision Support
         const fileInput = document.getElementById('fileInput');
         const attachmentPreview = document.getElementById('attachmentPreview');
+        const dropZone = document.getElementById('dropZone');
+
         document.getElementById('attachBtn').addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', () => {
-            Array.from(fileInput.files || []).forEach(f => activeAttachments.push({ name: f.name }));
+
+        function handleFiles(files) {
+            Array.from(files || []).forEach(f => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    activeAttachments.push({
+                        name: f.name,
+                        dataUrl: f.type.startsWith('image/') ? event.target.result : null,
+                        type: f.type
+                    });
+                    renderAttachmentChips();
+                };
+                if (f.type.startsWith('image/')) {
+                    reader.readAsDataURL(f);
+                } else {
+                    reader.readAsText(f);
+                }
+            });
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
             fileInput.value = '';
-            renderAttachmentChips();
         });
+
+        // Drag and Drop
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('bg-blue-500/10');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('bg-blue-500/10');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if (dt && dt.files) {
+                handleFiles(dt.files);
+            }
+        }, false);
 
         function renderAttachmentChips() {
             if (activeAttachments.length === 0) {
@@ -1042,11 +1047,13 @@
             }
             attachmentPreview.classList.remove('hidden');
             attachmentPreview.innerHTML = activeAttachments.map((a, i) => `
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs">
-                    <i class="fa-solid fa-file"></i> ${a.name}
-                    <button type="button" data-idx="${i}" class="remove-att-btn hover:text-white ml-1 cursor-pointer">×</button>
-                </span>
+                <div class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs">
+                    ${a.dataUrl ? `<img src="${a.dataUrl}" class="w-6 h-6 object-cover rounded-md" />` : '<i class="fa-solid fa-file text-blue-400"></i>'}
+                    <span class="max-w-[120px] truncate text-gray-700 dark:text-gray-300">${a.name}</span>
+                    <button type="button" data-idx="${i}" class="remove-att-btn text-gray-400 hover:text-red-500 ml-1 cursor-pointer">×</button>
+                </div>
             `).join('');
+
             attachmentPreview.querySelectorAll('.remove-att-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     activeAttachments.splice(Number(btn.getAttribute('data-idx')), 1);
@@ -1118,30 +1125,6 @@
             settingsModal.classList.add('hidden');
         });
 
-        // Canvas App Builder Modal
-        const canvasBuilderModal = document.getElementById('canvasBuilderModal');
-        const builderCodeInput = document.getElementById('builderCodeInput');
-        const builderPreviewIframe = document.getElementById('builderPreviewIframe');
-
-        const PRESET_COUNTER = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"><\/script></head><body class="bg-slate-900 text-white h-screen flex items-center justify-center"><div class="bg-slate-800 p-8 rounded-2xl text-center space-y-4"><h1 class="text-xl font-bold">Mei Counter</h1><div id="c" class="text-5xl font-bold text-purple-400">0</div><div class="flex gap-2 justify-center"><button onclick="u(-1)" class="px-4 py-2 bg-slate-700 rounded-lg">-</button><button onclick="u(1)" class="px-4 py-2 bg-purple-600 rounded-lg">+</button></div></div><script>let n=0;function u(d){n+=d;document.getElementById('c').textContent=n}<\/script></body></html>`;
-        const PRESET_TODO = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://cdn.tailwindcss.com"><\/script></head><body class="bg-slate-900 text-white p-8 flex justify-center"><div class="w-full max-w-md bg-slate-800 p-6 rounded-2xl space-y-4"><h1 class="text-lg font-bold">Mei Tasks</h1><div class="flex gap-2"><input id="i" class="flex-1 bg-slate-900 px-3 py-2 rounded-lg text-sm" placeholder="New task..."><button onclick="add()" class="px-4 py-2 bg-purple-600 rounded-lg text-sm">Add</button></div><ul id="l" class="space-y-2 text-sm"></ul></div><script>function add(){const i=document.getElementById('i');if(!i.value.trim())return;const li=document.createElement('li');li.className='bg-slate-900 px-3 py-2 rounded-lg flex justify-between';li.innerHTML='<span>'+i.value+'</span><button onclick="this.parentElement.remove()" class="text-rose-400">✕</button>';document.getElementById('l').appendChild(li);i.value=''}<\/script></body></html>`;
-
-        function runBuilderPreview() {
-            builderPreviewIframe.srcdoc = builderCodeInput.value;
-        }
-
-        document.getElementById('openCanvasBuilderNavBtn')?.addEventListener('click', () => {
-            if (!builderCodeInput.value.trim()) builderCodeInput.value = PRESET_COUNTER;
-            runBuilderPreview();
-            canvasBuilderModal.classList.remove('hidden');
-            closeSidebar();
-        });
-        document.getElementById('closeCanvasBuilderBtn').addEventListener('click', () => canvasBuilderModal.classList.add('hidden'));
-        document.getElementById('builderRunBtn').addEventListener('click', runBuilderPreview);
-        document.getElementById('builderDownloadBtn').addEventListener('click', () => downloadHtmlFile(builderCodeInput.value, 'mei-builder-app.html'));
-        document.getElementById('builderPresetCounterBtn').addEventListener('click', () => { builderCodeInput.value = PRESET_COUNTER; runBuilderPreview(); });
-        document.getElementById('builderPresetTodoBtn').addEventListener('click', () => { builderCodeInput.value = PRESET_TODO; runBuilderPreview(); });
-
         // AI Image Studio Modal
         const imageStudioModal = document.getElementById('imageStudioModal');
         function openImageStudio() {
@@ -1160,7 +1143,7 @@
             const w = aspect === '16:9' ? 1024 : 768;
             const h = aspect === '16:9' ? 576 : 768;
             const fullPrompt = encodeURIComponent(`${prompt}, ${style} style, high detail`);
-            const url = `https://image.pollinations.ai/prompt/${fullPrompt}?width=${w}&height=${h}&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
+            const url = `[https://image.pollinations.ai/prompt/$](https://image.pollinations.ai/prompt/$){fullPrompt}?width=${w}&height=${h}&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
 
             const grid = document.getElementById('imageGalleryGrid');
             const empty = document.getElementById('emptyGalleryState');
@@ -1168,7 +1151,7 @@
 
             const card = document.createElement('div');
             card.className = 'rounded-xl overflow-hidden border border-gray-700 bg-gray-900 flex flex-col';
-            card.innerHTML = `<img src="${url}" alt="${prompt}" class="w-full h-40 object-cover" onerror="this.src='https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio'"><div class="p-2 text-[11px] text-gray-300 truncate">${prompt}</div>`;
+            card.innerHTML = `<img src="${url}" alt="${prompt}" class="w-full h-40 object-cover" onerror="this.src='[https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio](https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio)'"><div class="p-2 text-[11px] text-gray-300 truncate">${prompt}</div>`;
             grid.prepend(card);
         });
 
