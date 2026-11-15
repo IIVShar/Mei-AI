@@ -93,16 +93,12 @@
                 <i class="fa-solid fa-house text-blue-400"></i> Home
             </button>
             
-            <a href="./explore.html" id="exploreAppsBtn" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium no-underline">
-                <i class="fa-solid fa-compass text-purple-400"></i> Explore
-            </a>
-
             <button id="openImageStudioNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
                 <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> AI Image Studio
             </button>
 
             <button id="openSettingsNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
-                <i class="fa-solid fa-gear text-amber-400"></i> Settings & Models
+                <i class="fa-solid fa-gear text-amber-400"></i> Settings & Vision APIs
             </button>
         </div>
 
@@ -132,7 +128,7 @@
 
                     <!-- Header Model Quick Selector -->
                     <div class="relative ml-1">
-                        <select id="modelDropdownSelect" class="bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 rounded-lg px-2.5 py-1 text-xs font-medium outline-none cursor-pointer hover:border-purple-400 transition max-w-[220px] truncate">
+                        <select id="modelDropdownSelect" class="bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 rounded-lg px-2.5 py-1 text-xs font-medium outline-none cursor-pointer hover:border-purple-400 transition max-w-[240px] truncate">
                             <!-- Populated dynamically -->
                         </select>
                     </div>
@@ -143,7 +139,7 @@
                         <i class="fa-solid fa-code text-purple-500"></i> Mei Canvas
                     </button>
 
-                    <button id="headerSettingsBtn" type="button" class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer" title="Settings & Models">
+                    <button id="headerSettingsBtn" type="button" class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer" title="Settings">
                         <i class="fa-solid fa-gear text-sm"></i>
                     </button>
 
@@ -158,15 +154,15 @@
                 <!-- Landing State Banner -->
                 <div id="emptyState" class="m-auto flex flex-col items-center justify-center text-center max-w-2xl w-full">
                     <div class="w-5 h-12 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_20px_rgba(168,85,247,0.8)] mb-3"></div>
-                    <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Mei v1 Family Models, Multi-Provider API support, AI Image Studio, and Canvas App Builder.</p>
+                    <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Mei AI v3.5 Family Workspace</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Expanded family models with live 3.5 vision understanding, real open-source URL endpoints, and Mei Canvas.</p>
 
                     <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-                            <span>✨ Canvas App Builder & Vision Support Active! 🚀</span>
+                            <span>👁️ Live 3.5 Vision & Multimodal Core Active</span>
                         </div>
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Upload or drag-and-drop images to let Mei "see" and analyze them, or generate interactive web apps in Mei Canvas.
+                            Upload or drag-and-drop screenshots, photos, or diagrams into the prompt bar to analyze them with advanced multimodal models like <b>Mei v3.5 Vision</b> or <b>Llama 3.3 70B Vision</b>.
                         </p>
                     </div>
 
@@ -198,7 +194,7 @@
                     <div class="flex items-end">
                         <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json,.js,.py,.html,.css">
                         
-                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition cursor-pointer" title="Attach File or Image">
+                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition cursor-pointer" title="Attach Image or File">
                             <i class="fa-solid fa-plus"></i>
                         </button>
 
@@ -304,12 +300,12 @@
         </div>
     </div>
 
-    <!-- Settings & Models Modal -->
+    <!-- Settings & Vision API Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
                 <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <i class="fa-solid fa-gear text-purple-400"></i> Settings & Model Selection
+                    <i class="fa-solid fa-gear text-purple-400"></i> Settings & Vision APIs
                 </h3>
                 <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -327,47 +323,34 @@
                     </div>
                 </div>
 
-                <!-- Family Model Selection -->
-                <div class="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60 space-y-2">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-sm">Active Mei Model</label>
-                    <p class="text-[11px] text-gray-500">Select your preferred Mei model variant (Mei v1 default).</p>
-                    <select id="settingsModelSelect" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
-                        <!-- Populated dynamically -->
-                    </select>
-                </div>
-
-                <!-- Provider Preset Selection -->
+                <!-- API Provider Preset -->
                 <div class="space-y-1.5">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">AI Provider Preset</label>
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Provider Preset</label>
                     <select id="providerPresetSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
+                        <option value="groq">Groq (Ultra-Fast Llama 3.3 / Vision)</option>
                         <option value="openrouter">OpenRouter (Multi-Model Gateway)</option>
-                        <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
-                        <option value="anthropic">Anthropic (Claude 3.5 Sonnet)</option>
-                        <option value="groq">Groq (Ultra-Fast Llama)</option>
-                        <option value="gemini">Google Gemini (Gemini 2.5 Flash)</option>
-                        <option value="together">Together AI (Llama 3.1 70B)</option>
-                        <option value="mistral">Mistral AI (Mistral Small)</option>
-                        <option value="ollama">Ollama (Local Server)</option>
-                        <option value="custom">Custom Endpoint & Model</option>
+                        <option value="ollama">Ollama (Local Open Source Server)</option>
+                        <option value="pollinations">Pollinations.ai (Free Open Endpoint)</option>
+                        <option value="custom">Custom Endpoint URL</option>
                     </select>
                 </div>
 
                 <!-- Custom Model ID Input -->
                 <div class="space-y-1.5">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">Custom Model ID</label>
-                    <input type="text" id="customModelInput" placeholder="e.g. gpt-4o-mini, claude-3-5-sonnet-latest, gemini-2.5-flash" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
+                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">Model ID / Name</label>
+                    <input type="text" id="customModelInput" placeholder="e.g. llama-3.3-70b-versatile, meta-llama/llama-3.2-11b-vision-instruct" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
                 </div>
 
                 <!-- API Base URL Input -->
                 <div class="space-y-1.5">
                     <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Base URL</label>
-                    <input type="text" id="apiBaseUrlInput" placeholder="https://openrouter.ai/api/v1" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
+                    <input type="text" id="apiBaseUrlInput" placeholder="https://api.groq.com/openai/v1" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
                 </div>
 
                 <!-- API Key Input -->
                 <div class="space-y-1.5">
                     <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Key</label>
-                    <input type="password" id="apiKeyInput" placeholder="sk-or-v1-... / sk-..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
+                    <input type="password" id="apiKeyInput" placeholder="gsk_... / sk-or-v1-..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
                 </div>
             </div>
 
@@ -392,39 +375,30 @@
         }
         initTheme();
 
-        // Mei Family Models Registry (Mei v1 Default)
+        // Expanded Mei Family Models Registry (Featuring v3.5 Vision & Code Variants)
         const MEI_FAMILY_MODELS = [
-            { id: "mei-v1-ultra", name: "✨ Mei v1 Ultra (Flagship)" },
-            { id: "mei-v1-pro", name: "⚡ Mei v1 Pro (Balanced)" },
-            { id: "mei-v1-flash", name: "🚀 Mei v1 Flash (Lightning Fast)" },
-            { id: "mei-v1-code", name: "💻 Mei v1 Code Canvas Max" },
-            { id: "mei-v2-ultra", name: "💠 Mei v2 Ultra" },
-            { id: "mei-v2-5-pro", name: "🔹 Mei v2.5 Pro" },
+            { id: "mei-v3-5-vision", name: "👁️ Mei v3.5 Vision (Flagship Multimodal)" },
+            { id: "mei-v3-5-code", name: "💻 Mei v3.5 Code Canvas Max" },
             { id: "mei-v3-ultra", name: "🌟 Mei v3 Ultra" },
-            { id: "mei-v3-pro", name: "⚡ Mei v3 Pro" },
-            { id: "mei-v3-flash", name: "🚀 Mei v3 Flash" },
-            { id: "mei-v3-code", name: "💻 Mei v3 Code Canvas Max" }
+            { id: "mei-v3-flash", name: "🚀 Mei v3 Flash (Lightning Fast)" },
+            { id: "llama-3.3-70b-versatile", name: "🔥 Llama 3.3 70B (Groq Open Source)" },
+            { id: "meta-llama/llama-3.2-11b-vision-instruct", name: "👁️ Llama 3.2 11B Vision Instruct" },
+            { id: "nvidia/nemotron-3.5-super-vl:free", name: "🛡️ Nemotron 3.5 Super VL (Vision)" },
+            { id: "deepseek/deepseek-v4.1-flash", name: "⚡ DeepSeek V4.1 Flash (Native Vision)" }
         ];
 
-        const PROVIDER_PRESETS = {
-            openrouter: { url: "[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)", model: "openai/gpt-4o-mini" },
-            openai: { url: "[https://api.openai.com/v1](https://api.openai.com/v1)", model: "gpt-4o-mini" },
-            anthropic: { url: "[https://api.anthropic.com/v1](https://api.anthropic.com/v1)", model: "claude-3-5-sonnet-latest" },
+        const API_PRESETS = {
             groq: { url: "[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)", model: "llama-3.3-70b-versatile" },
-            gemini: { url: "[https://generativelanguage.googleapis.com/v1beta/openai](https://generativelanguage.googleapis.com/v1beta/openai)", model: "gemini-2.5-flash" },
-            together: { url: "[https://api.together.xyz/v1](https://api.together.xyz/v1)", model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" },
-            mistral: { url: "[https://api.mistral.ai/v1](https://api.mistral.ai/v1)", model: "mistral-small-latest" },
+            openrouter: { url: "[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)", model: "meta-llama/llama-3.3-70b-instruct" },
             ollama: { url: "http://localhost:11434/v1", model: "llama3.2" },
+            pollinations: { url: "[https://text.pollinations.ai/](https://text.pollinations.ai/)", model: "openai" },
             custom: { url: "", model: "" }
         };
 
         const modelDropdownSelect = document.getElementById('modelDropdownSelect');
-        const settingsModelSelect = document.getElementById('settingsModelSelect');
-
         function populateModelDropdowns() {
             const optionsHtml = MEI_FAMILY_MODELS.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
             if (modelDropdownSelect) modelDropdownSelect.innerHTML = optionsHtml;
-            if (settingsModelSelect) settingsModelSelect.innerHTML = optionsHtml;
         }
         populateModelDropdowns();
 
@@ -432,7 +406,6 @@
         let savedSessions = [];
         let activeSessionId = null;
         let activeAttachments = [];
-        let galleryImages = [];
         let currentCanvasCode = "";
         let isCanvasFullscreen = false;
         let isGenerating = false;
@@ -465,15 +438,13 @@
         }
 
         function syncSettingsToUI() {
-            const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v1-ultra';
-            const savedProvider = localStorage.getItem('mei_provider_preset') || 'openrouter';
-            const savedCustomModel = localStorage.getItem('mei_custom_model_id') || PROVIDER_PRESETS[savedProvider]?.model || '';
-            const savedBaseUrl = localStorage.getItem('mei_api_base_url') || PROVIDER_PRESETS[savedProvider]?.url || '[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)';
+            const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v3-5-vision';
+            const savedProvider = localStorage.getItem('mei_provider_preset') || 'groq';
+            const savedCustomModel = localStorage.getItem('mei_custom_model_id') || API_PRESETS[savedProvider]?.model || 'llama-3.3-70b-versatile';
+            const savedBaseUrl = localStorage.getItem('mei_api_base_url') || API_PRESETS[savedProvider]?.url || '[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)';
             const savedApiKey = localStorage.getItem('mei_api_key') || '';
 
             if (modelDropdownSelect) modelDropdownSelect.value = savedModel;
-            if (settingsModelSelect) settingsModelSelect.value = savedModel;
-
             const providerEl = document.getElementById('providerPresetSelect');
             const customModelEl = document.getElementById('customModelInput');
             const baseUrlEl = document.getElementById('apiBaseUrlInput');
@@ -716,7 +687,7 @@
                 contentBox.className = 'flex-1 min-w-0 text-sm text-gray-800 dark:text-gray-200 leading-relaxed prose dark:prose-invert max-w-none overflow-x-auto';
 
                 if (isThinking) {
-                    contentBox.innerHTML = '<span class="text-xs text-gray-400 italic">Mei is thinking...</span>';
+                    contentBox.innerHTML = '<span class="text-xs text-gray-400 italic">Mei is analyzing & thinking...</span>';
                 } else {
                     contentBox.innerHTML = renderMarkdownSafe(content);
                     enhanceCodeBlocks(contentBox);
@@ -787,8 +758,8 @@
             });
         }
 
-        // Network & Multi-Provider API Engine (with Vision support)
-        async function fetchWithTimeout(url, options = {}, timeoutMs = 25000) {
+        // Network API Engine with Multimodal Vision Payload Formatting
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 35000) {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeoutMs);
             try {
@@ -798,19 +769,18 @@
             }
         }
 
-        async function queryCustomProvider(messages) {
+        async function queryVisionAPI(messages) {
             const apiKey = (localStorage.getItem('mei_api_key') || '').trim();
-            const provider = localStorage.getItem('mei_provider_preset') || 'openrouter';
-            if (!apiKey && provider !== 'ollama') return null;
+            const provider = localStorage.getItem('mei_provider_preset') || 'groq';
+            const baseUrl = (localStorage.getItem('mei_api_base_url'] || API_PRESETS[provider]?.url || '').replace(/\/+$/, '');
+            const modelId = (localStorage.getItem('mei_custom_model_id') || modelDropdownSelect.value || 'llama-3.3-70b-versatile').trim();
 
-            const baseUrl = (localStorage.getItem('mei_api_base_url') || PROVIDER_PRESETS[provider]?.url || '').replace(/\/+$/, '');
-            const modelId = (localStorage.getItem('mei_custom_model_id') || PROVIDER_PRESETS[provider]?.model || 'gpt-4o-mini').trim();
-            if (!baseUrl) return null;
+            if (!baseUrl) throw new Error("API Base URL is not configured.");
 
-            // Build multi-modal formatted history
-            const formattedMessages = messages.slice(-8).map((m, idx, arr) => {
+            // Format multi-modal payload (OpenAI / Groq Vision compliant schema)
+            const formattedMessages = messages.slice(-10).map((m, idx, arr) => {
                 if (m.images && m.images.length > 0 && idx === arr.length - 1) {
-                    const contentParts = [{ type: "text", text: m.content || "Please analyze these images." }];
+                    const contentParts = [{ type: "text", text: m.content || "Please analyze these attached images." }];
                     m.images.forEach(img => {
                         if (img.dataUrl) {
                             contentParts.push({
@@ -821,19 +791,12 @@
                     });
                     return { role: m.role, content: contentParts };
                 }
-                return {
-                    role: m.role === 'assistant' ? 'assistant' : 'user',
-                    content: m.content
-                };
+                return { role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content };
             });
 
             const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
             const headers = { 'Content-Type': 'application/json' };
             if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
-            if (provider === 'openrouter') {
-                headers['HTTP-Referer'] = window.location.origin;
-                headers['X-Title'] = 'Mei AI Workspace';
-            }
 
             const res = await fetchWithTimeout(endpoint, {
                 method: 'POST',
@@ -843,65 +806,15 @@
                     messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...formattedMessages],
                     temperature: 0.7
                 })
-            }, 30000);
+            }, 40000);
 
             if (!res.ok) {
-                const errBody = await res.text();
-                throw new Error(`Provider API error (${res.status}): ${errBody.slice(0, 100)}`);
+                const errText = await res.text();
+                throw new Error(`API Error (${res.status}): ${errText.slice(0, 140)}`);
             }
+
             const data = await res.json();
-            return data?.choices?.[0]?.message?.content || null;
-        }
-
-        async function queryFreeEngine(messages) {
-            const cleanHistory = messages.slice(-6).map(m => ({
-                role: m.role === 'assistant' ? 'assistant' : 'user',
-                content: String(m.content || '').slice(0, 2000)
-            }));
-            const res = await fetchWithTimeout('[https://text.pollinations.ai/](https://text.pollinations.ai/)', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...cleanHistory],
-                    model: 'openai',
-                    seed: Math.floor(Math.random() * 99999)
-                })
-            }, 12000);
-            if (!res.ok) return null;
-            const txt = await res.text();
-            if (!txt || (txt.trim().startsWith('{') && txt.includes('"error"'))) return null;
-            return txt.trim();
-        }
-
-        // Natural Fallback Reply Engine
-        function generateLocalMeiReply(prompt) {
-            const q = String(prompt || '').trim();
-            const lower = q.toLowerCase();
-
-            if (/(who are you|what is your name|what's your name|whats your name|your name|identify yourself)/i.test(lower)) {
-                return `I'm **Mei**, your AI assistant in the Mei AI Workspace! I can analyze uploaded images, write code, build interactive apps and slide decks in **Mei Canvas**, or generate artwork in **AI Image Studio**.`;
-            }
-
-            if (/^(hi|hello|hey|yo|sup)\b/i.test(lower)) {
-                return `Hello! 👋 I'm **Mei**. You can upload images for me to analyze or ask me to build something in Mei Canvas.`;
-            }
-
-            if (lower.includes('slide') || lower.includes('presentation') || lower.includes('space exploration')) {
-                const slidesHtml = [
-                    '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Space Exploration Deck</title>',
-                    '<script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></' + 'script></head>',
-                    '<body class="bg-slate-950 text-white h-screen flex flex-col items-center justify-center p-6 select-none">',
-                    '<div id="slide" class="max-w-3xl w-full aspect-video bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 rounded-3xl p-10 flex flex-col justify-between border border-purple-500/30 shadow-2xl">',
-                    '<div class="text-xs uppercase tracking-widest text-purple-300" id="tag">Slide 1 / 4</div>',
-                    '<div><h1 id="title" class="text-4xl font-bold mb-3">Space Exploration</h1><p id="desc" class="text-slate-200 text-lg">Humanity\'s journey beyond Earth into the cosmos.</p></div>',
-                    '<div class="flex justify-between items-center"><button onclick="nav(-1)" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm">← Prev</button><button onclick="nav(1)" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-sm font-semibold">Next →</button></div>',
-                    '</div>',
-                    '<script>const slides=[{t:"Space Exploration",d:"Humanity\'s journey beyond Earth into the cosmos."},{t:"Artemis & Lunar Bases",d:"Establishing sustainable habitats on the Moon."},{t:"Mission to Mars",d:"Interplanetary propulsion and robotic pathfinders."},{t:"Deep Space Telescopes",d:"Imaging exoplanets and the earliest galaxies."}];let i=0;function nav(s){i=(i+s+slides.length)%slides.length;document.getElementById("tag").textContent=`Slide ${i+1} / ${slides.length}`;document.getElementById("title").textContent=slides[i].t;document.getElementById("desc").textContent=slides[i].d}</' + 'script></body></html>'
-                ].join('\n');
-                return `Here is your 4-slide **Space Exploration** presentation deck in **Mei Canvas**:\n\n\`\`\`html\n${slidesHtml}\n\`\`\``;
-            }
-
-            return `I'm **Mei**! You can attach images for me to inspect, ask me to code apps in **Mei Canvas**, or configure your API key in **Settings & Models** for full multi-modal vision capabilities.`;
+            return data?.choices?.[0]?.message?.content || data?.response || null;
         }
 
         // Send Message Handler
@@ -923,16 +836,11 @@
             renderAttachmentChips();
 
             let displayPrompt = text;
-            if (currentAttachments.length > 0) {
-                const names = currentAttachments.map(a => a.name).join(', ');
-                if (!displayPrompt) displayPrompt = `[Attached images: ${names}]`;
+            if (currentAttachments.length > 0 && !displayPrompt) {
+                displayPrompt = `[Attached images: ${currentAttachments.map(a => a.name).join(', ')}]`;
             }
 
-            chatHistory.push({ 
-                role: 'user', 
-                content: displayPrompt, 
-                images: currentAttachments 
-            });
+            chatHistory.push({ role: 'user', content: displayPrompt, images: currentAttachments });
             appendMessageBubble('user', displayPrompt, currentAttachments, false);
             saveCurrentSession();
 
@@ -941,15 +849,10 @@
 
             let reply = null;
             try {
-                reply = await queryCustomProvider(chatHistory);
-                if (!reply && currentAttachments.length === 0 && !/slide|presentation/i.test(text)) {
-                    reply = await queryFreeEngine(chatHistory);
-                }
+                reply = await queryVisionAPI(chatHistory);
             } catch (err) {
-                reply = `⚠️ **Provider Notice**: ${err.message}\n\n` + generateLocalMeiReply(text);
+                reply = `⚠️ **Vision API Notice**: ${err.message}\n\nPlease verify your API Base URL, Model ID, and API Key in **Settings & Vision APIs**, or select an active open endpoint.`;
             }
-
-            if (!reply) reply = generateLocalMeiReply(text);
 
             chatHistory.push({ role: 'assistant', content: reply });
             saveCurrentSession();
@@ -1104,11 +1007,11 @@
 
         modelDropdownSelect.addEventListener('change', () => {
             localStorage.setItem('mei_active_family_model', modelDropdownSelect.value);
-            if (settingsModelSelect) settingsModelSelect.value = modelDropdownSelect.value;
+            document.getElementById('customModelInput').value = modelDropdownSelect.value;
         });
 
         document.getElementById('providerPresetSelect').addEventListener('change', (e) => {
-            const preset = PROVIDER_PRESETS[e.target.value];
+            const preset = API_PRESETS[e.target.value];
             if (preset) {
                 document.getElementById('apiBaseUrlInput').value = preset.url;
                 document.getElementById('customModelInput').value = preset.model;
@@ -1116,7 +1019,7 @@
         });
 
         document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-            localStorage.setItem('mei_active_family_model', settingsModelSelect.value || 'mei-v1-ultra');
+            localStorage.setItem('mei_active_family_model', modelDropdownSelect.value);
             localStorage.setItem('mei_provider_preset', document.getElementById('providerPresetSelect').value);
             localStorage.setItem('mei_custom_model_id', document.getElementById('customModelInput').value.trim());
             localStorage.setItem('mei_api_base_url', document.getElementById('apiBaseUrlInput').value.trim());
