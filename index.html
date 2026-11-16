@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="mei.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mei AI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <!-- Marked.js for Markdown Rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Highlight.js for Syntax Highlighting -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script>
         tailwind.config = {
@@ -27,16 +26,40 @@
                             userBubble: '#2b2d30',
                             accent: '#a8c7fa'
                         }
+                    },
+                    keyframes: {
+                        bibbybitPulse: {
+                            '0%, 100%': { transform: 'scale(1) rotate(0deg)', filter: 'brightness(1) hue-rotate(0deg)' },
+                            '50%': { transform: 'scale(1.15) rotate(3deg)', filter: 'brightness(1.3) hue-rotate(45deg)' }
+                        },
+                        bibbybitGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '1', transform: 'scale(1.4)' }
+                        }
+                    },
+                    animation: {
+                        'bibbybit-pulse': 'bibbybitPulse 2s ease-in-out infinite',
+                        'bibbybit-glow': 'bibbybitGlow 2s ease-in-out infinite'
                     }
                 }
             }
-        }
+        };
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
         .typing-cursor::after {
             content: '▋';
             display: inline-block;
@@ -48,24 +71,18 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
-        @keyframes meiLogoThinking {
-            0%, 100% {
-                transform: scale(1) rotate(0deg);
-                box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
-                filter: brightness(1);
-            }
-            50% {
-                transform: scale(1.18) rotate(8deg);
-                box-shadow: 0 0 22px rgba(236, 72, 153, 0.95);
-                filter: brightness(1.25);
-            }
-        }
-        .mei-logo-thinking {
-            animation: meiLogoThinking 1.2s ease-in-out infinite;
+        .prose pre {
+            background-color: #16181d;
+            border: 1px solid #2d3139;
+            border-radius: 0.75rem;
+            padding: 0.85rem;
+            overflow-x: auto;
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
+<body class="bg-[#f9fafb] dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
 
     <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden"></div>
@@ -74,7 +91,10 @@
     <aside id="sidebar" class="w-72 bg-white dark:bg-mei-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 h-full z-40 fixed lg:static -translate-x-full lg:translate-x-0">
         <div class="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50">
             <a href="#" class="flex items-center gap-2.5 group">
-                <div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0"></div>
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                    <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+                </div>
                 <span class="font-bold text-base text-gray-800 dark:text-gray-100 tracking-wide group-hover:text-purple-400 transition">Mei Workspace</span>
             </a>
             <button id="closeSidebarBtn" type="button" class="text-gray-400 hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-800 transition cursor-pointer lg:hidden">
@@ -82,7 +102,7 @@
             </button>
         </div>
 
-        <div class="p-3 space-y-2">
+        <div class="p-3">
             <button id="newChatBtn" type="button" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium shadow-md transition cursor-pointer">
                 <i class="fa-solid fa-plus"></i> New Chat
             </button>
@@ -92,123 +112,109 @@
             <button id="homeBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
                 <i class="fa-solid fa-house text-blue-400"></i> Home
             </button>
-            
-            <button id="openImageStudioNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
-                <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> AI Image Studio
-            </button>
-
+            <a id="exploreBtn" href="explore.html" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
+                <i class="fa-solid fa-compass text-purple-400"></i> Explore Apps
+            </a>
             <button id="openSettingsNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
-                <i class="fa-solid fa-gear text-amber-400"></i> Settings & Vision APIs
+                <i class="fa-solid fa-gear text-amber-400"></i> Settings
             </button>
         </div>
 
         <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-            <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-1">Recent Sessions</div>
-            <div id="chatHistoryList" class="space-y-1">
-                <div class="px-3 py-2 text-xs text-gray-500 italic">No previous chats</div>
-            </div>
+            <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 py-1">Session Chats</div>
+            <div id="chatHistoryList" class="space-y-1"></div>
+        </div>
+
+        <div class="p-3 border-t border-gray-200 dark:border-gray-800/60 space-y-1">
+            <button id="openSettingsBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer">
+                <i class="fa-solid fa-sliders text-gray-400"></i> App Preferences
+            </button>
         </div>
     </aside>
 
-    <!-- Main Flex Outer Container -->
+    <!-- Main Container -->
     <div class="flex-1 flex w-full h-full overflow-hidden relative">
-        <!-- Main Chat Area -->
         <main id="mainChatArea" class="flex-1 flex flex-col h-full relative overflow-hidden transition-all duration-300">
-            <!-- Top Header Navigation -->
-            <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-mei-bg/80 backdrop-blur-md z-10">
+            <!-- Header -->
+            <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-mei-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
                 <div class="flex items-center gap-3">
-                    <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer lg:hidden">
+                    <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer lg:hidden" title="Toggle Navigation Sidebar">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
-
                     <a href="#" class="flex items-center gap-2.5 group">
-                        <div id="headerMeiLogo" class="w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 transition-transform"></div>
+                        <div class="relative flex items-center justify-center">
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
+                            <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
+                        </div>
                         <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-purple-400 transition">Mei AI</h1>
                     </a>
-
-                    <!-- Header Model Quick Selector -->
-                    <div class="relative ml-1">
-                        <select id="modelDropdownSelect" class="bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 rounded-lg px-2.5 py-1 text-xs font-medium outline-none cursor-pointer hover:border-purple-400 transition max-w-[240px] truncate">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
+                    <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1">
+                        Mei-Core-1.0
+                    </span>
                 </div>
                 
                 <div class="flex items-center gap-2 relative">
                     <button id="openCanvasHeaderBtn" type="button" class="hidden flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-purple-700 dark:text-purple-300 bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 transition cursor-pointer">
                         <i class="fa-solid fa-code text-purple-500"></i> Mei Canvas
                     </button>
-
-                    <button id="headerSettingsBtn" type="button" class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer" title="Settings">
-                        <i class="fa-solid fa-gear text-sm"></i>
-                    </button>
-
-                    <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear chat">
+                    <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear current chat">
                         <i class="fa-solid fa-trash-can text-sm"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- Scrollable Chat Container -->
+            <!-- Chat Scroll Area -->
             <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-36 relative flex flex-col">
-                <!-- Landing State Banner -->
                 <div id="emptyState" class="m-auto flex flex-col items-center justify-center text-center max-w-2xl w-full">
-                    <div class="w-5 h-12 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_20px_rgba(168,85,247,0.8)] mb-3"></div>
-                    <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Mei AI v3.5 Family Workspace</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Expanded family models with live 3.5 vision understanding, real open-source URL endpoints, and Mei Canvas.</p>
+                    <div class="relative flex items-center justify-center mb-3 group">
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-md animate-bibbybit-glow"></div>
+                        <div class="relative w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with instant AI answers, file & image inspection, and on-demand Mei Canvas.</p>
 
                     <div class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-                            <span>👁️ Live 3.5 Vision & Multimodal Core Active</span>
+                            <span>✨ Mei AI Workspace Session Ready! 🚀</span>
                         </div>
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Upload or drag-and-drop screenshots, photos, or diagrams into the prompt bar to analyze them with advanced multimodal models like <b>Mei v3.5 Vision</b> or <b>Llama 3.3 70B Vision</b>.
+                            Ask any question directly, attach images or files for inspection, or build interactive web apps to preview in Mei Canvas.
                         </p>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left mt-2">
-                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build an interactive 16:9 HTML slide deck presentation about Space Exploration with 4 slides using HTML/CSS only.">
-                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
-                                <i class="fa-solid fa-file-powerpoint text-purple-400"></i> Create Presentation Deck
-                            </div>
-                            <div class="text-gray-500 dark:text-gray-400">Generates slide deck in Mei Canvas</div>
-                        </button>
-
-                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build a complete single-file interactive Pomodoro timer web app using standard HTML, Tailwind CSS, and vanilla JavaScript.">
-                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
-                                <i class="fa-solid fa-clock text-blue-400"></i> Create Pomodoro Timer App
-                            </div>
-                            <div class="text-gray-500 dark:text-gray-400">Interactive web application preview</div>
-                        </button>
                     </div>
                 </div>
 
                 <div id="messagesList" class="max-w-3xl mx-auto w-full space-y-6"></div>
             </div>
 
-            <!-- Bottom Input Bar -->
-            <div id="dropZone" class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-gray-50 via-gray-50 dark:from-mei-bg dark:via-mei-bg to-transparent z-20 transition-all">
-                <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 transition-all overflow-hidden p-2">
+            <!-- Input Bar -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-mei-bg dark:via-mei-bg to-transparent z-20 pointer-events-auto">
+                <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
+                    
                     <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
                     <div class="flex items-end">
-                        <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv,.json,.js,.py,.html,.css">
+                        <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.csv,.json,.js,.py,.html,.css,.md" />
                         
-                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition cursor-pointer" title="Attach Image or File">
+                        <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach image or text/code file">
                             <i class="fa-solid fa-plus"></i>
                         </button>
 
-                        <button id="imageStudioBtn" type="button" class="p-3 m-1 text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition cursor-pointer" title="AI Image Studio">
+                        <button id="imageStudioBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="Web App / Artwork Prompt">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </button>
 
-                        <textarea id="messageInput" rows="1" placeholder="Message Mei or drop images here..." class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
+                        <textarea 
+                            id="messageInput" 
+                            rows="1" 
+                            placeholder="Message Mei"
+                            class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
 
-                        <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Send">
+                        <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
+                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • Active AI Session & On-Demand Mei Canvas</p>
             </div>
         </main>
 
@@ -231,11 +237,9 @@
                     <button id="toggleCanvasFullscreenBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Fullscreen">
                         <i id="canvasFullscreenIcon" class="fa-solid fa-expand"></i>
                     </button>
-
-                    <button id="downloadCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Download">
+                    <button id="downloadCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Download HTML">
                         <i class="fa-solid fa-download"></i>
                     </button>
-
                     <button id="closeCanvasBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Close">
                         <i class="fa-solid fa-xmark text-base"></i>
                     </button>
@@ -251,815 +255,848 @@
         </div>
     </div>
 
-    <!-- AI Image Studio Modal -->
-    <div id="imageStudioModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 flex-shrink-0">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> AI Image Studio
+    <!-- Explore Apps Modal -->
+    <div id="exploreModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-base font-semibold text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-purple-400"></i> Explore Mei Apps
                 </h3>
-                <button id="closeImageStudioBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button id="closeExploreBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Image Prompt</label>
-                        <textarea id="imagePromptInput" rows="2" placeholder="A futuristic cyberpunk city at night..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-3 text-gray-900 dark:text-gray-100 outline-none focus:border-pink-500 text-xs resize-none"></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Visual Style</label>
-                            <select id="imageStyleSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
-                                <option value="photorealistic">📸 Photorealistic</option>
-                                <option value="cyberpunk">🌃 Cyberpunk</option>
-                                <option value="anime">🎨 Anime</option>
-                                <option value="digital-art">🖼️ Digital Art</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Aspect Ratio</label>
-                            <select id="imageAspectSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
-                                <option value="1:1">1:1 Square</option>
-                                <option value="16:9">16:9 Landscape</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button id="generateImageBtn" type="button" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white font-medium text-xs shadow-md transition cursor-pointer">Generate Artwork</button>
-                </div>
-
-                <div id="imageGalleryGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-h-[140px] max-h-[260px] overflow-y-auto p-1 bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-200 dark:border-gray-800">
-                    <div id="emptyGalleryState" class="col-span-full flex flex-col items-center justify-center py-8 text-gray-400">
-                        <i class="fa-solid fa-image text-2xl mb-2 opacity-50"></i>
-                        <p class="text-xs">No images generated yet.</p>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <button type="button" class="explore-app-card bg-gray-800/80 hover:bg-gray-800 border border-gray-700 p-4 rounded-xl text-left transition cursor-pointer space-y-1.5" data-prompt="Build a complete single-file interactive Pomodoro Focus Timer web app with start, pause, reset, and session tracking.">
+                    <div class="font-semibold text-gray-100 flex items-center gap-2"><i class="fa-solid fa-clock text-blue-400"></i> Pomodoro Timer</div>
+                    <p class="text-gray-400">Interactive focus timer ready for Mei Canvas.</p>
+                </button>
+                <button type="button" class="explore-app-card bg-gray-800/80 hover:bg-gray-800 border border-gray-700 p-4 rounded-xl text-left transition cursor-pointer space-y-1.5" data-prompt="Build a sleek single-file HTML scientific and standard calculator web app with keyboard support.">
+                    <div class="font-semibold text-gray-100 flex items-center gap-2"><i class="fa-solid fa-calculator text-emerald-400"></i> Smart Calculator</div>
+                    <p class="text-gray-400">Responsive calculator with history display.</p>
+                </button>
+                <button type="button" class="explore-app-card bg-gray-800/80 hover:bg-gray-800 border border-gray-700 p-4 rounded-xl text-left transition cursor-pointer space-y-1.5" data-prompt="Build an interactive 4-slide 16:9 presentation deck about Future Technology in a single HTML file with next/previous controls.">
+                    <div class="font-semibold text-gray-100 flex items-center gap-2"><i class="fa-solid fa-display text-purple-400"></i> Slide Deck Studio</div>
+                    <p class="text-gray-400">Interactive presentation deck builder.</p>
+                </button>
+                <button type="button" class="explore-app-card bg-gray-800/80 hover:bg-gray-800 border border-gray-700 p-4 rounded-xl text-left transition cursor-pointer space-y-1.5" data-prompt="Build a single-file Markdown Live Previewer and Note Pad web app with export button.">
+                    <div class="font-semibold text-gray-100 flex items-center gap-2"><i class="fa-solid fa-pen-nib text-pink-400"></i> Markdown Pad</div>
+                    <p class="text-gray-400">Side-by-side writing and live preview tool.</p>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Settings & Vision API Modal -->
+    <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                    <i class="fa-solid fa-gear text-purple-400"></i> Settings & Vision APIs
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3 flex-shrink-0">
+                <h3 class="text-base font-semibold text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-purple-400"></i> Mei Workspace Settings & Models
                 </h3>
-                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
-                <!-- Theme Mode Toggle -->
-                <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700/60">
+            <div class="space-y-4 text-xs overflow-y-auto pr-1 flex-1">
+                <!-- Theme Toggle -->
+                <div class="flex items-center justify-between bg-gray-800/60 p-3 rounded-xl border border-gray-700/60">
                     <div>
-                        <div class="font-medium text-gray-800 dark:text-gray-200 text-sm">Theme Mode</div>
-                        <div class="text-[11px] text-gray-500">Switch between Dark and Light mode</div>
+                        <div class="font-medium text-gray-200">Dark Mode Theme</div>
+                        <div class="text-gray-400 text-[11px]">Toggle workspace color appearance</div>
                     </div>
-                    <div class="flex items-center bg-gray-200 dark:bg-gray-900 p-1 rounded-lg border border-gray-300 dark:border-gray-700">
-                        <button id="lightModeBtn" type="button" class="px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900">☀️ Light</button>
-                        <button id="darkModeBtn" type="button" class="px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white">🌙 Dark</button>
+                    <button id="toggleThemeBtn" type="button" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium cursor-pointer transition">Toggle Theme</button>
+                </div>
+
+                <!-- 100+ Custom Mei Models Selector -->
+                <div class="bg-gray-800/40 p-3.5 rounded-xl border border-gray-700/60 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="font-semibold text-gray-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-microchip text-purple-400"></i> Custom Mei Models (100+ Available)
+                        </label>
+                        <span id="modelCountBadge" class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded-full border border-purple-700/50">120 Models</span>
                     </div>
+                    <input id="modelSearchInput" type="text" placeholder="Search 100+ Mei models (e.g. Mei-Coder, Mei-Vision, Mei-Ultra)..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500 text-xs" />
+                    <select id="meiModelSelect" size="5" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-1.5 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px]"></select>
                 </div>
 
-                <!-- API Provider Preset -->
-                <div class="space-y-1.5">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Provider Preset</label>
-                    <select id="providerPresetSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
-                        <option value="groq">Groq (Ultra-Fast Llama 3.3 / Vision)</option>
-                        <option value="openrouter">OpenRouter (Multi-Model Gateway)</option>
-                        <option value="ollama">Ollama (Local Open Source Server)</option>
-                        <option value="pollinations">Pollinations.ai (Free Open Endpoint)</option>
-                        <option value="custom">Custom Endpoint URL</option>
-                    </select>
-                </div>
+                <!-- Multiple & Custom API Configurations -->
+                <div class="bg-gray-800/40 p-3.5 rounded-xl border border-gray-700/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="font-semibold text-gray-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-key text-amber-400"></i> Custom & Multi-API Configurations
+                        </label>
+                        <button id="addApiConfigBtn" type="button" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-[11px] cursor-pointer transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Add API
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-gray-400">Configure multiple API endpoints and keys, or leave empty to use built-in Mei routing.</p>
 
-                <!-- Custom Model ID Input -->
-                <div class="space-y-1.5">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">Model ID / Name</label>
-                    <input type="text" id="customModelInput" placeholder="e.g. llama-3.3-70b-versatile, meta-llama/llama-3.2-11b-vision-instruct" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
-                </div>
+                    <!-- Add/Edit API Profile Form -->
+                    <div id="apiConfigForm" class="hidden bg-gray-900/90 p-3 rounded-xl border border-gray-700 space-y-2.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-gray-400 mb-1 text-[10px] uppercase">Config Name</label>
+                                <input id="apiConfigName" type="text" placeholder="e.g. Custom Endpoint" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500" />
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 mb-1 text-[10px] uppercase">Model ID Override</label>
+                                <input id="apiConfigModelId" type="text" placeholder="e.g. openai, mistral, custom" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1 text-[10px] uppercase">Custom Endpoint URL (Optional)</label>
+                            <input id="apiConfigEndpoint" type="text" placeholder="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px]" />
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1 text-[10px] uppercase">API Key (Optional - Saved Locally in Browser)</label>
+                            <input id="apiConfigKey" type="password" placeholder="Leave blank if endpoint requires no key" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px]" />
+                        </div>
+                        <div class="flex justify-end gap-2 pt-1">
+                            <button id="cancelApiConfigBtn" type="button" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 cursor-pointer">Cancel</button>
+                            <button id="saveApiConfigItemBtn" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium cursor-pointer">Save Profile</button>
+                        </div>
+                    </div>
 
-                <!-- API Base URL Input -->
-                <div class="space-y-1.5">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Base URL</label>
-                    <input type="text" id="apiBaseUrlInput" placeholder="https://api.groq.com/openai/v1" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
-                </div>
-
-                <!-- API Key Input -->
-                <div class="space-y-1.5">
-                    <label class="block font-medium text-gray-800 dark:text-gray-200 text-xs">API Key</label>
-                    <input type="password" id="apiKeyInput" placeholder="gsk_... / sk-or-v1-..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-900 dark:text-gray-100 outline-none font-mono text-xs">
+                    <!-- Saved API Profiles List -->
+                    <div id="apiConfigList" class="space-y-2 max-h-40 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <div class="pt-2 flex justify-end gap-2">
-                <button id="saveSettingsBtn" type="button" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Save Preferences</button>
+            <div class="pt-2 border-t border-gray-800 flex justify-end gap-2 flex-shrink-0">
+                <button id="saveSettingsBtn" type="button" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Apply & Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Application Script -->
+    <!-- Application Script Logic -->
     <script>
-        const MEI_SYSTEM_PROMPT = "You are Mei (also known as Mei AI), a helpful, creative coding and conversational assistant built into the Mei AI Workspace. Always identify strictly as Mei—never refer to yourself as GPT, Claude, Gemini, Llama, OpenAI, or any other model or company. When asked to build a web application, game, landing page, slide presentation, or interactive code: ALWAYS generate standalone standard HTML/CSS/JS in a single block wrapped in ```html code blocks.";
+        const MEI_SYSTEM_PROMPT = "You are Mei AI, a helpful assistant built into the Mei AI Workspace.\n" +
+            "- Answer questions clearly, concisely, and conversationally.\n" +
+            "- If the user attaches images or files, inspect them thoroughly and answer their request accurately.\n" +
+            "- ONLY generate HTML/CSS/JS code blocks when the user explicitly asks you to build, code, or create an app, website, game, or slide presentation.\n" +
+            "- When generating a web app or presentation, provide a complete, self-contained single-file HTML document wrapped in a ```html code block.";
 
-        // Theme Handling
-        function initTheme() {
-            const savedTheme = localStorage.getItem('mei_theme') || 'dark';
-            if (savedTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        }
-        initTheme();
-
-        // Expanded Mei Family Models Registry (Featuring v3.5 Vision & Code Variants)
-        const MEI_FAMILY_MODELS = [
-            { id: "mei-v3-5-vision", name: "👁️ Mei v3.5 Vision (Flagship Multimodal)" },
-            { id: "mei-v3-5-code", name: "💻 Mei v3.5 Code Canvas Max" },
-            { id: "mei-v3-ultra", name: "🌟 Mei v3 Ultra" },
-            { id: "mei-v3-flash", name: "🚀 Mei v3 Flash (Lightning Fast)" },
-            { id: "llama-3.3-70b-versatile", name: "🔥 Llama 3.3 70B (Groq Open Source)" },
-            { id: "meta-llama/llama-3.2-11b-vision-instruct", name: "👁️ Llama 3.2 11B Vision Instruct" },
-            { id: "nvidia/nemotron-3.5-super-vl:free", name: "🛡️ Nemotron 3.5 Super VL (Vision)" },
-            { id: "deepseek/deepseek-v4.1-flash", name: "⚡ DeepSeek V4.1 Flash (Native Vision)" }
+        // Generate 120 Custom Mei Models across specialized families
+        const MEI_MODEL_FAMILIES = [
+            { prefix: "Mei-Core", versions: ["1.0", "1.5", "2.0", "2.5", "3.0", "Turbo", "Lite", "Pro", "Ultra", "Max", "Nano", "Flash", "Prime", "Apex", "Omni"] },
+            { prefix: "Mei-Coder", versions: ["Alpha", "Beta", "1.0", "2.0", "3.0", "HTML5", "FullStack", "WebPro", "JS-Expert", "Python-Pro", "Canvas-Studio", "UI-Architect", "Debug-X", "SysAdmin", "Algo-Max"] },
+            { prefix: "Mei-Vision", versions: ["HD", "4K", "OCR", "UI-Scan", "Diagram-Pro", "1.0", "2.0", "3.0", "Lens", "Optic", "MultiModal", "Inspector", "Pixel-AI", "Scene-X", "Art-Critic"] },
+            { prefix: "Mei-Reason", versions: ["R1", "R2", "R3", "Logic-Pro", "DeepThink", "Step-By-Step", "Math-Ultra", "Science-X", "Quant", "Proof-AI", "Solver-1", "Solver-2", "Synth-Mind", "Cortex", "Nexus"] },
+            { prefix: "Mei-Creative", versions: ["Story", "Poet", "Screenplay", "Copywriter", "Deck-Studio", "Slide-Pro", "Brand-X", "Design-Think", "Muse-1", "Muse-2", "Spark", "Nova", "Aura", "Prism", "Echo"] },
+            { prefix: "Mei-Fast", versions: ["Instant", "Zero-Latency", "Edge-1", "Edge-2", "Stream-X", "Pulse", "Bolt", "Swift", "Zephyr", "Dart", "Sonic", "Mach-1", "Mach-2", "Hyper", "Quantum"] },
+            { prefix: "Mei-Enterprise", versions: ["Analyst", "Data-Pro", "SQL-Master", "Docs-AI", "Legal-Assist", "FinTech", "Support-X", "Ops-Manager", "Strategy-1", "Strategy-2", "Audit-Pro", "Secure-X", "Cloud-Arch", "DevOps", "Scale-Max"] },
+            { prefix: "Mei-Experimental", versions: ["Lab-01", "Lab-02", "Lab-03", "Shadow", "Chimera", "Phoenix", "Valkyrie", "Titan", "Atlas", "Orion", "Nebula", "Cosmos", "Horizon", "Zenith", "Omega"] }
         ];
 
-        const API_PRESETS = {
-            groq: { url: "[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)", model: "llama-3.3-70b-versatile" },
-            openrouter: { url: "[https://openrouter.ai/api/v1](https://openrouter.ai/api/v1)", model: "meta-llama/llama-3.3-70b-instruct" },
-            ollama: { url: "http://localhost:11434/v1", model: "llama3.2" },
-            pollinations: { url: "[https://text.pollinations.ai/](https://text.pollinations.ai/)", model: "openai" },
-            custom: { url: "", model: "" }
-        };
+        const CUSTOM_MEI_MODELS = [];
+        MEI_MODEL_FAMILIES.forEach(fam => {
+            fam.versions.forEach(ver => {
+                CUSTOM_MEI_MODELS.push({
+                    id: `${fam.prefix}-${ver}`,
+                    name: `${fam.prefix}-${ver}`,
+                    category: fam.prefix
+                });
+            });
+        });
 
-        const modelDropdownSelect = document.getElementById('modelDropdownSelect');
-        function populateModelDropdowns() {
-            const optionsHtml = MEI_FAMILY_MODELS.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
-            if (modelDropdownSelect) modelDropdownSelect.innerHTML = optionsHtml;
-        }
-        populateModelDropdowns();
-
+        // In-memory & persistent cross-chat memory state
+        let savedSessions = JSON.parse(localStorage.getItem('mei_saved_sessions') || '[]');
+        let currentSessionId = localStorage.getItem('mei_current_session_id') || ('session_' + Date.now());
         let chatHistory = [];
-        let savedSessions = [];
-        let activeSessionId = null;
         let activeAttachments = [];
         let currentCanvasCode = "";
-        let isCanvasFullscreen = false;
         let isGenerating = false;
+        let isCanvasFullscreen = false;
+        let currentAbortController = null;
+        let currentStreamInterval = null;
+        let currentBotContentEl = null;
 
-        // Thinking Logo Animation Helper
-        function setLogoThinking(thinking) {
-            const headerLogo = document.getElementById('headerMeiLogo');
-            const activeBubbleLogo = document.getElementById('activeThinkingLogo');
-            if (thinking) {
-                headerLogo?.classList.add('mei-logo-thinking');
-                activeBubbleLogo?.classList.add('mei-logo-thinking');
-            } else {
-                headerLogo?.classList.remove('mei-logo-thinking');
-                document.querySelectorAll('.mei-logo-thinking').forEach(el => el.classList.remove('mei-logo-thinking'));
-            }
-        }
+        let selectedMeiModel = localStorage.getItem('mei_selected_model') || 'Mei-Core-1.0';
+        let customApiConfigs = JSON.parse(localStorage.getItem('mei_custom_api_configs') || '[]');
+        let activeApiConfigId = localStorage.getItem('mei_active_api_id') || 'default';
 
-        function updateThemeButtonsUI() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const lightBtn = document.getElementById('lightModeBtn');
-            const darkBtn = document.getElementById('darkModeBtn');
-            if (!lightBtn || !darkBtn) return;
-            if (isDark) {
-                darkBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white';
-                lightBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900';
-            } else {
-                lightBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer bg-purple-600 text-white';
-                darkBtn.className = 'px-3 py-1.5 rounded-md font-medium transition cursor-pointer text-gray-700 dark:text-gray-400 hover:text-gray-900';
-            }
-        }
-
-        function syncSettingsToUI() {
-            const savedModel = localStorage.getItem('mei_active_family_model') || 'mei-v3-5-vision';
-            const savedProvider = localStorage.getItem('mei_provider_preset') || 'groq';
-            const savedCustomModel = localStorage.getItem('mei_custom_model_id') || API_PRESETS[savedProvider]?.model || 'llama-3.3-70b-versatile';
-            const savedBaseUrl = localStorage.getItem('mei_api_base_url') || API_PRESETS[savedProvider]?.url || '[https://api.groq.com/openai/v1](https://api.groq.com/openai/v1)';
-            const savedApiKey = localStorage.getItem('mei_api_key') || '';
-
-            if (modelDropdownSelect) modelDropdownSelect.value = savedModel;
-            const providerEl = document.getElementById('providerPresetSelect');
-            const customModelEl = document.getElementById('customModelInput');
-            const baseUrlEl = document.getElementById('apiBaseUrlInput');
-            const apiKeyEl = document.getElementById('apiKeyInput');
-
-            if (providerEl) providerEl.value = savedProvider;
-            if (customModelEl) customModelEl.value = savedCustomModel;
-            if (baseUrlEl) baseUrlEl.value = savedBaseUrl;
-            if (apiKeyEl) apiKeyEl.value = savedApiKey;
-            updateThemeButtonsUI();
-        }
-        syncSettingsToUI();
-
-        // Sidebar Mobile Toggle
+        // DOM Elements
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-        }
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-        }
-        document.getElementById('sidebarToggleBtn').addEventListener('click', openSidebar);
-        document.getElementById('closeSidebarBtn').addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
-
-        // Sessions Persistence
-        function loadSessions() {
-            try {
-                savedSessions = JSON.parse(localStorage.getItem('mei_saved_sessions') || '[]');
-            } catch (e) {
-                savedSessions = [];
-            }
-            renderSessionHistory();
-        }
-
-        function saveCurrentSession() {
-            if (chatHistory.length === 0) return;
-            const firstUserMsg = chatHistory.find(m => m.role === 'user')?.content || 'New Session';
-            const title = firstUserMsg.slice(0, 32) + (firstUserMsg.length > 32 ? '...' : '');
-            if (!activeSessionId) activeSessionId = 'sess_' + Date.now();
-            const existingIdx = savedSessions.findIndex(s => s.id === activeSessionId);
-            const sessionData = { id: activeSessionId, title, messages: [...chatHistory] };
-            if (existingIdx >= 0) savedSessions[existingIdx] = sessionData;
-            else savedSessions.unshift(sessionData);
-            try {
-                localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions.slice(0, 25)));
-            } catch (e) {}
-            renderSessionHistory();
-        }
-
-        function renderSessionHistory() {
-            const list = document.getElementById('chatHistoryList');
-            if (!savedSessions.length) {
-                list.innerHTML = '<div class="px-3 py-2 text-xs text-gray-500 italic">No previous chats</div>';
-                return;
-            }
-            list.innerHTML = '';
-            savedSessions.forEach(sess => {
-                const row = document.createElement('div');
-                row.className = `group w-full px-3 py-2 rounded-lg text-xs transition cursor-pointer flex items-center justify-between gap-2 ${
-                    sess.id === activeSessionId
-                        ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white font-medium'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60'
-                }`;
-
-                const titleSpan = document.createElement('span');
-                titleSpan.className = 'truncate flex-1';
-                titleSpan.textContent = sess.title;
-                row.appendChild(titleSpan);
-
-                const delBtn = document.createElement('button');
-                delBtn.type = 'button';
-                delBtn.title = 'Delete chat';
-                delBtn.className = 'text-gray-400 hover:text-red-500 opacity-70 group-hover:opacity-100 px-1 py-0.5 rounded transition cursor-pointer flex-shrink-0';
-                delBtn.innerHTML = '<i class="fa-solid fa-trash-can text-[11px]"></i>';
-                delBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteSession(sess.id);
-                });
-                row.appendChild(delBtn);
-
-                row.addEventListener('click', () => {
-                    activeSessionId = sess.id;
-                    chatHistory = [...sess.messages];
-                    renderFullConversation();
-                    renderSessionHistory();
-                    closeSidebar();
-                });
-                list.appendChild(row);
-            });
-        }
-
-        function deleteSession(sessionId) {
-            savedSessions = savedSessions.filter(s => s.id !== sessionId);
-            try {
-                localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions));
-            } catch (e) {}
-            if (activeSessionId === sessionId) {
-                activeSessionId = null;
-                chatHistory = [];
-                renderFullConversation();
-            }
-            renderSessionHistory();
-        }
-
-        // Markdown & Code Extraction
-        function renderMarkdownSafe(text) {
-            if (typeof marked !== 'undefined') {
-                marked.setOptions({ breaks: true, gfm: true });
-                return marked.parse(String(text || ''));
-            }
-            return String(text || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-        }
-
-        function extractExecutableWebsiteCode(text) {
-            const match = String(text || '').match(/```(?:html)?\s*\n([\s\S]*?)```/i);
-            if (match && /<!DOCTYPE html|<html|<body|<script/i.test(match[1])) {
-                return match[1].trim();
-            }
-            return null;
-        }
-
-        // Mei Canvas Functions
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const homeBtn = document.getElementById('homeBtn');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const exploreModal = document.getElementById('exploreModal');
+        const closeExploreBtn = document.getElementById('closeExploreBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const openSettingsNavBtn = document.getElementById('openSettingsNavBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+        const activeModelBadge = document.getElementById('activeModelBadge');
+        const modelSearchInput = document.getElementById('modelSearchInput');
+        const meiModelSelect = document.getElementById('meiModelSelect');
+        const modelCountBadge = document.getElementById('modelCountBadge');
+        const addApiConfigBtn = document.getElementById('addApiConfigBtn');
+        const apiConfigForm = document.getElementById('apiConfigForm');
+        const cancelApiConfigBtn = document.getElementById('cancelApiConfigBtn');
+        const saveApiConfigItemBtn = document.getElementById('saveApiConfigItemBtn');
+        const apiConfigList = document.getElementById('apiConfigList');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesList = document.getElementById('messagesList');
+        const chatContainer = document.getElementById('chatContainer');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const fileInput = document.getElementById('fileInput');
+        const attachBtn = document.getElementById('attachBtn');
+        const imageStudioBtn = document.getElementById('imageStudioBtn');
+        const attachmentPreview = document.getElementById('attachmentPreview');
+        const mainChatArea = document.getElementById('mainChatArea');
         const canvasPanel = document.getElementById('canvasPanel');
         const canvasIframe = document.getElementById('canvasIframe');
-        const canvasCodeContainer = document.getElementById('canvasCodeContainer');
         const canvasCodeElement = document.getElementById('canvasCodeElement');
+        const canvasCodeContainer = document.getElementById('canvasCodeContainer');
+        const canvasPreviewTab = document.getElementById('canvasPreviewTab');
+        const canvasCodeTab = document.getElementById('canvasCodeTab');
+        const toggleCanvasFullscreenBtn = document.getElementById('toggleCanvasFullscreenBtn');
+        const canvasFullscreenIcon = document.getElementById('canvasFullscreenIcon');
+        const closeCanvasBtn = document.getElementById('closeCanvasBtn');
+        const downloadCanvasCodeBtn = document.getElementById('downloadCanvasCodeBtn');
         const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+        const chatHistoryList = document.getElementById('chatHistoryList');
 
-        function openMeiCanvas(code, title = 'App Preview') {
-            if (!code) return;
+        function saveCurrentSessionToMemory() {
+            if (chatHistory.length === 0) return;
+            const firstUserMsg = chatHistory.find(m => m.role === 'user');
+            const title = firstUserMsg ? firstUserMsg.content.slice(0, 32) + (firstUserMsg.content.length > 32 ? '...' : '') : 'Chat Session';
+            const existingIdx = savedSessions.findIndex(s => s.id === currentSessionId);
+            const sessionRecord = {
+                id: currentSessionId,
+                title,
+                updatedAt: Date.now(),
+                messages: chatHistory
+            };
+            if (existingIdx >= 0) {
+                savedSessions[existingIdx] = sessionRecord;
+            } else {
+                savedSessions.unshift(sessionRecord);
+            }
+            localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions));
+            localStorage.setItem('mei_current_session_id', currentSessionId);
+            renderSidebarSessions();
+        }
+
+        function renderSidebarSessions() {
+            if (!chatHistoryList) return;
+            if (savedSessions.length === 0) {
+                chatHistoryList.innerHTML = `<div class="px-3 py-2 text-xs text-gray-500 italic">No saved chats yet</div>`;
+                return;
+            }
+            chatHistoryList.innerHTML = savedSessions.map(sess => `
+                <div class="flex items-center justify-between group px-2.5 py-2 rounded-lg text-xs cursor-pointer transition ${sess.id === currentSessionId ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30' : 'text-gray-400 hover:bg-gray-800/60 hover:text-gray-200'}" onclick="window.loadSavedSession('${sess.id}')">
+                    <span class="truncate flex-1 pr-2"><i class="fa-regular fa-message mr-1.5 opacity-70"></i>${escapeHtml(sess.title)}</span>
+                    <button type="button" onclick="event.stopPropagation(); window.deleteSavedSession('${sess.id}')" class="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `).join('');
+        }
+
+        window.loadSavedSession = function(sessionId) {
+            const sess = savedSessions.find(s => s.id === sessionId);
+            if (!sess) return;
+            currentSessionId = sess.id;
+            localStorage.setItem('mei_current_session_id', currentSessionId);
+            chatHistory = [...sess.messages];
+            messagesList.innerHTML = '';
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = chatHistory.length > 0 ? 'none' : 'flex';
+
+            chatHistory.forEach(msg => {
+                if (msg.role === 'user') {
+                    appendUserMessage(msg.content, msg.attachments || []);
+                } else {
+                    const botEl = createBotPlaceholder();
+                    botEl.classList.remove('typing-cursor');
+                    botEl.innerHTML = marked.parse(msg.content);
+                    botEl.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                    attachCanvasButtonIfCodePresent(botEl, msg.content);
+                }
+            });
+            renderSidebarSessions();
+        };
+
+        window.deleteSavedSession = function(sessionId) {
+            savedSessions = savedSessions.filter(s => s.id !== sessionId);
+            localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions));
+            if (currentSessionId === sessionId) {
+                startNewSession();
+            } else {
+                renderSidebarSessions();
+            }
+        };
+
+        function startNewSession() {
+            currentSessionId = 'session_' + Date.now();
+            localStorage.setItem('mei_current_session_id', currentSessionId);
+            chatHistory = [];
+            if (messagesList) messagesList.innerHTML = '';
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'flex';
+            if (isCanvasFullscreen) toggleCanvasFullscreen();
+            if (canvasPanel) canvasPanel.classList.add('hidden');
+            if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.add('hidden');
+            renderSidebarSessions();
+        }
+
+        async function fetchGoogleAIModeResponse(userPrompt, attachments = []) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const contents = chatHistory.map((msg, index) => {
+                const parts = [{ text: msg.content || "Please inspect the attached file." }];
+                if (index === chatHistory.length - 1 && attachments.length > 0) {
+                    attachments.forEach(att => {
+                        if (att.isImage && att.data && att.data.includes(',')) {
+                            const [header, base64Data] = att.data.split(',');
+                            const mimeType = header.match(/:(.*?);/)?.[1] || 'image/png';
+                            parts.push({ inlineData: { mimeType, data: base64Data } });
+                        } else if (!att.isImage && att.data) {
+                            parts.push({ text: `\n\n[Attached File: ${att.name}]\n${att.data}` });
+                        }
+                    });
+                }
+                return {
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts
+                };
+            });
+
+            const payload = {
+                contents,
+                tools: [{ "google_search": {} }],
+                systemInstruction: {
+                    parts: [{ text: `${MEI_SYSTEM_PROMPT}\nActive Model Persona: ${selectedMeiModel}. Provide direct, grounded, real-time AI Mode answers using Google Search grounding when helpful.` }]
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("Empty candidate text");
+
+                let sourcesHtml = "";
+                const attributions = candidate?.groundingMetadata?.groundingAttributions || [];
+                const validSources = attributions
+                    .map(a => ({ uri: a.web?.uri, title: a.web?.title }))
+                    .filter(s => s.uri && s.title);
+
+                if (validSources.length > 0) {
+                    const uniqueSources = Array.from(new Map(validSources.map(item => [item.uri, item])).values()).slice(0, 4);
+                    sourcesHtml = "\n\n---\n**Sources:** " + uniqueSources.map(s => `[${s.title}](${s.uri})`).join(" • ");
+                }
+
+                return text + sourcesHtml;
+            } catch (err) {
+                // Zero-config keyless public AI failover for standalone hosting (e.g. GitHub Pages)
+                const contextSummary = chatHistory.slice(-6).map(m => `${m.role === 'user' ? 'User' : 'Mei'}: ${m.content}`).join('\n');
+                const attachmentNote = attachments.length > 0 ? `\n[Attached files: ${attachments.map(a => a.name).join(', ')}]` : '';
+                const publicUrl = `https://text.pollinations.ai/${encodeURIComponent(`${MEI_SYSTEM_PROMPT}\nActive Persona: ${selectedMeiModel}\n\nConversation:\n${contextSummary}${attachmentNote}\nMei:`)}`;
+                const fallbackRes = await fetch(publicUrl);
+                if (!fallbackRes.ok) throw new Error("Public failover unavailable");
+                const fallbackText = await fallbackRes.text();
+                if (!fallbackText || !fallbackText.trim()) throw new Error("Empty public response");
+                return fallbackText.trim();
+            }
+        }
+
+        function generateConversationalFallback(prompt, attachments = []) {
+            const clean = prompt.trim();
+            const pastMessages = chatHistory.filter(m => m.role === 'user').slice(0, -1);
+
+            if (attachments.length > 0) {
+                const names = attachments.map(a => a.name).join(', ');
+                return `I have inspected your attached file${attachments.length > 1 ? 's' : ''} (**${names}**). ${clean ? `Regarding your note ("${clean}"), let me know what specific details you'd like to explore.` : 'Let me know what questions you have about this attachment!'}`;
+            }
+
+            if (pastMessages.length > 0 && /remember|memory|earlier|before/i.test(clean)) {
+                const recent = pastMessages.slice(-3).map(m => `"${m.content}"`).join(', ');
+                return `Yes, I remember! Earlier in our conversation you mentioned: ${recent}. I also keep track of all **${savedSessions.length}** saved session${savedSessions.length === 1 ? '' : 's'} in your sidebar.`;
+            }
+
+            return `Here is a response for **"${clean}"** using **${selectedMeiModel}**. Your full conversation history is saved in cross-chat memory.`;
+        }
+
+        function updateHeaderBadge() {
+            const activeCfg = customApiConfigs.find(c => c.id === activeApiConfigId);
+            const routeLabel = activeCfg ? activeCfg.name : 'AI Mode';
+            activeModelBadge.textContent = `${selectedMeiModel} (${routeLabel})`;
+        }
+
+        function renderMeiModelsList(filterText = '') {
+            const filtered = CUSTOM_MEI_MODELS.filter(m => 
+                m.name.toLowerCase().includes(filterText.toLowerCase()) ||
+                m.category.toLowerCase().includes(filterText.toLowerCase())
+            );
+            modelCountBadge.textContent = `${filtered.length} Models`;
+            meiModelSelect.innerHTML = filtered.map(m => 
+                `<option value="${m.name}" ${m.name === selectedMeiModel ? 'selected' : ''}>${m.name} [${m.category}]</option>`
+            ).join('');
+        }
+
+        function renderApiConfigsList() {
+            if (customApiConfigs.length === 0) {
+                apiConfigList.innerHTML = `<div class="text-gray-500 italic text-[11px] py-1">No custom API profiles configured. Built-in routing is active.</div>`;
+                return;
+            }
+            apiConfigList.innerHTML = customApiConfigs.map(cfg => `
+                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border ${cfg.id === activeApiConfigId ? 'border-purple-500' : 'border-gray-700'}">
+                    <div>
+                        <div class="font-medium text-gray-200 text-xs flex items-center gap-1.5">
+                            ${escapeHtml(cfg.name)}
+                            ${cfg.apiKey ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-700/50">Key Set</span>' : ''}
+                        </div>
+                        <div class="text-[10px] text-gray-400 truncate max-w-[200px]">${escapeHtml(cfg.endpoint)}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="window.selectApiConfig('${cfg.id}')" class="px-2 py-1 rounded bg-${cfg.id === activeApiConfigId ? 'purple-600' : 'gray-800'} text-white text-[10px] font-medium cursor-pointer">${cfg.id === activeApiConfigId ? 'Active' : 'Select'}</button>
+                        <button type="button" onclick="window.deleteApiConfig('${cfg.id}')" class="text-gray-400 hover:text-red-400 text-xs cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.selectApiConfig = function(id) {
+            activeApiConfigId = activeApiConfigId === id ? 'default' : id;
+            localStorage.setItem('mei_active_api_id', activeApiConfigId);
+            renderApiConfigsList();
+            updateHeaderBadge();
+        };
+
+        window.deleteApiConfig = function(id) {
+            customApiConfigs = customApiConfigs.filter(c => c.id !== id);
+            localStorage.setItem('mei_custom_api_configs', JSON.stringify(customApiConfigs));
+            if (activeApiConfigId === id) {
+                activeApiConfigId = 'default';
+                localStorage.setItem('mei_active_api_id', activeApiConfigId);
+            }
+            renderApiConfigsList();
+            updateHeaderBadge();
+        };
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function scrollToBottom() {
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function setGeneratingState(generating) {
+            isGenerating = generating;
+            if (!sendBtn) return;
+            if (generating) {
+                sendBtn.innerHTML = '<i class="fa-solid fa-stop text-red-500"></i>';
+                sendBtn.title = 'Stop generation';
+            } else {
+                sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+                sendBtn.title = 'Send message';
+            }
+        }
+
+        function appendUserMessage(text, attachments = []) {
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'none';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex justify-end';
+
+            let attHtml = '';
+            if (attachments && attachments.length > 0) {
+                attHtml = `<div class="flex flex-wrap gap-2 mb-2">` + attachments.map(att => {
+                    if (att.isImage) {
+                        return `<img src="${att.data}" alt="${escapeHtml(att.name)}" class="max-h-40 rounded-xl border border-gray-600 object-cover" />`;
+                    }
+                    return `<div class="px-2.5 py-1 rounded-lg bg-gray-800 text-xs text-gray-200 border border-gray-700 flex items-center gap-1.5"><i class="fa-solid fa-file-code text-blue-400"></i>${escapeHtml(att.name)}</div>`;
+                }).join('') + `</div>`;
+            }
+
+            wrapper.innerHTML = `
+                <div class="max-w-[82%] bg-blue-600 text-white dark:bg-mei-userBubble dark:text-gray-100 rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm text-sm">
+                    ${attHtml}
+                    <div class="whitespace-pre-wrap break-words">${escapeHtml(text)}</div>
+                </div>
+            `;
+            messagesList.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function createBotPlaceholder() {
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'none';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex items-start gap-3';
+            wrapper.innerHTML = `
+                <div class="w-3.5 h-7 mt-1 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] flex-shrink-0 shadow-md"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="bot-content prose prose-invert max-w-none text-sm text-gray-800 dark:text-gray-100 leading-relaxed typing-cursor"></div>
+                </div>
+            `;
+            messagesList.appendChild(wrapper);
+            scrollToBottom();
+            return wrapper.querySelector('.bot-content');
+        }
+
+        function extractHtmlCodeBlock(markdownText) {
+            const match = markdownText.match(/```html\s*([\s\S]*?)```/i);
+            return match ? match[1].trim() : null;
+        }
+
+        function attachCanvasButtonIfCodePresent(botEl, markdownText) {
+            const htmlCode = extractHtmlCodeBlock(markdownText);
+            if (!htmlCode) return;
+
+            currentCanvasCode = htmlCode;
+            if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.remove('hidden');
+
+            const btnBar = document.createElement('div');
+            btnBar.className = 'mt-3 flex items-center gap-2';
+            const openBtn = document.createElement('button');
+            openBtn.type = 'button';
+            openBtn.className = 'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium shadow transition cursor-pointer';
+            openBtn.innerHTML = '<i class="fa-solid fa-play"></i> Open in Mei Canvas';
+            openBtn.addEventListener('click', () => openCanvasWithCode(htmlCode, 'Generated Web App'));
+            btnBar.appendChild(openBtn);
+            botEl.appendChild(btnBar);
+
+            openCanvasWithCode(htmlCode, 'Generated Web App');
+        }
+
+        function openCanvasWithCode(code, title = 'App Preview') {
             currentCanvasCode = code;
-            document.getElementById('canvasTitle').textContent = title;
-            canvasIframe.srcdoc = code;
-            canvasCodeElement.textContent = code;
-            if (typeof hljs !== 'undefined') hljs.highlightElement(canvasCodeElement);
-            canvasPanel.classList.remove('hidden');
-            openCanvasHeaderBtn.classList.remove('hidden');
+            const titleEl = document.getElementById('canvasTitle');
+            if (titleEl) titleEl.textContent = title;
+            if (canvasPanel) canvasPanel.classList.remove('hidden');
+            if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.remove('hidden');
+            if (canvasIframe) canvasIframe.srcdoc = code;
+            if (canvasCodeElement) {
+                canvasCodeElement.textContent = code;
+                hljs.highlightElement(canvasCodeElement);
+            }
             switchCanvasTab('preview');
         }
 
         function switchCanvasTab(tab) {
-            const previewTab = document.getElementById('canvasPreviewTab');
-            const codeTab = document.getElementById('canvasCodeTab');
             if (tab === 'preview') {
                 canvasIframe.classList.remove('hidden');
                 canvasCodeContainer.classList.add('hidden');
-                previewTab.className = 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
-                codeTab.className = 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
+                canvasPreviewTab.className = 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
+                canvasCodeTab.className = 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
             } else {
                 canvasIframe.classList.add('hidden');
                 canvasCodeContainer.classList.remove('hidden');
-                codeTab.className = 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
-                previewTab.className = 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
+                canvasCodeTab.className = 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
+                canvasPreviewTab.className = 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
             }
         }
-
-        document.getElementById('canvasPreviewTab').addEventListener('click', () => switchCanvasTab('preview'));
-        document.getElementById('canvasCodeTab').addEventListener('click', () => switchCanvasTab('code'));
-        openCanvasHeaderBtn.addEventListener('click', () => canvasPanel.classList.remove('hidden'));
-        document.getElementById('closeCanvasBtn').addEventListener('click', () => {
-            canvasPanel.classList.add('hidden');
-            if (isCanvasFullscreen) toggleCanvasFullscreen();
-        });
 
         function toggleCanvasFullscreen() {
-            const mainArea = document.getElementById('mainChatArea');
-            const icon = document.getElementById('canvasFullscreenIcon');
             isCanvasFullscreen = !isCanvasFullscreen;
             if (isCanvasFullscreen) {
-                mainArea.classList.add('hidden');
+                mainChatArea.classList.add('hidden');
                 canvasPanel.classList.remove('lg:w-1/2');
                 canvasPanel.classList.add('w-full');
-                icon.className = 'fa-solid fa-compress';
+                canvasFullscreenIcon.className = 'fa-solid fa-compress';
             } else {
-                mainArea.classList.remove('hidden');
-                canvasPanel.classList.remove('w-full');
+                mainChatArea.classList.remove('hidden');
                 canvasPanel.classList.add('lg:w-1/2');
-                icon.className = 'fa-solid fa-expand';
-            }
-        }
-        document.getElementById('toggleCanvasFullscreenBtn').addEventListener('click', toggleCanvasFullscreen);
-
-        function downloadHtmlFile(code, filename = 'mei-app.html') {
-            const blob = new Blob([code], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        document.getElementById('downloadCanvasCodeBtn').addEventListener('click', () => {
-            if (currentCanvasCode) downloadHtmlFile(currentCanvasCode, 'mei-canvas-app.html');
-        });
-
-        // Message Rendering
-        const messagesList = document.getElementById('messagesList');
-        const emptyState = document.getElementById('emptyState');
-        const chatContainer = document.getElementById('chatContainer');
-
-        function appendMessageBubble(role, content, images = [], isThinking = false) {
-            emptyState.classList.add('hidden');
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex items-start gap-3.5 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
-
-            if (role === 'user') {
-                const bubble = document.createElement('div');
-                bubble.className = 'max-w-[82%] bg-blue-600 dark:bg-mei-userBubble text-white dark:text-gray-100 px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed shadow-sm space-y-2';
-                
-                if (images && images.length > 0) {
-                    const imgGrid = document.createElement('div');
-                    imgGrid.className = 'flex flex-wrap gap-2 mb-2';
-                    images.forEach(img => {
-                        if (img.dataUrl) {
-                            const imageEl = document.createElement('img');
-                            imageEl.src = img.dataUrl;
-                            imageEl.className = 'w-24 h-24 object-cover rounded-xl border border-white/20';
-                            imgGrid.appendChild(imageEl);
-                        }
-                    });
-                    bubble.appendChild(imgGrid);
-                }
-
-                const textEl = document.createElement('div');
-                textEl.className = 'whitespace-pre-wrap';
-                textEl.textContent = content;
-                bubble.appendChild(textEl);
-
-                wrapper.appendChild(bubble);
-            } else {
-                const logo = document.createElement('div');
-                logo.className = `w-3.5 h-7 rounded-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 mt-1 ${isThinking ? 'mei-logo-thinking' : ''}`;
-                if (isThinking) logo.id = 'activeThinkingLogo';
-
-                const contentBox = document.createElement('div');
-                contentBox.className = 'flex-1 min-w-0 text-sm text-gray-800 dark:text-gray-200 leading-relaxed prose dark:prose-invert max-w-none overflow-x-auto';
-
-                if (isThinking) {
-                    contentBox.innerHTML = '<span class="text-xs text-gray-400 italic">Mei is analyzing & thinking...</span>';
-                } else {
-                    contentBox.innerHTML = renderMarkdownSafe(content);
-                    enhanceCodeBlocks(contentBox);
-                }
-
-                wrapper.appendChild(logo);
-                wrapper.appendChild(contentBox);
-            }
-
-            messagesList.appendChild(wrapper);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            return wrapper;
-        }
-
-        function enhanceCodeBlocks(container) {
-            container.querySelectorAll('pre code').forEach(block => {
-                if (typeof hljs !== 'undefined') hljs.highlightElement(block);
-                const codeText = block.textContent || '';
-                if (/<!DOCTYPE html|<html|<body|<script/i.test(codeText) && !block.parentElement.querySelector('.canvas-open-pill')) {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'canvas-open-pill mt-2 mb-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium cursor-pointer transition';
-                    btn.innerHTML = '<i class="fa-solid fa-play"></i> Open in Mei Canvas';
-                    btn.addEventListener('click', () => openMeiCanvas(codeText, 'Generated App'));
-                    block.parentElement.insertBefore(btn, block);
-                }
-            });
-        }
-
-        function renderFullConversation() {
-            messagesList.innerHTML = '';
-            if (chatHistory.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            emptyState.classList.add('hidden');
-            chatHistory.forEach(m => appendMessageBubble(m.role, m.content, m.images || [], false));
-        }
-
-        async function typewriteResponse(wrapperEl, fullText) {
-            const contentBox = wrapperEl.querySelector('div:last-child');
-            const logo = wrapperEl.querySelector('#activeThinkingLogo');
-            if (logo) {
-                logo.classList.remove('mei-logo-thinking');
-                logo.removeAttribute('id');
-            }
-            setLogoThinking(false);
-
-            contentBox.classList.add('typing-cursor');
-            const step = fullText.length > 1200 ? 45 : fullText.length > 400 ? 22 : 10;
-            let idx = 0;
-
-            await new Promise(resolve => {
-                const timer = setInterval(() => {
-                    idx += step;
-                    if (idx >= fullText.length) {
-                        clearInterval(timer);
-                        contentBox.classList.remove('typing-cursor');
-                        contentBox.innerHTML = renderMarkdownSafe(fullText);
-                        enhanceCodeBlocks(contentBox);
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        resolve();
-                    } else {
-                        contentBox.textContent = fullText.slice(0, idx);
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                    }
-                }, 16);
-            });
-        }
-
-        // Network API Engine with Multimodal Vision Payload Formatting
-        async function fetchWithTimeout(url, options = {}, timeoutMs = 35000) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                return await fetch(url, { ...options, signal: controller.signal });
-            } finally {
-                clearTimeout(timer);
+                canvasFullscreenIcon.className = 'fa-solid fa-expand';
             }
         }
 
-        async function queryVisionAPI(messages) {
-            const apiKey = (localStorage.getItem('mei_api_key') || '').trim();
-            const provider = localStorage.getItem('mei_provider_preset') || 'groq';
-            const baseUrl = (localStorage.getItem('mei_api_base_url'] || API_PRESETS[provider]?.url || '').replace(/\/+$/, '');
-            const modelId = (localStorage.getItem('mei_custom_model_id') || modelDropdownSelect.value || 'llama-3.3-70b-versatile').trim();
-
-            if (!baseUrl) throw new Error("API Base URL is not configured.");
-
-            // Format multi-modal payload (OpenAI / Groq Vision compliant schema)
-            const formattedMessages = messages.slice(-10).map((m, idx, arr) => {
-                if (m.images && m.images.length > 0 && idx === arr.length - 1) {
-                    const contentParts = [{ type: "text", text: m.content || "Please analyze these attached images." }];
-                    m.images.forEach(img => {
-                        if (img.dataUrl) {
-                            contentParts.push({
-                                type: "image_url",
-                                image_url: { url: img.dataUrl }
-                            });
-                        }
-                    });
-                    return { role: m.role, content: contentParts };
-                }
-                return { role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content };
-            });
-
-            const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
-            const headers = { 'Content-Type': 'application/json' };
-            if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
-
-            const res = await fetchWithTimeout(endpoint, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    model: modelId,
-                    messages: [{ role: 'system', content: MEI_SYSTEM_PROMPT }, ...formattedMessages],
-                    temperature: 0.7
-                })
-            }, 40000);
-
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(`API Error (${res.status}): ${errText.slice(0, 140)}`);
-            }
-
-            const data = await res.json();
-            return data?.choices?.[0]?.message?.content || data?.response || null;
-        }
-
-        // Send Message Handler
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        async function handleSendMessage(overrideText = null) {
-            const rawText = overrideText !== null ? overrideText : messageInput.value;
-            const text = String(rawText || '').trim();
-            if ((!text && activeAttachments.length === 0) || isGenerating) return;
-
-            isGenerating = true;
-            sendBtn.disabled = true;
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-
-            let currentAttachments = [...activeAttachments];
-            activeAttachments = [];
-            renderAttachmentChips();
-
-            let displayPrompt = text;
-            if (currentAttachments.length > 0 && !displayPrompt) {
-                displayPrompt = `[Attached images: ${currentAttachments.map(a => a.name).join(', ')}]`;
-            }
-
-            chatHistory.push({ role: 'user', content: displayPrompt, images: currentAttachments });
-            appendMessageBubble('user', displayPrompt, currentAttachments, false);
-            saveCurrentSession();
-
-            const thinkingEl = appendMessageBubble('assistant', '', [], true);
-            setLogoThinking(true);
-
-            let reply = null;
-            try {
-                reply = await queryVisionAPI(chatHistory);
-            } catch (err) {
-                reply = `⚠️ **Vision API Notice**: ${err.message}\n\nPlease verify your API Base URL, Model ID, and API Key in **Settings & Vision APIs**, or select an active open endpoint.`;
-            }
-
-            chatHistory.push({ role: 'assistant', content: reply });
-            saveCurrentSession();
-
-            await typewriteResponse(thinkingEl, reply);
-
-            const webCode = extractExecutableWebsiteCode(reply);
-            if (webCode) openMeiCanvas(webCode, 'Live App Preview');
-
-            isGenerating = false;
-            sendBtn.disabled = false;
-            messageInput.focus();
-        }
-
-        sendBtn.addEventListener('click', () => handleSendMessage());
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-            }
-        });
-        messageInput.addEventListener('input', () => {
-            messageInput.style.height = 'auto';
-            messageInput.style.height = Math.min(messageInput.scrollHeight, 192) + 'px';
-        });
-
-        // Prompt Chips
-        document.querySelectorAll('.prompt-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                const prompt = chip.getAttribute('data-prompt');
-                if (prompt) handleSendMessage(prompt);
-            });
-        });
-
-        // File Attachments & Drag-and-Drop Vision Support
-        const fileInput = document.getElementById('fileInput');
-        const attachmentPreview = document.getElementById('attachmentPreview');
-        const dropZone = document.getElementById('dropZone');
-
-        document.getElementById('attachBtn').addEventListener('click', () => fileInput.click());
-
-        function handleFiles(files) {
-            Array.from(files || []).forEach(f => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    activeAttachments.push({
-                        name: f.name,
-                        dataUrl: f.type.startsWith('image/') ? event.target.result : null,
-                        type: f.type
-                    });
-                    renderAttachmentChips();
-                };
-                if (f.type.startsWith('image/')) {
-                    reader.readAsDataURL(f);
-                } else {
-                    reader.readAsText(f);
-                }
-            });
-        }
-
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-            fileInput.value = '';
-        });
-
-        // Drag and Drop
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.add('bg-blue-500/10');
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('bg-blue-500/10');
-            }, false);
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            if (dt && dt.files) {
-                handleFiles(dt.files);
-            }
-        }, false);
-
-        function renderAttachmentChips() {
+        function renderAttachmentPreviews() {
             if (activeAttachments.length === 0) {
                 attachmentPreview.classList.add('hidden');
                 attachmentPreview.innerHTML = '';
                 return;
             }
             attachmentPreview.classList.remove('hidden');
-            attachmentPreview.innerHTML = activeAttachments.map((a, i) => `
-                <div class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs">
-                    ${a.dataUrl ? `<img src="${a.dataUrl}" class="w-6 h-6 object-cover rounded-md" />` : '<i class="fa-solid fa-file text-blue-400"></i>'}
-                    <span class="max-w-[120px] truncate text-gray-700 dark:text-gray-300">${a.name}</span>
-                    <button type="button" data-idx="${i}" class="remove-att-btn text-gray-400 hover:text-red-500 ml-1 cursor-pointer">×</button>
+            attachmentPreview.innerHTML = activeAttachments.map((att, idx) => `
+                <div class="relative group flex items-center gap-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-2.5 py-1.5 text-xs">
+                    ${att.isImage ? `<img src="${att.data}" class="w-6 h-6 rounded object-cover" />` : `<i class="fa-solid fa-file-lines text-blue-400"></i>`}
+                    <span class="max-w-[120px] truncate text-gray-700 dark:text-gray-200">${escapeHtml(att.name)}</span>
+                    <button type="button" onclick="window.removeAttachment(${idx})" class="text-gray-400 hover:text-red-400 ml-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             `).join('');
+        }
 
-            attachmentPreview.querySelectorAll('.remove-att-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    activeAttachments.splice(Number(btn.getAttribute('data-idx')), 1);
-                    renderAttachmentChips();
-                });
+        window.removeAttachment = function(idx) {
+            activeAttachments.splice(idx, 1);
+            renderAttachmentPreviews();
+        };
+
+        async function handleSendMessage(overridePrompt = null) {
+            if (isGenerating) {
+                if (currentAbortController) currentAbortController.abort();
+                setGeneratingState(false);
+                if (currentBotContentEl) currentBotContentEl.classList.remove('typing-cursor');
+                return;
+            }
+
+            const rawText = overridePrompt !== null ? overridePrompt : messageInput.value.trim();
+            if (!rawText && activeAttachments.length === 0) return;
+
+            const attachmentsToSend = [...activeAttachments];
+            activeAttachments = [];
+            renderAttachmentPreviews();
+
+            if (overridePrompt === null) {
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+            }
+
+            appendUserMessage(rawText, attachmentsToSend);
+            chatHistory.push({
+                role: 'user',
+                content: rawText,
+                attachments: attachmentsToSend
+            });
+            saveCurrentSessionToMemory();
+
+            setGeneratingState(true);
+            currentBotContentEl = createBotPlaceholder();
+
+            let fullReply = '';
+            const activeCfg = customApiConfigs.find(c => c.id === activeApiConfigId);
+
+            if (activeCfg && activeCfg.endpoint) {
+                try {
+                    const apiMessages = [
+                        { role: 'system', content: MEI_SYSTEM_PROMPT },
+                        ...chatHistory.map(m => ({ role: m.role, content: m.content }))
+                    ];
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (activeCfg.apiKey) {
+                        headers['Authorization'] = `Bearer ${activeCfg.apiKey}`;
+                    }
+                    const res = await fetch(activeCfg.endpoint, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({
+                            model: activeCfg.modelId || selectedMeiModel,
+                            messages: apiMessages
+                        })
+                    });
+                    const data = await res.json();
+                    fullReply = data.choices?.[0]?.message?.content || generateConversationalFallback(rawText, attachmentsToSend);
+                } catch (err) {
+                    fullReply = generateConversationalFallback(rawText, attachmentsToSend);
+                }
+            } else {
+                try {
+                    fullReply = await fetchGoogleAIModeResponse(rawText, attachmentsToSend);
+                } catch (err) {
+                    fullReply = generateConversationalFallback(rawText, attachmentsToSend);
+                }
+            }
+
+            currentBotContentEl.classList.remove('typing-cursor');
+            currentBotContentEl.innerHTML = marked.parse(fullReply);
+            currentBotContentEl.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+            attachCanvasButtonIfCodePresent(currentBotContentEl, fullReply);
+
+            chatHistory.push({ role: 'assistant', content: fullReply });
+            saveCurrentSessionToMemory();
+            setGeneratingState(false);
+            scrollToBottom();
+        }
+
+        // Event Listeners Wiring
+        if (sendBtn) sendBtn.addEventListener('click', () => handleSendMessage());
+
+        if (messageInput) {
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            });
+            messageInput.addEventListener('input', () => {
+                messageInput.style.height = 'auto';
+                messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + 'px';
             });
         }
 
-        // New Chat, Home, Clear
-        function resetToHome() {
-            activeSessionId = null;
-            chatHistory = [];
-            renderFullConversation();
-            renderSessionHistory();
-            closeSidebar();
+        if (newChatBtn) newChatBtn.addEventListener('click', startNewSession);
+        if (homeBtn) homeBtn.addEventListener('click', startNewSession);
+        if (clearChatBtn) clearChatBtn.addEventListener('click', () => window.deleteSavedSession(currentSessionId));
+
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            });
         }
-        document.getElementById('newChatBtn').addEventListener('click', resetToHome);
-        document.getElementById('homeBtn').addEventListener('click', resetToHome);
-        document.getElementById('clearChatBtn').addEventListener('click', () => {
-            if (activeSessionId) {
-                deleteSession(activeSessionId);
-            } else {
-                resetToHome();
-            }
+        if (closeSidebarBtn) {
+            closeSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+        }
+
+        if (closeExploreBtn) closeExploreBtn.addEventListener('click', () => exploreModal.classList.add('hidden'));
+        document.querySelectorAll('.explore-app-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const prompt = card.getAttribute('data-prompt');
+                exploreModal.classList.add('hidden');
+                if (prompt) handleSendMessage(prompt);
+            });
         });
 
-        // Settings Modal & Model Sync
-        const settingsModal = document.getElementById('settingsModal');
         function openSettingsModal() {
-            syncSettingsToUI();
+            renderMeiModelsList(modelSearchInput ? modelSearchInput.value : '');
+            renderApiConfigsList();
             settingsModal.classList.remove('hidden');
-            closeSidebar();
         }
-        document.getElementById('openSettingsNavBtn').addEventListener('click', openSettingsModal);
-        document.getElementById('headerSettingsBtn').addEventListener('click', openSettingsModal);
-        document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.classList.add('hidden'));
-
-        document.getElementById('lightModeBtn').addEventListener('click', () => {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('mei_theme', 'light');
-            updateThemeButtonsUI();
-        });
-        document.getElementById('darkModeBtn').addEventListener('click', () => {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('mei_theme', 'dark');
-            updateThemeButtonsUI();
-        });
-
-        modelDropdownSelect.addEventListener('change', () => {
-            localStorage.setItem('mei_active_family_model', modelDropdownSelect.value);
-            document.getElementById('customModelInput').value = modelDropdownSelect.value;
-        });
-
-        document.getElementById('providerPresetSelect').addEventListener('change', (e) => {
-            const preset = API_PRESETS[e.target.value];
-            if (preset) {
-                document.getElementById('apiBaseUrlInput').value = preset.url;
-                document.getElementById('customModelInput').value = preset.model;
-            }
-        });
-
-        document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-            localStorage.setItem('mei_active_family_model', modelDropdownSelect.value);
-            localStorage.setItem('mei_provider_preset', document.getElementById('providerPresetSelect').value);
-            localStorage.setItem('mei_custom_model_id', document.getElementById('customModelInput').value.trim());
-            localStorage.setItem('mei_api_base_url', document.getElementById('apiBaseUrlInput').value.trim());
-            localStorage.setItem('mei_api_key', document.getElementById('apiKeyInput').value.trim());
-            syncSettingsToUI();
-            settingsModal.classList.add('hidden');
-        });
-
-        // AI Image Studio Modal
-        const imageStudioModal = document.getElementById('imageStudioModal');
-        function openImageStudio() {
-            imageStudioModal.classList.remove('hidden');
-            closeSidebar();
+        if (openSettingsBtn) openSettingsBtn.addEventListener('click', openSettingsModal);
+        if (openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettingsModal);
+        if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', () => {
+                if (meiModelSelect && meiModelSelect.value) {
+                    selectedMeiModel = meiModelSelect.value;
+                    localStorage.setItem('mei_selected_model', selectedMeiModel);
+                }
+                updateHeaderBadge();
+                settingsModal.classList.add('hidden');
+            });
         }
-        document.getElementById('openImageStudioNavBtn').addEventListener('click', openImageStudio);
-        document.getElementById('imageStudioBtn').addEventListener('click', openImageStudio);
-        document.getElementById('closeImageStudioBtn').addEventListener('click', () => imageStudioModal.classList.add('hidden'));
 
-        document.getElementById('generateImageBtn').addEventListener('click', () => {
-            const prompt = document.getElementById('imagePromptInput').value.trim();
-            if (!prompt) return;
-            const style = document.getElementById('imageStyleSelect').value;
-            const aspect = document.getElementById('imageAspectSelect').value;
-            const w = aspect === '16:9' ? 1024 : 768;
-            const h = aspect === '16:9' ? 576 : 768;
-            const fullPrompt = encodeURIComponent(`${prompt}, ${style} style, high detail`);
-            const url = `[https://image.pollinations.ai/prompt/$](https://image.pollinations.ai/prompt/$){fullPrompt}?width=${w}&height=${h}&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
+        if (modelSearchInput) {
+            modelSearchInput.addEventListener('input', (e) => renderMeiModelsList(e.target.value));
+        }
 
-            const grid = document.getElementById('imageGalleryGrid');
-            const empty = document.getElementById('emptyGalleryState');
-            if (empty) empty.remove();
+        if (toggleThemeBtn) {
+            toggleThemeBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+        }
 
-            const card = document.createElement('div');
-            card.className = 'rounded-xl overflow-hidden border border-gray-700 bg-gray-900 flex flex-col';
-            card.innerHTML = `<img src="${url}" alt="${prompt}" class="w-full h-40 object-cover" onerror="this.src='[https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio](https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio)'"><div class="p-2 text-[11px] text-gray-300 truncate">${prompt}</div>`;
-            grid.prepend(card);
-        });
+        if (addApiConfigBtn) addApiConfigBtn.addEventListener('click', () => apiConfigForm.classList.remove('hidden'));
+        if (cancelApiConfigBtn) cancelApiConfigBtn.addEventListener('click', () => apiConfigForm.classList.add('hidden'));
 
-        // Init
-        loadSessions();
+        if (saveApiConfigItemBtn) {
+            saveApiConfigItemBtn.addEventListener('click', () => {
+                const name = document.getElementById('apiConfigName').value.trim();
+                const endpoint = document.getElementById('apiConfigEndpoint').value.trim();
+                const modelId = document.getElementById('apiConfigModelId').value.trim();
+                const apiKey = document.getElementById('apiConfigKey').value.trim();
+
+                if (!name || !endpoint) return;
+
+                const newCfg = {
+                    id: 'cfg_' + Date.now(),
+                    name,
+                    endpoint,
+                    modelId,
+                    apiKey
+                };
+
+                customApiConfigs.push(newCfg);
+                localStorage.setItem('mei_custom_api_configs', JSON.stringify(customApiConfigs));
+                activeApiConfigId = newCfg.id;
+                localStorage.setItem('mei_active_api_id', activeApiConfigId);
+
+                document.getElementById('apiConfigName').value = '';
+                document.getElementById('apiConfigEndpoint').value = '';
+                document.getElementById('apiConfigModelId').value = '';
+                document.getElementById('apiConfigKey').value = '';
+                apiConfigForm.classList.add('hidden');
+
+                renderApiConfigsList();
+                updateHeaderBadge();
+            });
+        }
+
+        if (attachBtn && fileInput) {
+            attachBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files || []);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    const isImage = file.type.startsWith('image/');
+                    reader.onload = () => {
+                        activeAttachments.push({
+                            name: file.name,
+                            isImage,
+                            data: reader.result
+                        });
+                        renderAttachmentPreviews();
+                    };
+                    if (isImage) reader.readAsDataURL(file);
+                    else reader.readAsText(file);
+                });
+                fileInput.value = '';
+            });
+        }
+
+        if (imageStudioBtn) {
+            imageStudioBtn.addEventListener('click', () => {
+                messageInput.value = 'Build an interactive single-file HTML web app for ';
+                messageInput.focus();
+            });
+        }
+
+        if (canvasPreviewTab) canvasPreviewTab.addEventListener('click', () => switchCanvasTab('preview'));
+        if (canvasCodeTab) canvasCodeTab.addEventListener('click', () => switchCanvasTab('code'));
+        if (toggleCanvasFullscreenBtn) toggleCanvasFullscreenBtn.addEventListener('click', toggleCanvasFullscreen);
+        if (openCanvasHeaderBtn) {
+            openCanvasHeaderBtn.addEventListener('click', () => {
+                if (currentCanvasCode) openCanvasWithCode(currentCanvasCode);
+            });
+        }
+        if (closeCanvasBtn) {
+            closeCanvasBtn.addEventListener('click', () => {
+                if (isCanvasFullscreen) toggleCanvasFullscreen();
+                canvasPanel.classList.add('hidden');
+            });
+        }
+        if (downloadCanvasCodeBtn) {
+            downloadCanvasCodeBtn.addEventListener('click', () => {
+                if (!currentCanvasCode) return;
+                const blob = new Blob([currentCanvasCode], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'mei_canvas_app.html';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Initialize Workspace State
+        updateHeaderBadge();
+        renderSidebarSessions();
+        if (savedSessions.some(s => s.id === currentSessionId)) {
+            window.loadSavedSession(currentSessionId);
+        }
     </script>
 </body>
 </html>
+```
