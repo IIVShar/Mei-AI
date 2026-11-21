@@ -1,26 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-     <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mei AI</title>
+    <!-- Pre-paint theme initialization to prevent theme flicker -->
+    <script>
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem("mei_theme");
+                if (savedTheme === "light") {
+                    document.documentElement.classList.remove("dark");
+                } else {
+                    document.documentElement.classList.add("dark");
+                }
+            } catch (_) {
+                document.documentElement.classList.add("dark");
+            }
+        })();
+    </script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <!-- Marked.js for Markdown Rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify for XSS-safe Markdown Sanitization -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
     <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Puter.js for AI Chat -->
-    <script src="https://js.puter.com/v2/"></script>
+    <!-- PptxGenJS Fallback Runtime for Offline PPTX Generation -->
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    },
                     colors: {
                         mei: {
                             bg: '#131314',
@@ -29,20 +52,6 @@
                             userBubble: '#2b2d30',
                             accent: '#a8c7fa'
                         }
-                    },
-                    keyframes: {
-                        bibbybitPulse: {
-                            '0%, 100%': { transform: 'scale(1) rotate(0deg)', filter: 'brightness(1) hue-rotate(0deg)' },
-                            '50%': { transform: 'scale(1.15) rotate(3deg)', filter: 'brightness(1.3) hue-rotate(45deg)' }
-                        },
-                        bibbybitGlow: {
-                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
-                            '50%': { opacity: '1', transform: 'scale(1.4)' }
-                        }
-                    },
-                    animation: {
-                        'bibbybit-pulse': 'bibbybitPulse 2s ease-in-out infinite',
-                        'bibbybit-glow': 'bibbybitGlow 2s ease-in-out infinite'
                     }
                 }
             }
@@ -97,7 +106,26 @@
             overflow-x: auto;
             margin-top: 0.75rem;
             margin-bottom: 0.75rem;
+            position: relative;
         }
+        .prose a {
+            color: #60a5fa;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .prose a:hover {
+            color: #93c5fd;
+        }
+        .drag-active {
+            border-color: #a855f7 !important;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35) !important;
+        }
+        /* Markdown Output Styles */
+        .message-content p { margin-bottom: 0.75em; }
+        .message-content p:last-child { margin-bottom: 0; }
+        .message-content ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.75em; }
+        .message-content ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.75em; }
+        .message-content code:not(pre code) { background-color: rgba(100,116,139,0.2); padding: 0.2em 0.4em; border-radius: 0.25em; font-family: monospace; font-size: 0.9em; }
     </style>
 </head>
 <body class="bg-[#f9fafb] dark:bg-mei-bg text-gray-900 dark:text-gray-100 h-screen w-screen overflow-hidden flex font-sans m-0 p-0 transition-colors duration-200">
@@ -105,17 +133,22 @@
     <!-- Mobile Drawer Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/70 z-30 lg:hidden"></div>
 
-    <!-- Sidebar -->
+    <!-- Non-blocking Toast / Notice Banner -->
+    <div id="toastBanner" class="hidden fixed top-16 right-4 z-50 max-w-sm bg-gray-900 text-white border border-purple-500/40 rounded-2xl px-4 py-3 shadow-2xl text-xs flex items-center justify-between gap-3 transition-opacity duration-300 opacity-0">
+        <span id="toastMessage">Notice</span>
+        <button id="closeToastBtn" type="button" class="text-gray-400 hover:text-white cursor-pointer" aria-label="Close notification">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
     <aside id="sidebar" class="w-72 bg-white dark:bg-mei-sidebar flex flex-col flex-shrink-0 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 h-full z-40 fixed lg:static -translate-x-full lg:translate-x-0">
         <div class="p-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800/50">
-            <a href="#" class="flex items-center gap-2.5 group">
-                <div class="relative flex items-center justify-center">
-                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
-                    <div class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
-                </div>
+            <button type="button" id="sidebarBrandBtn" class="flex items-center gap-2.5 group cursor-pointer text-left">
+                <div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] flex-shrink-0"></div>
                 <span class="font-bold text-base text-gray-800 dark:text-gray-100 tracking-wide group-hover:text-purple-400 transition">Mei Workspace</span>
-            </a>
-            <button id="closeSidebarBtn" type="button" class="text-gray-400 hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-800 transition cursor-pointer lg:hidden">
+            </button>
+            <button id="closeSidebarBtn" type="button" class="text-gray-400 hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-800 transition cursor-pointer lg:hidden" aria-label="Close sidebar">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
@@ -130,11 +163,14 @@
             <button id="homeBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
                 <i class="fa-solid fa-house text-blue-400"></i> Home
             </button>
+            <a id="openExploreNavBtn" href="explore.html" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
+                <i class="fa-solid fa-compass text-emerald-400"></i> Explore
+            </a>
             <button id="openImageStudioNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
                 <i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> AI Image Studio
             </button>
             <button id="openSettingsNavBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer font-medium">
-                <i class="fa-solid fa-gear text-amber-400"></i> Settings & Models
+                <i class="fa-solid fa-gear text-amber-400"></i> Settings &amp; Models
             </button>
         </div>
 
@@ -146,26 +182,6 @@
         </div>
 
         <div class="p-3 border-t border-gray-200 dark:border-gray-800/60 space-y-1">
-            <div id="sidebarAccountInfo" class="p-2.5 rounded-xl bg-gray-100/90 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/60 text-[11px] space-y-2">
-                <div class="flex items-center gap-2.5">
-                    <div id="accountAvatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
-                        MW
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <div class="flex items-center justify-between gap-1.5">
-                            <span class="font-semibold text-gray-800 dark:text-gray-100 truncate text-xs" id="accountStatusLabel">Workspace Member</span>
-                            <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[10px] flex-shrink-0" id="accountPlanBadge">Active</span>
-                        </div>
-                        <div class="text-gray-500 dark:text-gray-400 truncate font-mono text-[10px]" id="accountUserMeta">member@workspace.local</div>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between pt-1 border-t border-gray-200/70 dark:border-gray-700/50 text-[10px] text-gray-500 dark:text-gray-400">
-                    <span id="accountSessionRole">Personal Workspace</span>
-                    <button id="accountActionBtn" type="button" class="text-purple-500 hover:text-purple-400 font-medium cursor-pointer transition">
-                        Sign In
-                    </button>
-                </div>
-            </div>
             <button id="openSettingsBtn" type="button" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition cursor-pointer">
                 <i class="fa-solid fa-sliders text-gray-400"></i> App Preferences
             </button>
@@ -175,126 +191,149 @@
     <!-- Main Container -->
     <div class="flex-1 flex w-full h-full overflow-hidden relative">
         <main id="mainChatArea" class="flex-1 flex flex-col h-full relative overflow-hidden transition-all duration-300">
-            <!-- Header -->
+            <!-- Top Header -->
             <header class="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-8 border-b border-gray-200 dark:border-gray-800/60 bg-white/80 dark:bg-mei-bg/80 backdrop-blur-md z-10 transition-colors duration-200">
                 <div class="flex items-center gap-3 min-w-0">
                     <button id="sidebarToggleBtn" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition cursor-pointer lg:hidden" title="Toggle Navigation Sidebar">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
-                    <a href="#" class="flex items-center gap-2.5 group flex-shrink-0">
-                        <div class="relative flex items-center justify-center">
-                            <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-sm animate-bibbybit-glow"></div>
-                            <div id="headerMeiLogo" class="relative w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 animate-bibbybit-pulse"></div>
-                        </div>
-                        <h1 class="text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-purple-400 transition">Mei AI</h1>
-                    </a>
-                    <span id="activeModelBadge" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1 truncate">
-                        Mei-Core-1.0
-                    </span>
-                </div>
-                
-                <div class="flex items-center gap-2 relative flex-shrink-0">
-                    <button id="openCanvasHeaderBtn" type="button" class="hidden flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-purple-700 dark:text-purple-300 bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 transition cursor-pointer">
+                    <button type="button" id="headerBrandBtn" class="flex items-center gap-2.5 group flex-shrink-0 cursor-pointer" title="Return to Mei AI Home">
+                        <div id="headerMeiLogo" class="w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] flex-shrink-0"></div>
+                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-100 group-hover:text-purple-400 transition">Mei AI</span>
+                    </button>
+                    <button id="openCanvasHeaderBtn" type="button" class="hidden items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-purple-700 dark:text-purple-300 bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 transition cursor-pointer">
                         <i class="fa-solid fa-code text-purple-500"></i> Mei Canvas
                     </button>
-                    <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer ml-1" title="Clear current chat">
+                    <button id="activeModelBadge" type="button" title="Configure active model & API keys" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 ml-1 truncate cursor-pointer hover:opacity-90 transition">
+                        Mei-Core-1.0
+                    </button>
+                </div>
+
+                <!-- Top-Right Corner Clear Chat Garbage Button -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button id="clearChatBtn" type="button" class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-9 h-9 rounded-full transition flex items-center justify-center cursor-pointer" title="Clear current chat" aria-label="Clear current chat">
                         <i class="fa-solid fa-trash-can text-sm"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- Scrollable Chat Area (strictly above the bottom prompt composer) -->
+            <!-- Scrollable Chat Area -->
             <div id="chatContainer" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth pb-44 relative flex flex-col">
-                <div id="emptyState" class="m-auto flex flex-col items-center justify-center text-center max-w-2xl w-full">
-                    <div class="relative flex items-center justify-center mb-3 group">
-                        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] blur-md animate-bibbybit-glow"></div>
-                        <div class="relative w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_20px_rgba(168,85,247,0.8)] animate-bibbybit-pulse"></div>
-                    </div>
+                <div id="emptyState" class="mx-auto flex flex-col items-center justify-center text-center max-w-2xl w-full pt-4 pb-6 transition-all duration-300">
+                    <div class="w-5 h-12 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] mb-3"></div>
                     <h2 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Hello, I'm Mei!</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with multi-model Qwen failover, file &amp; image inspection, and live Mei Canvas.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Equipped with live web search, URL link reader, autonomous Python `.pptx` builder, and live Mei Canvas.</p>
 
-                    <div id="meiEngineBanner" class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-900/40 via-blue-900/30 to-pink-900/40 border border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
-                        <div class="flex items-center justify-between gap-2 mb-2 text-amber-400 font-bold text-sm">
-                            <span>✨ Mei AI Neural Engine Ready! 🚀</span>
-                            <span id="bannerModelCount" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-200 border border-purple-400/30">48 Models</span>
+                    <div id="meiEngineBanner" class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-100/90 via-blue-100/80 to-pink-100/90 dark:from-purple-900/40 dark:via-blue-900/30 dark:to-pink-900/40 border border-purple-300 dark:border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
+                        <div class="flex items-center justify-between gap-2 mb-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
+                            <span>Mei AI Neural Engine Ready</span>
+                            <span id="bannerModelCount" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-purple-500/15 dark:bg-purple-500/20 text-purple-700 dark:text-purple-200 border border-purple-400/30">120 Models + Web</span>
                         </div>
-                        <p class="text-xs text-gray-300 leading-relaxed">
-                            Runs sequential failover across your configured endpoints and internal model pool with live Mei Canvas app &amp; slide previews.
+                        <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
+                            Searches the live web, inspects pasted links, generates <strong>Python (`python-pptx`)</strong> decks &amp; downloadable <strong>.pptx</strong> files, and renders live apps in <strong>Mei Canvas</strong>.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left mt-2">
-                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build an interactive 16:9 HTML slide deck presentation about Space Exploration with 4 slides using HTML/CSS only.">
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Make a 5-slide PowerPoint presentation (.pptx) with Python about Future Space Exploration and build the downloadable .pptx file.">
                             <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
-                                <i class="fa-solid fa-file-powerpoint text-purple-400"></i> Create Presentation Deck
+                                <i class="fa-solid fa-file-powerpoint text-purple-400"></i> Auto-Build PPTX Presentation
                             </div>
-                            <div class="text-gray-500 dark:text-gray-400">Generates slide deck in Mei Canvas</div>
+                            <div class="text-gray-500 dark:text-gray-400">Generates Python script &amp; downloadable .pptx</div>
+                        </button>
+
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Search the web for the latest breakthroughs in renewable energy and summarize the top stories.">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-globe text-emerald-400"></i> Search Live Web News
+                            </div>
+                            <div class="text-gray-500 dark:text-gray-400">Fetches live results &amp; clickable sources</div>
                         </button>
 
                         <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Build a complete single-file interactive Pomodoro timer web app using standard HTML, Tailwind CSS, and vanilla JavaScript.">
                             <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
                                 <i class="fa-solid fa-clock text-blue-400"></i> Create Pomodoro Timer App
                             </div>
-                            <div class="text-gray-500 dark:text-gray-400">Interactive web application preview</div>
+                            <div class="text-gray-500 dark:text-gray-400">Interactive web application in Mei Canvas</div>
+                        </button>
+
+                        <button type="button" class="prompt-chip bg-white dark:bg-mei-card hover:bg-gray-50 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 p-3.5 rounded-xl transition shadow-sm text-xs cursor-pointer" data-prompt="Read and summarize https://en.wikipedia.org/wiki/Artificial_intelligence">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-link text-pink-400"></i> Read &amp; Summarize Any Link
+                            </div>
+                            <div class="text-gray-500 dark:text-gray-400">Extracts &amp; summarizes full webpage content</div>
                         </button>
                     </div>
                 </div>
 
-                <div id="messagesList" class="max-w-3xl mx-auto w-full space-y-6"></div>
+                <!-- Messages render here once conversation begins -->
+                <div id="messagesList" class="hidden max-w-3xl mx-auto w-full space-y-6 border-t border-gray-200/70 dark:border-gray-800/60 pt-4"></div>
             </div>
 
-            <!-- Input Bar -->
+            <!-- Chat Composer Bar -->
             <div class="absolute bottom-0 left-0 right-0 p-4 lg:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] dark:from-mei-bg dark:via-mei-bg to-transparent z-20 pointer-events-auto">
-                <div class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
-                    
+                <div id="composerBox" class="max-w-4xl mx-auto relative flex flex-col bg-white dark:bg-[#1e1e20] rounded-3xl border border-gray-300 dark:border-gray-700/80 shadow-lg focus-within:border-blue-500 dark:focus-within:border-gray-500 transition-all overflow-hidden p-2">
+
                     <div id="attachmentPreview" class="hidden px-3 pt-2 flex flex-wrap gap-2 items-center"></div>
 
                     <div class="flex items-end">
                         <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.txt,.csv,.json,.js,.py,.html,.css,.md" />
-                        
+
                         <button id="attachBtn" type="button" class="p-3 m-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Attach image or text/code file">
                             <i class="fa-solid fa-plus"></i>
                         </button>
 
-                        <button id="imageStudioBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="AI Image Studio">
+                        <button id="webSearchToggleBtn" type="button" class="p-3 m-1 text-emerald-500 dark:text-emerald-400 bg-emerald-500/15 hover:bg-emerald-500/25 rounded-full transition flex-shrink-0 cursor-pointer ring-1 ring-emerald-500/30" title="Live Web Search & Link Reader: Active">
+                            <i class="fa-solid fa-globe"></i>
+                        </button>
+
+                        <button id="imageStudioShortcutBtn" type="button" class="p-3 m-1 text-pink-500 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/30 rounded-full transition flex-shrink-0 cursor-pointer" title="AI Image Studio">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                         </button>
 
-                        <textarea 
-                            id="messageInput" 
-                            rows="1" 
+                        <textarea
+                            id="messageInput"
+                            rows="1"
                             placeholder="Message Mei"
                             class="w-full max-h-48 resize-none bg-transparent border-none focus:ring-0 text-gray-900 dark:text-gray-100 p-3 outline-none placeholder-gray-400 text-sm"></textarea>
 
-                        <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer" title="Send message">
+                        <button id="sendBtn" type="button" class="p-3 m-1 text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-full transition flex-shrink-0 cursor-pointer" title="Send message">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
-                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • Sequential Failover • Live Mei Canvas</p>
+                <p class="text-[11px] text-center text-gray-400 dark:text-gray-500 mt-2">Mei AI Workspace • Live Web Search &amp; Link Reader • Python PPTX Builder • Live Mei Canvas</p>
             </div>
         </main>
 
-        <!-- Mei Canvas Side Panel -->
+        <!-- Mei Canvas Live Preview & Code Panel -->
         <div id="canvasPanel" class="hidden w-full lg:w-1/2 h-full bg-[#1e1e20] border-l border-gray-800 flex flex-col z-30 transition-all duration-300">
-            <div class="h-14 px-4 bg-[#18181a] border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+            <div class="h-14 px-4 bg-[#18181a] border-b border-gray-800 flex items-center justify-between flex-shrink-0 gap-2">
                 <div class="flex items-center gap-3 overflow-hidden">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 flex-shrink-0">
                         <i class="fa-solid fa-layer-group"></i> Mei Canvas
                     </span>
                     <span id="canvasTitle" class="text-sm font-medium text-gray-200 truncate">App Preview</span>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 flex-shrink-0">
                     <div class="flex items-center bg-gray-900 p-1 rounded-lg border border-gray-800 text-xs">
-                        <button id="canvasPreviewTab" type="button" class="px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer">Preview</button>
-                        <button id="canvasCodeTab" type="button" class="px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer">Code</button>
+                        <button id="canvasPreviewTab" type="button" class="px-2.5 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer">Preview</button>
+                        <button id="canvasCodeTab" type="button" class="px-2.5 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer">Code</button>
                     </div>
 
+                    <button id="downloadCanvasPptxBtn" type="button" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium transition cursor-pointer" title="Download Built PowerPoint (.pptx)">
+                        <i class="fa-solid fa-file-powerpoint"></i> <span id="canvasPptxBtnLabel">.pptx</span>
+                    </button>
+                    <button id="openCanvasNewTabBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Open Preview in New Tab">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </button>
                     <button id="toggleCanvasFullscreenBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Fullscreen">
                         <i id="canvasFullscreenIcon" class="fa-solid fa-expand"></i>
                     </button>
-                    <button id="downloadCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Download HTML">
+                    <button id="copyCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Copy Code">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                    <button id="downloadCanvasCodeBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Download File">
                         <i class="fa-solid fa-download"></i>
                     </button>
                     <button id="closeCanvasBtn" type="button" class="text-gray-400 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition cursor-pointer" title="Close">
@@ -304,7 +343,8 @@
             </div>
 
             <div class="flex-1 relative bg-black/40 overflow-hidden">
-                <iframe id="canvasIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+                <!-- Isolated sandbox without allow-same-origin -->
+                <iframe id="canvasIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms"></iframe>
                 <div id="canvasCodeContainer" class="hidden w-full h-full overflow-auto p-4 bg-[#141416] text-gray-200 font-mono text-xs">
                     <pre><code id="canvasCodeElement" class="language-html"></code></pre>
                 </div>
@@ -312,8 +352,38 @@
         </div>
     </div>
 
+    <!-- Explore Prompts Modal -->
+    <div id="exploreModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-emerald-400"></i> Explore Mei Workflows
+                </h3>
+                <button id="closeExploreBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto text-xs">
+                <button type="button" class="explore-item text-left p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer" data-prompt="Build a single-file Kanban board web app with HTML, CSS, and JavaScript inside Mei Canvas.">
+                    <div class="font-semibold text-purple-500 dark:text-purple-400 mb-1">Kanban Board in Canvas</div>
+                    <div class="text-gray-600 dark:text-gray-300">Creates a live task board with columns &amp; cards.</div>
+                </button>
+                <button type="button" class="explore-item text-left p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer" data-prompt="Make a 4-slide PowerPoint presentation (.pptx) with Python about Quantum Computing.">
+                    <div class="font-semibold text-amber-500 dark:text-amber-400 mb-1">Quantum Deck (.pptx)</div>
+                    <div class="text-gray-600 dark:text-gray-300">Outputs python-pptx code and downloadable slides.</div>
+                </button>
+                <button type="button" class="explore-item text-left p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer" data-prompt="Search the web for robotics breakthroughs and summarize what you find.">
+                    <div class="font-semibold text-emerald-500 dark:text-emerald-400 mb-1">Web Topic Lookup</div>
+                    <div class="text-gray-600 dark:text-gray-300">Queries live encyclopedia &amp; web summaries.</div>
+                </button>
+                <button type="button" class="explore-item text-left p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/70 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer" data-prompt="Read and summarize https://en.wikipedia.org/wiki/Solar_System">
+                    <div class="font-semibold text-blue-500 dark:text-blue-400 mb-1">URL Link Reader</div>
+                    <div class="text-gray-600 dark:text-gray-300">Fetches and summarizes a linked article.</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- AI Image Studio Modal -->
-    <div id="imageStudioModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+    <div id="imageStudioModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 flex-shrink-0">
                 <h3 class="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -321,7 +391,7 @@
                 </h3>
                 <button id="closeImageStudioBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
+
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
                 <div class="space-y-3">
                     <div>
@@ -333,10 +403,10 @@
                         <div>
                             <label class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Visual Style</label>
                             <select id="imageStyleSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none">
-                                <option value="photorealistic">📸 Photorealistic</option>
-                                <option value="cyberpunk">🌃 Cyberpunk</option>
-                                <option value="anime">🎨 Anime</option>
-                                <option value="digital-art">🖼️ Digital Art</option>
+                                <option value="photorealistic">Photorealistic</option>
+                                <option value="cyberpunk">Cyberpunk</option>
+                                <option value="anime">Anime</option>
+                                <option value="digital-art">Digital Art</option>
                             </select>
                         </div>
                         <div>
@@ -361,1534 +431,862 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-3 flex-shrink-0">
-                <h3 class="text-base font-semibold text-gray-100 flex items-center gap-2">
+    <!-- Settings & Custom API Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col text-gray-900 dark:text-gray-100">
+            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 flex-shrink-0">
+                <h3 class="text-base font-semibold flex items-center gap-2">
                     <i class="fa-solid fa-sliders text-purple-400"></i> Mei Workspace Settings &amp; Models
                 </h3>
-                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-200 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button id="closeSettingsBtn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+                <!-- Appearance / Theme Toggle -->
+                <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800">
+                    <div>
+                        <div class="font-medium text-gray-800 dark:text-gray-200">Workspace Theme</div>
+                        <div class="text-[11px] text-gray-500">Switch between Dark Mode and Light Mode</div>
+                    </div>
+                    <button id="themeToggleBtn" type="button" class="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-medium transition cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-half-stroke"></i> Toggle Theme
+                    </button>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium">Default Model Engine</label>
+                    <select id="defaultModelSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                        <option value="mei-core">Mei-Core-1.0 (Recommended)</option>
+                        <option value="gpt-4">GPT-4 Turbo</option>
+                        <option value="claude-3">Claude 3 Opus</option>
+                    </select>
+                </div>
+
+                <!-- Multiple API Key Profiles Manager -->
+                <div class="space-y-3 bg-gray-50 dark:bg-gray-800/40 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium">API Key Profiles (Multi-Profile Manager)</label>
+                        <span id="activeProfileIndicator" class="text-[11px] font-medium text-purple-600 dark:text-purple-400">None Active</span>
+                    </div>
+                    
+                    <!-- Saved Profiles List -->
+                    <div id="apiProfilesList" class="space-y-2 max-h-44 overflow-y-auto"></div>
+
+                    <!-- Add New Profile Form -->
+                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700/70 space-y-2">
+                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400">Add Another API Profile</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="text" id="profileNameInput" placeholder="Profile Name (e.g. Work Gemini)" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                            <select id="profileProviderSelect" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                                <option value="google">Google Gemini API</option>
+                                <option value="openrouter">OpenRouter API</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="password" id="profileKeyInput" placeholder="Paste API Key (AIza... or sk-or-...)" class="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                            <button id="addProfileBtn" type="button" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition cursor-pointer flex-shrink-0">
+                                <i class="fa-solid fa-plus mr-1"></i> Add Profile
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-500">Save as many API profiles as you want. Click any saved profile above to make it active, or fall back to other saved profiles automatically.</p>
+                </div>
+                    
+                    <!-- Saved Profiles List -->
+                    <div id="apiProfilesList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+
+                    <!-- Add New Profile Form -->
+                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700/70 space-y-2">
+                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400">Add New Profile</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="text" id="profileNameInput" placeholder="Profile Name (e.g. Personal Gemini)" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                            <select id="profileProviderSelect" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                                <option value="google">Google Gemini API</option>
+                                <option value="openrouter">OpenRouter API</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="password" id="profileKeyInput" placeholder="Paste API Key (AIza... or sk-or-...)" class="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                            <button id="addProfileBtn" type="button" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition cursor-pointer flex-shrink-0">
+                                <i class="fa-solid fa-plus mr-1"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-500">Profiles are stored locally in your browser. Select an active profile to prioritize it in Tier 1/2.</p>
+                </div>
             </div>
             
-            <div class="space-y-4 text-xs overflow-y-auto pr-1 flex-1">
-                <!-- Theme Toggle -->
-                <div class="flex items-center justify-between bg-gray-800/60 p-3 rounded-xl border border-gray-700/60">
-                    <div>
-                        <div class="font-medium text-gray-200">Dark Mode Theme</div>
-                        <div class="text-gray-400 text-[11px]">Toggle workspace color appearance</div>
-                    </div>
-                    <button id="toggleThemeBtn" type="button" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium cursor-pointer transition">Toggle Theme</button>
-                </div>
-
-                <!-- 120+ Custom Mei Models Selector -->
-                <div class="bg-gray-800/40 p-3.5 rounded-xl border border-gray-700/60 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="font-semibold text-gray-200 flex items-center gap-1.5">
-                            <i class="fa-solid fa-microchip text-purple-400"></i> Custom Mei Models (120+ Available)
-                        </label>
-                        <span id="modelCountBadge" class="text-[10px] bg-purple-950 text-purple-300 px-2 py-0.5 rounded-full border border-purple-700/50">120 Models</span>
-                    </div>
-                    <input id="modelSearchInput" type="text" placeholder="Search 120+ Mei models (e.g. Mei-Coder, Mei-Vision, Mei-Ultra)..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500 text-xs" />
-                    <select id="meiModelSelect" size="5" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-1.5 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px]"></select>
-                </div>
-
-                <!-- Multiple & Custom API Configurations -->
-                <div class="bg-gray-800/40 p-3.5 rounded-xl border border-gray-700/60 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="font-semibold text-gray-200 flex items-center gap-1.5">
-                            <i class="fa-solid fa-key text-amber-400"></i> Custom &amp; Multi-API Configurations
-                        </label>
-                        <button id="addApiConfigBtn" type="button" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-[11px] cursor-pointer transition flex items-center gap-1">
-                            <i class="fa-solid fa-plus"></i> Add API
-                        </button>
-                    </div>
-                    <p class="text-[11px] text-gray-400">Configure custom endpoints and keys first in the failover queue; Mei AI automatically cycles through fallback models if needed.</p>
-
-                    <!-- Add/Edit API Profile Form -->
-                    <div id="apiConfigForm" class="hidden bg-gray-900/90 p-3 rounded-xl border border-gray-700 space-y-2.5">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-gray-400 mb-1 text-[10px] uppercase">Config Name</label>
-                                <input id="apiConfigName" type="text" placeholder="e.g. Custom Endpoint" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500" />
-                            </div>
-                            <div>
-                                <label class="block text-gray-400 mb-1 text-[10px] uppercase">Model ID Override</label>
-                                <input id="apiConfigModelId" type="text" placeholder="e.g. Mei-Core-1.0" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500" />
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 text-[10px] uppercase">Custom Endpoint URL</label>
-                            <input id="apiConfigEndpoint" type="text" placeholder="https://api.example.com/v1/chat/completions" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px]" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1 text-[10px] uppercase">API Key (Optional - Saved Locally in Browser)</label>
-                            <input id="apiConfigKey" type="password" placeholder="Leave blank if endpoint requires no key" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-gray-200 outline-none focus:border-purple-500 font-mono text-[11px]" />
-                        </div>
-                        <div class="flex justify-end gap-2 pt-1">
-                            <button id="cancelApiConfigBtn" type="button" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 cursor-pointer">Cancel</button>
-                            <button id="saveApiConfigItemBtn" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium cursor-pointer">Save Profile</button>
-                        </div>
-                    </div>
-
-                    <!-- Saved API Profiles List -->
-                    <div id="apiConfigList" class="space-y-2 max-h-40 overflow-y-auto"></div>
-                </div>
-            </div>
-
-            <div class="pt-2 border-t border-gray-800 flex justify-end gap-2 flex-shrink-0">
-                <button id="saveSettingsBtn" type="button" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs cursor-pointer">Apply &amp; Close</button>
+            <div class="pt-3 border-t border-gray-200 dark:border-gray-800 flex justify-end">
+                <button id="saveSettingsBtn" type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition cursor-pointer">Save Changes</button>
             </div>
         </div>
     </div>
 
-    <!-- Application Script Logic -->
+    <!-- Core App Logic -->
     <script>
-        (function () {
-            "use strict";
-
-            // =========================================================================
-            // 1. QWEN REPOSITORY DISCOVERY, MODEL POOL & CONSTANTS
-            // =========================================================================
-            const MEI_SYSTEM_PROMPT = "You are Mei, a helpful AI assistant in Mei AI Workspace. When asked to build an interactive app, game, dashboard, or presentation, provide a complete standalone single-file HTML document inside a ```html fenced block.";
-            const QWEN_REPO_OWNER = "QwenLM";
-            const QWEN_REPO_NAME = "Qwen";
-            const QWEN_REPO_BRANCHES = ["main", "master", "qwen2.5", "qwen3"];
-            const QWEN_REPO_API_TREE = `https://api.github.com/repos/${QWEN_REPO_OWNER}/${QWEN_REPO_NAME}/git/trees/main?recursive=1`;
-            const QWEN_REPO_RAW_BASE = `https://raw.githubusercontent.com/${QWEN_REPO_OWNER}/${QWEN_REPO_NAME}/main`;
-            const EXAMPLE_RETRY_MODELS = ["qwen-coder", "qwen", "openai", "mistral"];
-            const EXAMPLE_ENDPOINT_URL = "https://gen.pollinations.ai/v1/chat/completions";
-            const PUTER_KIMI_MODEL = "moonshotai/kimi-k3";
-            const PUTER_GEMMA_MODEL = "google/gemma-4-31b-it";
-            const POLLINATIONS_CHAT_ENDPOINTS = [
-                "https://gen.pollinations.ai/v1/chat/completions",
-                "https://text.pollinations.ai/openai",
-                "http://localhost:11434/v1/chat/completions",
-                "http://localhost:8000/v1/chat/completions"
-            ];
-            const POLLINATIONS_TEXT_BASE = "https://text.pollinations.ai";
-            const REAL_WORKING_ENDPOINTS = [
-                { url: "https://gen.pollinations.ai/v1/chat/completions", model: "qwen", source: "Pollinations Chat" },
-                { url: "https://text.pollinations.ai/openai", model: "qwen-coder", source: "Pollinations OpenAI" },
-                { url: "https://text.pollinations.ai", model: "qwen", source: "Pollinations Text" },
-                { url: "http://localhost:11434/v1/chat/completions", model: "qwen2.5:latest", source: "Localhost Ollama" },
-                { url: "http://localhost:8000/v1/chat/completions", model: "qwen", source: "Localhost Server" }
-            ];
-            const NO_AUTH_ENDPOINT_BASES = [
-                "https://text.pollinations.ai",
-                "https://gen.pollinations.ai/v1/chat/completions",
-                "https://text.pollinations.ai/openai",
-                "http://localhost:11434/v1/chat/completions",
-                "http://localhost:1234/v1/chat/completions",
-                "http://localhost:8000/v1/chat/completions",
-                "http://localhost:8080/v1/chat/completions",
-                "http://localhost:3000/v1/chat/completions"
-            ];
-            const CORS_PROXY_TEMPLATES = [
-                (u) => u
-            ];
-            const CUSTOM_MEI_MODELS = Array.from({ length: 120 }, (_, i) => {
-                const idx = i + 1;
-                const categories = ["Core", "Coder", "Vision", "Reasoner", "Turbo", "Omni"];
-                const category = categories[i % categories.length];
-                const name = idx === 1 ? "Mei-Core-1.0" : `Mei-${category}-${idx}`;
-                return { name, category };
-            });
-
-            let savedSessions = [];
-            try {
-                savedSessions = JSON.parse(localStorage.getItem('mei_saved_sessions') || '[]');
-            } catch (_) {
-                savedSessions = [];
-            }
-
-            let currentSessionId = null;
-            try {
-                currentSessionId = localStorage.getItem('mei_current_session_id') || ('session_' + Date.now());
-            } catch (_) {
-                currentSessionId = 'session_' + Date.now();
-            }
-
-            let chatHistory = [];
-            let activeAttachments = [];
-            let selectedMeiModel = localStorage.getItem('mei_selected_model') || 'Mei-Core-1.0';
-            let customApiConfigs = [];
-            try {
-                customApiConfigs = JSON.parse(localStorage.getItem('mei_custom_api_configs') || '[]');
-            } catch (_) {
-                customApiConfigs = [];
-            }
-            let activeApiConfigId = localStorage.getItem('mei_active_api_id') || 'default';
-            let isGenerating = false;
-            let currentAbortController = null;
-            let currentBotContentEl = null;
-            let currentCanvasCode = '';
-            let isCanvasFullscreen = false;
-            let isAccountSignedIn = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements ---
+            // Modals
+            const exploreModal = document.getElementById('exploreModal');
+            const imageStudioModal = document.getElementById('imageStudioModal');
+            const settingsModal = document.getElementById('settingsModal');
+            
+            // Sidebar & Drawer
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
             const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
             const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-            const newChatBtn = document.getElementById('newChatBtn');
-            const homeBtn = document.getElementById('homeBtn');
-            const clearChatBtn = document.getElementById('clearChatBtn');
-            const chatHistoryList = document.getElementById('chatHistoryList');
-            const messagesList = document.getElementById('messagesList');
-            const messageInput = document.getElementById('messageInput');
-            const sendBtn = document.getElementById('sendBtn');
-            const attachBtn = document.getElementById('attachBtn');
-            const fileInput = document.getElementById('fileInput');
-            const attachmentPreview = document.getElementById('attachmentPreview');
-            const activeModelBadge = document.getElementById('activeModelBadge');
-            const bannerModelCount = document.getElementById('bannerModelCount');
-            const mainChatArea = document.getElementById('mainChatArea');
-
-            const canvasPanel = document.getElementById('canvasPanel');
-            const canvasIframe = document.getElementById('canvasIframe');
-            const canvasCodeContainer = document.getElementById('canvasCodeContainer');
-            const canvasCodeElement = document.getElementById('canvasCodeElement');
-            const canvasPreviewTab = document.getElementById('canvasPreviewTab');
-            const canvasCodeTab = document.getElementById('canvasCodeTab');
-            const toggleCanvasFullscreenBtn = document.getElementById('toggleCanvasFullscreenBtn');
-            const canvasFullscreenIcon = document.getElementById('canvasFullscreenIcon');
-            const downloadCanvasCodeBtn = document.getElementById('downloadCanvasCodeBtn');
-            const closeCanvasBtn = document.getElementById('closeCanvasBtn');
-            const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
-
-            const settingsModal = document.getElementById('settingsModal');
-            const openSettingsBtn = document.getElementById('openSettingsBtn');
+            
+            // Navigation Buttons
+            const openImageStudioNavBtn = document.getElementById('openImageStudioNavBtn');
+            const imageStudioShortcutBtn = document.getElementById('imageStudioShortcutBtn');
             const openSettingsNavBtn = document.getElementById('openSettingsNavBtn');
+            const openSettingsBtn = document.getElementById('openSettingsBtn');
+            const activeModelBadge = document.getElementById('activeModelBadge');
+            const homeBtn = document.getElementById('homeBtn');
+            const headerBrandBtn = document.getElementById('headerBrandBtn');
+            
+            // Close Modal Buttons
+            const closeExploreBtn = document.getElementById('closeExploreBtn');
+            const closeImageStudioBtn = document.getElementById('closeImageStudioBtn');
             const closeSettingsBtn = document.getElementById('closeSettingsBtn');
             const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-            const toggleThemeBtn = document.getElementById('toggleThemeBtn');
-            const modelSearchInput = document.getElementById('modelSearchInput');
-            const meiModelSelect = document.getElementById('meiModelSelect');
-            const modelCountBadge = document.getElementById('modelCountBadge');
-            const addApiConfigBtn = document.getElementById('addApiConfigBtn');
-            const apiConfigForm = document.getElementById('apiConfigForm');
-            const cancelApiConfigBtn = document.getElementById('cancelApiConfigBtn');
-            const saveApiConfigItemBtn = document.getElementById('saveApiConfigItemBtn');
-            const apiConfigList = document.getElementById('apiConfigList');
+            
+            // API Profile Elements
+            const apiProfilesList = document.getElementById('apiProfilesList');
+            const activeProfileIndicator = document.getElementById('activeProfileIndicator');
+            const profileNameInput = document.getElementById('profileNameInput');
+            const profileProviderSelect = document.getElementById('profileProviderSelect');
+            const profileKeyInput = document.getElementById('profileKeyInput');
+            const addProfileBtn = document.getElementById('addProfileBtn');
+            
+            // Chat UI
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const emptyState = document.getElementById('emptyState');
+            const messagesList = document.getElementById('messagesList');
+            const chatContainer = document.getElementById('chatContainer');
+            const clearChatBtn = document.getElementById('clearChatBtn');
+            const newChatBtn = document.getElementById('newChatBtn');
+            const promptChips = document.querySelectorAll('.prompt-chip, .explore-item');
+            
+            // Toast
+            const toastBanner = document.getElementById('toastBanner');
+            const toastMessage = document.getElementById('toastMessage');
+            const closeToastBtn = document.getElementById('closeToastBtn');
+            
+            // Theme Toggle
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-            const imageStudioModal = document.getElementById('imageStudioModal');
-            const imageStudioBtn = document.getElementById('imageStudioBtn');
-            const openImageStudioNavBtn = document.getElementById('openImageStudioNavBtn');
-            const closeImageStudioBtn = document.getElementById('closeImageStudioBtn');
-            const generateImageBtn = document.getElementById('generateImageBtn');
+            // Canvas Panel
+            const openCanvasHeaderBtn = document.getElementById('openCanvasHeaderBtn');
+            const canvasPanel = document.getElementById('canvasPanel');
+            const closeCanvasBtn = document.getElementById('closeCanvasBtn');
+            const canvasPreviewTab = document.getElementById('canvasPreviewTab');
+            const canvasCodeTab = document.getElementById('canvasCodeTab');
+            const canvasIframe = document.getElementById('canvasIframe');
+            const canvasCodeContainer = document.getElementById('canvasCodeContainer');
+            const toggleCanvasFullscreenBtn = document.getElementById('toggleCanvasFullscreenBtn');
+            const mainChatArea = document.getElementById('mainChatArea');
+            const canvasFullscreenIcon = document.getElementById('canvasFullscreenIcon');
 
-            const INTERNAL_QWEN_MODELS = [
-                // Qwen3 & Qwen3.5 Series
-                "Qwen/Qwen3.5-72B-Instruct",
-                "Qwen/Qwen3.5-32B-Instruct",
-                "Qwen/Qwen3.5-14B-Instruct",
-                "Qwen/Qwen3.5-8B-Instruct",
-                "Qwen/Qwen3.5-Coder-32B-Instruct",
-                "Qwen/Qwen3.5-VL-72B-Instruct",
-                "Qwen/Qwen3-235B-A22B",
-                "Qwen/Qwen3-235B-A22B-Instruct-2507",
-                "Qwen/Qwen3-235B-A22B-Thinking-2507",
-                "Qwen/Qwen3-32B",
-                "Qwen/Qwen3-30B-A3B",
-                "Qwen/Qwen3-30B-A3B-Instruct-2507",
-                "Qwen/Qwen3-30B-A3B-Thinking-2507",
-                "Qwen/Qwen3-14B",
-                "Qwen/Qwen3-8B",
-                "Qwen/Qwen3-4B",
-                "Qwen/Qwen3-1.7B",
-                "Qwen/Qwen3-0.6B",
-                "Qwen/Qwen3-Coder-480B-A35B-Instruct",
-                "Qwen/Qwen3-Coder-30B-A3B-Instruct",
-                "Qwen/Qwen3-VL-235B-A22B-Instruct",
-                "Qwen/Qwen3-VL-32B-Instruct",
-                "Qwen/Qwen3-VL-8B-Instruct",
+            // --- API Key Profiles Management ---
+            let apiProfiles = [];
+            let activeProfileId = null;
 
-                // QwQ & QVQ Reasoning Series
-                "Qwen/QwQ-32B",
-                "Qwen/QwQ-32B-Preview",
-                "Qwen/QVQ-72B-Preview",
-
-                // Qwen2.5 Series
-                "Qwen/Qwen2.5-72B-Instruct",
-                "Qwen/Qwen2.5-32B-Instruct",
-                "Qwen/Qwen2.5-14B-Instruct",
-                "Qwen/Qwen2.5-7B-Instruct",
-                "Qwen/Qwen2.5-3B-Instruct",
-                "Qwen/Qwen2.5-1.5B-Instruct",
-                "Qwen/Qwen2.5-0.5B-Instruct",
-                "Qwen/Qwen2.5-Coder-32B-Instruct",
-                "Qwen/Qwen2.5-Coder-14B-Instruct",
-                "Qwen/Qwen2.5-Coder-7B-Instruct",
-                "Qwen/Qwen2.5-Coder-3B-Instruct",
-                "Qwen/Qwen2.5-Coder-1.5B-Instruct",
-                "Qwen/Qwen2.5-Coder-0.5B-Instruct",
-                "Qwen/Qwen2.5-Math-72B-Instruct",
-                "Qwen/Qwen2.5-Math-7B-Instruct",
-                "Qwen/Qwen2.5-Math-1.5B-Instruct",
-                "Qwen/Qwen2.5-VL-72B-Instruct",
-                "Qwen/Qwen2.5-VL-32B-Instruct",
-                "Qwen/Qwen2.5-VL-7B-Instruct",
-                "Qwen/Qwen2.5-VL-3B-Instruct",
-                "Qwen/Qwen2.5-Omni-7B",
-
-                // Qwen2 & CodeQwen Series
-                "Qwen/Qwen2-72B-Instruct",
-                "Qwen/Qwen2-57B-A14B-Instruct",
-                "Qwen/Qwen2-7B-Instruct",
-                "Qwen/Qwen2-1.5B-Instruct",
-                "Qwen/Qwen2-0.5B-Instruct",
-                "Qwen/Qwen2-VL-72B-Instruct",
-                "Qwen/Qwen2-VL-7B-Instruct",
-                "Qwen/Qwen2-VL-2B-Instruct",
-                "Qwen/Qwen2-Audio-7B-Instruct",
-                "Qwen/CodeQwen1.5-7B-Chat",
-
-                // Qwen1.5 Series
-                "Qwen/Qwen1.5-110B-Chat",
-                "Qwen/Qwen1.5-72B-Chat",
-                "Qwen/Qwen1.5-32B-Chat",
-                "Qwen/Qwen1.5-14B-Chat",
-                "Qwen/Qwen1.5-7B-Chat",
-                "Qwen/Qwen1.5-4B-Chat",
-                "Qwen/Qwen1.5-1.8B-Chat",
-                "Qwen/Qwen1.5-0.5B-Chat",
-                "Qwen/Qwen1.5-MoE-A2.7B-Chat"
-            ];
-            let discoveredQwenModels = [];
-            const endpointRateLimits = new Map();
-            const RATE_LIMIT_DEFAULT_COOLDOWN_MS = 18000;
-
-            function getRateLimitKey(url) {
-                if (!url || typeof url !== 'string') return 'default';
+            function loadApiProfiles() {
                 try {
-                    const parsed = new URL(url);
-                    return `${parsed.origin}${parsed.pathname}`;
-                } catch (_) {
-                    return url;
+                    const saved = localStorage.getItem('mei_api_profiles');
+                    const savedActive = localStorage.getItem('mei_active_profile_id');
+                    if (saved) apiProfiles = JSON.parse(saved);
+                    if (savedActive) activeProfileId = savedActive;
+                } catch (e) {
+                    console.warn('Could not load API profiles', e);
                 }
+                renderApiProfiles();
             }
 
-            function isEndpointRateLimited(url) {
-                const key = getRateLimitKey(url);
-                const until = endpointRateLimits.get(key) || 0;
-                if (Date.now() >= until) {
-                    endpointRateLimits.delete(key);
-                    return false;
-                }
-                return true;
-            }
-
-            function markEndpointRateLimited(url, retryAfterHeader = null, customMs = null) {
-                const key = getRateLimitKey(url);
-                let cooldownMs = typeof customMs === 'number' && customMs > 0
-                    ? customMs
-                    : RATE_LIMIT_DEFAULT_COOLDOWN_MS;
-
-                if (retryAfterHeader) {
-                    const numericSeconds = Number(retryAfterHeader);
-                    if (!Number.isNaN(numericSeconds) && numericSeconds > 0) {
-                        cooldownMs = Math.min(Math.max(numericSeconds * 1000, 3000), 120000);
+            function saveApiProfiles() {
+                try {
+                    localStorage.setItem('mei_api_profiles', JSON.stringify(apiProfiles));
+                    if (activeProfileId) {
+                        localStorage.setItem('mei_active_profile_id', activeProfileId);
                     } else {
-                        const parsedDate = Date.parse(retryAfterHeader);
-                        if (!Number.isNaN(parsedDate)) {
-                            cooldownMs = Math.min(Math.max(parsedDate - Date.now(), 3000), 120000);
+                        localStorage.removeItem('mei_active_profile_id');
+                    }
+                } catch (e) {
+                    console.warn('Could not save API profiles', e);
+                }
+                renderApiProfiles();
+            }
+
+            function getActiveProfile() {
+                return apiProfiles.find(p => p.id === activeProfileId) || null;
+            }
+
+            function renderApiProfiles() {
+                const active = getActiveProfile();
+                if (active) {
+                    activeProfileIndicator.textContent = `Active: ${active.name}`;
+                    activeModelBadge.textContent = `${active.name} (${active.provider === 'google' ? 'Gemini' : 'OpenRouter'})`;
+                } else {
+                    activeProfileIndicator.textContent = 'Default Free Tier';
+                    activeModelBadge.textContent = 'Mei-Core-1.0';
+                }
+
+                if (apiProfiles.length === 0) {
+                    apiProfilesList.innerHTML = `<div class="text-xs text-gray-500 italic py-2 text-center">No custom profiles saved. Using free fallback tiers.</div>`;
+                    return;
+                }
+
+                apiProfilesList.innerHTML = '';
+                apiProfiles.forEach(profile => {
+                    const isSelected = profile.id === activeProfileId;
+                    const maskedKey = profile.key.length > 8 
+                        ? `${profile.key.substring(0, 4)}••••${profile.key.substring(profile.key.length - 4)}`
+                        : '••••••••';
+                    const providerLabel = profile.provider === 'google' ? 'Gemini' : 'OpenRouter';
+                    const badgeColor = profile.provider === 'google' 
+                        ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30' 
+                        : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30';
+
+                    const item = document.createElement('div');
+                    item.className = `flex items-center justify-between p-2.5 rounded-lg border text-xs transition ${
+                        isSelected 
+                            ? 'bg-purple-500/10 border-purple-500/50 dark:bg-purple-900/20' 
+                            : 'bg-white dark:bg-gray-800/80 border-gray-200 dark:border-gray-700'
+                    }`;
+
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer select-none" data-select-id="${profile.id}">
+                            <div class="w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${
+                                isSelected ? 'border-purple-500 bg-purple-500 text-white' : 'border-gray-400 dark:border-gray-600'
+                            }">
+                                ${isSelected ? '<i class="fa-solid fa-check text-[9px]"></i>' : ''}
+                            </div>
+                            <div class="truncate">
+                                <div class="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                                    <span class="truncate">${profile.name}</span>
+                                    <span class="text-[10px] px-1.5 py-0.2 rounded border ${badgeColor}">${providerLabel}</span>
+                                </div>
+                                <div class="text-[10px] text-gray-400 font-mono">${maskedKey}</div>
+                            </div>
+                        </div>
+                        <button type="button" data-delete-id="${profile.id}" class="text-gray-400 hover:text-red-500 p-1.5 rounded transition cursor-pointer ml-2" title="Delete profile">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+
+                    item.querySelector('[data-select-id]').addEventListener('click', () => {
+                        activeProfileId = (activeProfileId === profile.id) ? null : profile.id;
+                        saveApiProfiles();
+                        showToast(activeProfileId ? `Switched to "${profile.name}"` : 'Switched to Default Free Tier');
+                    });
+
+                    item.querySelector('[data-delete-id]').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        apiProfiles = apiProfiles.filter(p => p.id !== profile.id);
+                        if (activeProfileId === profile.id) {
+                            activeProfileId = apiProfiles.length > 0 ? apiProfiles[0].id : null;
                         }
-                    }
-                }
+                        saveApiProfiles();
+                        showToast(`Deleted profile "${profile.name}"`);
+                    });
 
-                endpointRateLimits.set(key, Date.now() + cooldownMs);
-                return cooldownMs;
-            }
-
-            function looksLikeRateLimitMessage(text) {
-                if (!text || typeof text !== 'string') return false;
-                return /(rate[\s_-]*limit|too many requests|quota exceeded|throttl|try again later|429)/i.test(text);
-            }
-
-            function getInternalQwenModelIds() {
-                const combined = [...discoveredQwenModels, ...INTERNAL_QWEN_MODELS];
-                return Array.from(new Set(combined.filter(Boolean)));
-            }
-
-            function escapeHtml(str) {
-                return String(str || '')
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#39;');
-            }
-
-            function isBlockedModelUrl(url) {
-                if (!url || typeof url !== 'string') return true;
-                const trimmed = url.trim();
-                if (!trimmed) return true;
-                if (/^javascript:/i.test(trimmed)) return true;
-                return false;
-            }
-
-            async function fetchWithTimeout(url, options = {}, timeoutMs = 8000, externalSignal = null) {
-                const controller = new AbortController();
-                const onAbort = () => controller.abort();
-                if (externalSignal) {
-                    if (externalSignal.aborted) controller.abort();
-                    else externalSignal.addEventListener('abort', onAbort, { once: true });
-                }
-                const timer = setTimeout(() => controller.abort(), timeoutMs);
-                try {
-                    return await fetch(url, { ...options, signal: controller.signal });
-                } finally {
-                    clearTimeout(timer);
-                    if (externalSignal) {
-                        externalSignal.removeEventListener('abort', onAbort);
-                    }
-                }
-            }
-
-            function extractReplyFromPayload(parsedJson, rawText) {
-                if (parsedJson && typeof parsedJson === 'object') {
-                    if (Array.isArray(parsedJson.choices) && parsedJson.choices[0]) {
-                        const c = parsedJson.choices[0];
-                        if (c.message && typeof c.message.content === 'string' && c.message.content.trim()) {
-                            return c.message.content.trim();
-                        }
-                        if (typeof c.text === 'string' && c.text.trim()) {
-                            return c.text.trim();
-                        }
-                    }
-                    if (c?.message?.content && Array.isArray(c.message.content)) {
-                        const joined = c.message.content.map(p => (typeof p === 'string' ? p : (p?.text || ''))).join('').trim();
-                        if (joined) return joined;
-                    }
-                    if (typeof parsedJson.response === 'string' && parsedJson.response.trim()) {
-                        return parsedJson.response.trim();
-                    }
-                    if (typeof parsedJson.output === 'string' && parsedJson.output.trim()) {
-                        return parsedJson.output.trim();
-                    }
-                }
-                if (typeof rawText === 'string') {
-                    const trimmed = rawText.trim();
-                    if (trimmed && !trimmed.startsWith('<!DOCTYPE') && !trimmed.startsWith('<html')) {
-                        return trimmed;
-                    }
-                }
-                return '';
-            }
-
-            async function queryPuterKimiChat(promptText, signal = null, modelOverride = PUTER_KIMI_MODEL) {
-                if (signal && signal.aborted) throw new Error('Aborted');
-                if (typeof window.puter === 'undefined' || !window.puter.ai || typeof window.puter.ai.chat !== 'function') {
-                    throw new Error('Puter AI unavailable');
-                }
-
-                const modelToUse = modelOverride || PUTER_KIMI_MODEL;
-                const puterPromise = window.puter.ai.chat(
-                    promptText || "",
-                    { model: modelToUse }
-                ).then(response => {
-                    if (typeof window.puter?.print === 'function') {
-                        try { window.puter.print(response); } catch (_) {}
-                    }
-                    return response;
+                    apiProfilesList.appendChild(item);
                 });
-
-                let abortHandler = null;
-                const abortPromise = signal
-                    ? new Promise((_, reject) => {
-                        if (signal.aborted) {
-                            reject(new Error('Aborted'));
-                            return;
-                        }
-                        abortHandler = () => reject(new Error('Aborted'));
-                        signal.addEventListener('abort', abortHandler, { once: true });
-                    })
-                    : null;
-
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Puter timeout')), 12000);
-                });
-
-                try {
-                    const racers = abortPromise ? [puterPromise, abortPromise, timeoutPromise] : [puterPromise, timeoutPromise];
-                    const res = await Promise.race(racers);
-                    if (typeof res === 'string' && res.trim()) {
-                        return res.trim();
-                    }
-                    if (res && typeof res === 'object') {
-                        if (typeof res.message?.content === 'string' && res.message.content.trim()) {
-                            return res.message.content.trim();
-                        }
-                        if (typeof res.text === 'string' && res.text.trim()) {
-                            return res.text.trim();
-                        }
-                        const extracted = extractReplyFromPayload(res, '');
-                        if (extracted) return extracted;
-                    }
-                    throw new Error('Empty Puter response');
-                } finally {
-                    if (signal && abortHandler) {
-                        signal.removeEventListener('abort', abortHandler);
-                    }
-                }
             }
 
-            function synthesizeMeiEngineResponse(modelName, promptText, attachments = []) {
-                const cleanPrompt = String(promptText || '').trim();
-                const attNote = attachments && attachments.length
-                    ? ` (with ${attachments.length} attachment${attachments.length > 1 ? 's' : ''})`
-                    : '';
-                return `**${escapeHtml(modelName)}**${attNote} is ready to assist with: *${escapeHtml(cleanPrompt || 'your request')}*. Try asking to build an interactive web app, dashboard, or slide deck to preview it live in **Mei Canvas**.`;
-            }
+            addProfileBtn.addEventListener('click', () => {
+                const name = profileNameInput.value.trim();
+                const provider = profileProviderSelect.value;
+                const key = profileKeyInput.value.trim();
 
-            async function trySingleCandidate(item, promptText, attachments = [], signal = null, attemptIndex = 0) {
-                if (!item || (item.kind !== 'puter-ai' && (!item.url || isBlockedModelUrl(item.url)))) {
-                    throw new Error('Invalid endpoint');
-                }
-                if (signal && signal.aborted) {
-                    throw new Error('Aborted');
+                if (!name || !key) {
+                    showToast('Please enter both a profile name and an API key.');
+                    return;
                 }
 
-                const resolvedModel = item.modelId || resolveInternalModelId(item.name, attemptIndex);
-                const fullPrompt = attachments && attachments.length
-                    ? `${promptText}\n[Attachments: ${attachments.map(a => a.name).join(', ')}]`
-                    : promptText;
-
-                if (item.kind === 'puter-ai') {
-                    return await queryPuterKimiChat(fullPrompt, signal, resolvedModel || PUTER_KIMI_MODEL);
-                }
-
-                const isTextGetBase = item.url.replace(/\/+$/, '') === POLLINATIONS_TEXT_BASE;
-                if (isTextGetBase) {
-                    const query = encodeURIComponent(fullPrompt);
-                    const modelParam = encodeURIComponent(resolvedModel || 'qwen');
-                    const getUrl = `${POLLINATIONS_TEXT_BASE}/${query}?model=${modelParam}&seed=${Math.floor(Math.random() * 1000000)}`;
-                    const res = await fetchWithTimeout(getUrl, { method: 'GET' }, 7500, signal);
-                    if (!res) throw new Error('No response');
-                    if (res.status === 429 || res.status === 502 || res.status === 503 || res.status === 504) {
-                        markEndpointRateLimited(item.url, res.headers.get('retry-after'));
-                        throw new Error(`HTTP ${res.status}`);
-                    }
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const text = await res.text();
-                    if (looksLikeRateLimitMessage(text)) {
-                        markEndpointRateLimited(item.url);
-                        throw new Error('Rate limited response');
-                    }
-                    const reply = extractReplyFromPayload(null, text);
-                    if (!reply) throw new Error('Empty reply');
-                    return reply;
-                }
-
-                const headers = { 'Content-Type': 'application/json' };
-                if (item.apiKey) {
-                    headers['Authorization'] = `Bearer ${item.apiKey}`;
-                }
-
-                const messagesPayload = [
-                    { role: 'system', content: MEI_SYSTEM_PROMPT },
-                    ...chatHistory.slice(-6).map(m => ({
-                        role: m.role === 'assistant' ? 'assistant' : 'user',
-                        content: String(m.content || '').slice(0, 2000)
-                    })),
-                    { role: 'user', content: fullPrompt }
-                ];
-
-                const res = await fetchWithTimeout(item.url, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({
-                        model: resolvedModel,
-                        messages: messagesPayload,
-                        seed: Math.floor(Math.random() * 1000000),
-                        temperature: 0.7
-                    })
-                }, 7500, signal);
-
-                if (!res) throw new Error('No response');
-                if (res.status === 429 || res.status === 502 || res.status === 503 || res.status === 504) {
-                    markEndpointRateLimited(item.url, res.headers.get('retry-after'));
-                    throw new Error(`HTTP ${res.status}`);
-                }
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
-                }
-
-                const rawText = await res.text();
-                if (looksLikeRateLimitMessage(rawText)) {
-                    markEndpointRateLimited(item.url);
-                    throw new Error('Rate limited payload');
-                }
-
-                let parsed = null;
-                try {
-                    parsed = JSON.parse(rawText);
-                } catch (_) {
-                    parsed = null;
-                }
-
-                const reply = extractReplyFromPayload(parsed, rawText);
-                if (!reply) {
-                    throw new Error('Unparseable reply');
-                }
-                return reply;
-            }
-
-            function refreshModelCountUI() {
-                const qwenCount = getInternalQwenModelIds().length;
-                const total = CUSTOM_MEI_MODELS.length + qwenCount;
-                if (bannerModelCount) bannerModelCount.textContent = `${total} Models`;
-                if (modelCountBadge) modelCountBadge.textContent = `${total} Models`;
-            }
-
-            function scrollToBottom() {
-                const chatContainer = document.getElementById('chatContainer');
-                if (chatContainer) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }
-            }
-
-            function saveCurrentSessionToMemory() {
-                if (!currentSessionId) return;
-                const firstUser = chatHistory.find(m => m.role === 'user');
-                const titleText = firstUser && firstUser.content
-                    ? String(firstUser.content).trim().slice(0, 36)
-                    : 'New Chat';
-                const safeMessages = chatHistory.map(m => ({
-                    role: m.role,
-                    content: m.content,
-                    metaModel: m.metaModel,
-                    skippedCount: m.skippedCount,
-                    attachments: Array.isArray(m.attachments)
-                        ? m.attachments.map(a => ({
-                            name: a.name,
-                            isImage: a.isImage,
-                            data: a.isImage ? null : a.data
-                        }))
-                        : []
-                }));
-
-                const existingIndex = savedSessions.findIndex(s => s.id === currentSessionId);
-                const record = {
-                    id: currentSessionId,
-                    title: titleText || 'New Chat',
-                    updatedAt: Date.now(),
-                    messages: safeMessages
+                const newProfile = {
+                    id: 'prof_' + Date.now(),
+                    name,
+                    provider,
+                    key
                 };
 
-                if (existingIndex >= 0) {
-                    savedSessions[existingIndex] = record;
-                } else if (safeMessages.length > 0) {
-                    savedSessions.unshift(record);
-                }
+                apiProfiles.push(newProfile);
+                activeProfileId = newProfile.id;
+                saveApiProfiles();
 
-                try {
-                    localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions.slice(0, 30)));
-                    localStorage.setItem('mei_current_session_id', currentSessionId);
-                } catch (_) {}
-                renderSidebarSessions();
+                profileNameInput.value = '';
+                profileKeyInput.value = '';
+                showToast(`Added and activated "${name}"`);
+            });
+
+            loadApiProfiles();
+
+            // --- Utilities ---
+            
+            function showToast(msg, duration = 3000) {
+                toastMessage.textContent = msg;
+                toastBanner.classList.remove('hidden');
+                // Small delay to allow transition to apply
+                setTimeout(() => toastBanner.classList.remove('opacity-0'), 10);
+                
+                setTimeout(() => {
+                    toastBanner.classList.add('opacity-0');
+                    setTimeout(() => toastBanner.classList.add('hidden'), 300);
+                }, duration);
             }
 
-            function renderSidebarSessions() {
-                if (!chatHistoryList) return;
-                if (!Array.isArray(savedSessions) || savedSessions.length === 0) {
-                    chatHistoryList.innerHTML = '<div class="px-3 py-2 text-xs text-gray-500 italic">No previous chats</div>';
-                    return;
-                }
-                chatHistoryList.innerHTML = savedSessions.map(sess => {
-                    const isActive = sess.id === currentSessionId;
-                    return `
-                        <div class="group flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs cursor-pointer transition ${isActive ? 'bg-purple-600/20 text-purple-200 border border-purple-500/30' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60'}">
-                            <button type="button" onclick="window.loadSavedSession('${escapeHtml(sess.id)}')" class="truncate text-left flex-1 cursor-pointer">
-                                ${escapeHtml(sess.title || 'Chat Session')}
-                            </button>
-                            <button type="button" onclick="window.deleteSavedSession('${escapeHtml(sess.id)}')" class="text-gray-400 hover:text-red-400 opacity-70 group-hover:opacity-100 px-1 cursor-pointer" title="Delete session">
-                                <i class="fa-solid fa-trash-can text-[11px]"></i>
-                            </button>
-                        </div>
-                    `;
-                }).join('');
+            closeToastBtn.addEventListener('click', () => {
+                toastBanner.classList.add('opacity-0');
+                setTimeout(() => toastBanner.classList.add('hidden'), 300);
+            });
+
+            // --- Modal Handling ---
+            function openModal(modal) {
+                modal.classList.remove('hidden');
+                if(window.innerWidth < 1024) closeSidebar(); // close sidebar on mobile if open
+            }
+            function closeModal(modal) {
+                modal.classList.add('hidden');
             }
 
-            function createBotPlaceholder() {
-                const emptyState = document.getElementById('emptyState');
-                if (emptyState) emptyState.style.display = 'none';
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'flex items-start gap-3.5 justify-start';
-
-                const logoEl = document.createElement('div');
-                logoEl.className = 'w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] shadow-[0_0_12px_rgba(168,85,247,0.7)] flex-shrink-0 mt-1 mei-logo-thinking';
-
-                const contentEl = document.createElement('div');
-                contentEl.className = 'flex-1 min-w-0 text-sm text-gray-800 dark:text-gray-200 leading-relaxed prose dark:prose-invert max-w-none overflow-x-auto typing-cursor';
-                contentEl.innerHTML = '<span class="text-xs text-gray-400 italic">Thinking...</span>';
-
-                wrapper.appendChild(logoEl);
-                wrapper.appendChild(contentEl);
-                if (messagesList) messagesList.appendChild(wrapper);
-                scrollToBottom();
-
-                return { wrapper, logoEl, contentEl };
-            }
-
-            function buildNoAuthFailoverQueue(activeCfg, qwenPool) {
-                const queue = [];
-                const pool = Array.isArray(qwenPool) && qwenPool.length ? qwenPool : ["Qwen/Qwen2.5-72B-Instruct"];
-                const chatBases = NO_AUTH_ENDPOINT_BASES.filter(u => !/\/models$/i.test(u));
-
-                queue.push({
-                    id: 'puter_kimi_k3_primary',
-                    name: selectedMeiModel,
-                    kind: 'puter-ai',
-                    url: 'puter://ai.chat',
-                    modelId: PUTER_KIMI_MODEL,
-                    apiKey: '',
-                    source: 'Puter AI (Kimi K3)'
+            // Close when clicking outside modal content
+            [exploreModal, imageStudioModal, settingsModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal(modal);
                 });
+            });
 
-                queue.push({
-                    id: 'puter_gemma_4_31b_primary',
-                    name: selectedMeiModel,
-                    kind: 'puter-ai',
-                    url: 'puter://ai.chat',
-                    modelId: PUTER_GEMMA_MODEL,
-                    apiKey: '',
-                    source: 'Puter AI (Gemma 4 31B)'
+            if (closeExploreBtn) closeExploreBtn.addEventListener('click', () => closeModal(exploreModal));
+
+            openImageStudioNavBtn.addEventListener('click', () => openModal(imageStudioModal));
+            imageStudioShortcutBtn.addEventListener('click', () => openModal(imageStudioModal));
+            closeImageStudioBtn.addEventListener('click', () => closeModal(imageStudioModal));
+
+            openSettingsNavBtn.addEventListener('click', () => openModal(settingsModal));
+            openSettingsBtn.addEventListener('click', () => openModal(settingsModal));
+            activeModelBadge.addEventListener('click', () => openModal(settingsModal));
+            closeSettingsBtn.addEventListener('click', () => closeModal(settingsModal));
+            saveSettingsBtn.addEventListener('click', () => {
+                closeModal(settingsModal);
+                showToast("Settings saved successfully.");
+            });
+
+            // --- Sidebar Handling (Mobile) ---
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+
+            sidebarToggleBtn.addEventListener('click', openSidebar);
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // --- Theme Toggling ---
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('mei_theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('mei_theme', 'dark');
+                    }
                 });
-
-                if (activeCfg && activeCfg.endpoint) {
-                    queue.push({
-                        id: activeCfg.id,
-                        name: activeCfg.modelId || activeCfg.name,
-                        kind: 'http-endpoint',
-                        url: activeCfg.endpoint,
-                        modelId: activeCfg.modelId || resolveInternalModelId(activeCfg.modelId, 0),
-                        apiKey: activeCfg.apiKey || '',
-                        source: 'Custom API'
-                    });
-                }
-
-                // Prioritize Pollinations first across Pollinations models and Qwen models
-                const pollinationsModels = [...EXAMPLE_RETRY_MODELS, ...pool];
-                for (let pIdx = 0; pIdx < pollinationsModels.length; pIdx += 1) {
-                    const mId = pollinationsModels[pIdx];
-                    const chatUrl = POLLINATIONS_CHAT_ENDPOINTS[pIdx % POLLINATIONS_CHAT_ENDPOINTS.length];
-                    queue.push({
-                        id: `pollinations_chat_${pIdx}`,
-                        name: selectedMeiModel,
-                        kind: 'http-endpoint',
-                        url: chatUrl,
-                        modelId: mId,
-                        apiKey: activeCfg && activeCfg.apiKey ? activeCfg.apiKey : '',
-                        source: 'Pollinations Chat'
-                    });
-                    queue.push({
-                        id: `pollinations_text_${pIdx}`,
-                        name: selectedMeiModel,
-                        kind: 'http-endpoint',
-                        url: POLLINATIONS_TEXT_BASE,
-                        modelId: mId,
-                        apiKey: activeCfg && activeCfg.apiKey ? activeCfg.apiKey : '',
-                        source: 'Pollinations Text'
-                    });
-                }
-
-                // Interleave across all Qwen models first so every model is rotated through
-                for (let m = 0; m < pool.length; m += 1) {
-                    const qModelId = pool[m];
-                    const baseUrl = chatBases[m % Math.max(1, chatBases.length)] || "https://gen.pollinations.ai/v1/chat/completions";
-                    const proxyFn = CORS_PROXY_TEMPLATES[m % CORS_PROXY_TEMPLATES.length];
-                    queue.push({
-                        id: `qwen_rot_${m}`,
-                        name: selectedMeiModel,
-                        kind: 'qwen-model',
-                        url: proxyFn(baseUrl),
-                        modelId: qModelId,
-                        apiKey: activeCfg && activeCfg.apiKey ? activeCfg.apiKey : '',
-                        source: `Qwen Pool #${m + 1}`
-                    });
-                }
-
-                let generatedCounter = queue.length;
-
-                // Generate 1,000+ no-auth endpoint + model + route combinations across the entire Qwen pool
-                for (let b = 0; b < NO_AUTH_ENDPOINT_BASES.length; b += 1) {
-                    const baseUrl = NO_AUTH_ENDPOINT_BASES[b];
-                    const isModelPath = /\/models$/i.test(baseUrl);
-                    for (let m = 0; m < pool.length; m += 1) {
-                        const qModelId = pool[m];
-                        for (let p = 0; p < CORS_PROXY_TEMPLATES.length; p += 1) {
-                            if (queue.length >= 1024) break;
-                            const rawTarget = isModelPath ? `${baseUrl}/${encodeURIComponent(qModelId)}` : baseUrl;
-                            const proxiedUrl = CORS_PROXY_TEMPLATES[p](rawTarget);
-
-                            queue.push({
-                                id: `noauth_ep_${generatedCounter++}`,
-                                name: selectedMeiModel,
-                                kind: isModelPath ? 'hf-model-endpoint' : 'http-endpoint',
-                                url: proxiedUrl,
-                                modelId: qModelId,
-                                apiKey: '',
-                                source: `No-Auth Pool #${generatedCounter}`
-                            });
-                        }
-                        if (queue.length >= 1024) break;
-                    }
-                    if (queue.length >= 1024) break;
-                }
-
-                // Ensure at least 1,000 entries if pool is small
-                while (queue.length < 1000) {
-                    const idx = queue.length;
-                    const qModelId = pool[idx % pool.length];
-                    const baseUrl = NO_AUTH_ENDPOINT_BASES[idx % NO_AUTH_ENDPOINT_BASES.length];
-                    const proxyFn = CORS_PROXY_TEMPLATES[idx % CORS_PROXY_TEMPLATES.length];
-                    const rawTarget = /\/models$/i.test(baseUrl) ? `${baseUrl}/${encodeURIComponent(qModelId)}` : baseUrl;
-                    queue.push({
-                        id: `noauth_ep_pad_${idx}`,
-                        name: selectedMeiModel,
-                        kind: /\/models$/i.test(baseUrl) ? 'hf-model-endpoint' : 'http-endpoint',
-                        url: proxyFn(rawTarget),
-                        modelId: qModelId,
-                        apiKey: '',
-                        source: `No-Auth Pool #${idx + 1}`
-                    });
-                }
-
-                return queue;
             }
 
-            function resolveInternalModelId(requestedName, index = 0) {
-                const pool = getInternalQwenModelIds();
-                if (!pool.length) return "Qwen/Qwen2.5-72B-Instruct";
-                if (requestedName && /^(qwen|qwq|qvq|codeqwen)/i.test(String(requestedName).trim())) {
-                    const clean = String(requestedName).trim();
-                    return clean.includes('/') ? clean : `Qwen/${clean}`;
-                }
-                return pool[index % pool.length];
+            // --- Canvas Panel Handling ---
+            function openCanvas() {
+                canvasPanel.classList.remove('hidden');
+                openCanvasHeaderBtn.classList.remove('hidden');
+                openCanvasHeaderBtn.classList.add('flex');
             }
 
-            function extractQwenModelsFromRepoText(rawText) {
-                if (!rawText || typeof rawText !== 'string') return [];
-                const matches = rawText.match(/\b(?:Qwen(?:3\.5|3|2\.5|2|1\.5)?-[A-Za-z0-9._-]+|QwQ-[A-Za-z0-9._-]+|QVQ-[A-Za-z0-9._-]+|CodeQwen[A-Za-z0-9._-]+)\b/gi) || [];
-                const normalized = matches
-                    .map(m => m.replace(/[.,:;!?]+$/, ''))
-                    .filter(m => m.length >= 4 && !/^(qwen|qwq|qvq|codeqwen)$/i.test(m))
-                    .map(m => m.includes('/') ? m : `Qwen/${m}`);
-                return Array.from(new Set(normalized));
+            function closeCanvas() {
+                canvasPanel.classList.add('hidden');
+                if (canvasPanel.classList.contains('fixed')) toggleCanvasFullscreen(); // exit fullscreen if closing
             }
 
-            async function syncQwenRepositoryModels() {
-                try {
-                    const found = new Set();
-                    const proxyFetch = async (url, timeoutMs = 6000) => {
-                        const urls = [
-                            url,
-                            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-                            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-                        ];
-                        for (const target of urls) {
-                            try {
-                                const res = await fetchWithTimeout(target, {}, timeoutMs);
-                                if (res && res.ok) return await res.text();
-                            } catch (_) {}
-                        }
-                        return null;
-                    };
+            openCanvasHeaderBtn.addEventListener('click', openCanvas);
+            closeCanvasBtn.addEventListener('click', closeCanvas);
 
-                    for (const branch of QWEN_REPO_BRANCHES) {
-                        const rawReadmeUrl = `https://raw.githubusercontent.com/${QWEN_REPO_OWNER}/${QWEN_REPO_NAME}/${branch}/README.md`;
-                        const readmeText = await proxyFetch(rawReadmeUrl, 5500);
-                        if (readmeText) {
-                            extractQwenModelsFromRepoText(readmeText).forEach(m => found.add(m));
-                        }
-                    }
+            // Canvas Tabs
+            canvasPreviewTab.addEventListener('click', () => {
+                canvasPreviewTab.classList.replace('text-gray-400', 'text-white');
+                canvasPreviewTab.classList.replace('hover:text-gray-200', 'bg-purple-600');
+                
+                canvasCodeTab.classList.replace('text-white', 'text-gray-400');
+                canvasCodeTab.classList.replace('bg-purple-600', 'hover:text-gray-200');
 
-                    if (found.size > 0) {
-                        discoveredQwenModels = Array.from(found);
-                        refreshModelCountUI();
-                    }
-                } catch (_) {}
-            }
+                canvasIframe.classList.remove('hidden');
+                canvasCodeContainer.classList.add('hidden');
+            });
 
-            async function queryLiveQwenEndpoint(resolvedModelId, promptText, signal = null, apiKey = '') {
-                const headers = { 'Content-Type': 'application/json' };
-                if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+            canvasCodeTab.addEventListener('click', () => {
+                canvasCodeTab.classList.replace('text-gray-400', 'text-white');
+                canvasCodeTab.classList.replace('hover:text-gray-200', 'bg-purple-600');
+                
+                canvasPreviewTab.classList.replace('text-white', 'text-gray-400');
+                canvasPreviewTab.classList.replace('bg-purple-600', 'hover:text-gray-200');
 
-                const chatEndpoints = [
-                    { url: 'https://gen.pollinations.ai/v1/chat/completions', model: resolvedModelId },
-                    { url: 'https://text.pollinations.ai/openai', model: resolvedModelId },
-                    { url: 'http://localhost:11434/v1/chat/completions', model: resolvedModelId },
-                    { url: 'http://localhost:8000/v1/chat/completions', model: resolvedModelId }
-                ];
+                canvasCodeContainer.classList.remove('hidden');
+                canvasIframe.classList.add('hidden');
+            });
 
-                for (const ep of chatEndpoints) {
-                    if (signal && signal.aborted) throw new Error('Aborted');
-                    try {
-                        const res = await fetchWithTimeout(ep.url, {
-                            method: 'POST',
-                            headers,
-                            body: JSON.stringify({
-                                model: ep.model,
-                                messages: [
-                                    { role: 'system', content: MEI_SYSTEM_PROMPT },
-                                    { role: 'user', content: promptText }
-                                ],
-                                max_tokens: 512,
-                                temperature: 0.7
-                            })
-                        }, 6500, signal);
-                        if (res && res.ok) {
-                            const txt = await res.text();
-                            let parsed = null;
-                            try { parsed = JSON.parse(txt); } catch (_) {}
-                            const extracted = extractReplyFromPayload(parsed, txt);
-                            if (extracted) return extracted.replace(/<\|im_end\|>/g, '').trim();
-                        }
-                    } catch (err) {
-                        if (err && err.message === 'Aborted') throw err;
-                    }
-                }
-
-                return null;
-            }
-
-            async function executeSequentialFailover(promptText, attachments = [], signal = null, onStatus = null) {
-                const activeCfg = customApiConfigs.find(c => c.id === activeApiConfigId);
-                const qwenPool = getInternalQwenModelIds();
-                const queue = buildNoAuthFailoverQueue(activeCfg, qwenPool);
-
-                let attempt = 0;
-                let cycle = 0;
-                let skippedCount = 0;
-
-                while (true) {
-                    if (signal && signal.aborted) throw new Error('Aborted');
-                    cycle += 1;
-                    const availableQueue = queue.filter(item => !isEndpointRateLimited(item.url));
-                    const activeQueue = availableQueue.length > 0 ? availableQueue : queue;
-
-                    if (cycle > 1 && typeof onStatus === 'function') {
-                        onStatus(`Rate-limit aware rotation — cycle ${cycle} (${endpointRateLimits.size} cooled down)...`);
-                    }
-                    for (let i = 0; i < activeQueue.length; i += 1) {
-                        if (signal && signal.aborted) throw new Error('Aborted');
-                        const item = activeQueue[i];
-                        const displayName = item.name || selectedMeiModel;
-                        if (typeof onStatus === 'function') {
-                            onStatus(`Attempt ${attempt + 1}/${activeQueue.length} (${item.modelId})...`);
-                        }
-                        try {
-                            const reply = await trySingleCandidate(item, promptText, attachments, signal, attempt);
-                            if (reply && String(reply).trim().length > 0) {
-                                return {
-                                    text: reply,
-                                    modelName: displayName,
-                                    modelId: item.modelId,
-                                    skippedCount
-                                };
-                            }
-                        } catch (err) {
-                            if (err && (err.name === 'AbortError' || err.message === 'Aborted')) throw err;
-                        }
-                        attempt += 1;
-                        skippedCount += 1;
-                        const cooldownPressure = Math.min(endpointRateLimits.size * 60, 1200);
-                        const delayMs = Math.min(120 * Math.pow(1.2, Math.min(attempt, 8)) + cooldownPressure, 2500);
-                        await new Promise((resolve) => setTimeout(resolve, delayMs));
-                    }
+            // Canvas Fullscreen
+            function toggleCanvasFullscreen() {
+                if (canvasPanel.classList.contains('fixed')) {
+                    // Exit fullscreen
+                    canvasPanel.classList.remove('fixed', 'inset-0', 'z-50');
+                    mainChatArea.classList.remove('hidden');
+                    canvasFullscreenIcon.classList.replace('fa-compress', 'fa-expand');
+                } else {
+                    // Enter fullscreen
+                    canvasPanel.classList.add('fixed', 'inset-0', 'z-50');
+                    mainChatArea.classList.add('hidden'); // hide chat area entirely
+                    canvasFullscreenIcon.classList.replace('fa-expand', 'fa-compress');
                 }
             }
+            toggleCanvasFullscreenBtn.addEventListener('click', toggleCanvasFullscreen);
 
-            function attachProvenancePill(containerEl, modelName, skippedCount) {
-                if (!containerEl) return;
-                const pill = document.createElement('div');
-                pill.className = 'mt-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[11px] font-mono text-purple-300';
-                pill.innerHTML = `<i class="fa-solid fa-microchip"></i> <span>${escapeHtml(modelName)}</span>${skippedCount > 0 ? `<span class="text-gray-400">• ${skippedCount} skipped</span>` : ''}`;
-                containerEl.appendChild(pill);
-            }
 
-            function attachCanvasButtonIfCodePresent(containerEl, markdownText) {
-                if (!containerEl || !markdownText) return;
-                const match = String(markdownText).match(/```html\s*\n([\s\S]*?)```/i);
-                if (match && match[1]) {
-                    const htmlCode = match[1].trim();
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'mt-2 ml-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-medium cursor-pointer transition';
-                    btn.innerHTML = '<i class="fa-solid fa-layer-group"></i> Open in Mei Canvas';
-                    btn.addEventListener('click', () => openCanvasWithCode(htmlCode, 'Mei Canvas App'));
-                    containerEl.appendChild(btn);
-                    openCanvasWithCode(htmlCode, 'Mei Canvas App');
-                }
-            }
+            // --- Chat Handling ---
+            
+            let chatHistory = [];
+            let currentAbortController = null;
+            let activeStreamStopper = null;
+            let isGenerating = false;
 
-            function setGeneratingState(generating) {
-                isGenerating = generating;
-                if (!sendBtn) return;
-                if (generating) {
+            function setGeneratingState(active) {
+                isGenerating = active;
+                if (active) {
                     sendBtn.innerHTML = '<i class="fa-solid fa-stop"></i>';
-                    sendBtn.classList.remove('text-blue-600', 'dark:text-blue-400');
-                    sendBtn.classList.add('text-red-500', 'dark:text-red-400');
-                    sendBtn.title = 'Stop generation';
+                    sendBtn.title = 'Stop Mei';
+                    sendBtn.classList.remove('opacity-40', 'cursor-not-allowed', 'text-blue-600', 'dark:text-blue-400');
+                    sendBtn.classList.add('text-red-500', 'dark:text-red-400', 'bg-red-500/10');
                 } else {
                     sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
-                    sendBtn.classList.remove('text-red-500', 'dark:text-red-400');
-                    sendBtn.classList.add('text-blue-600', 'dark:text-blue-400');
                     sendBtn.title = 'Send message';
-                }
-            }
-
-            function renderAttachmentPreviews() {
-                if (!attachmentPreview) return;
-                if (!activeAttachments.length) {
-                    attachmentPreview.classList.add('hidden');
-                    attachmentPreview.innerHTML = '';
-                    return;
-                }
-                attachmentPreview.classList.remove('hidden');
-                attachmentPreview.innerHTML = activeAttachments.map((att, idx) => `
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-xs text-purple-200">
-                        <i class="fa-solid ${att.isImage ? 'fa-image' : 'fa-file-lines'}"></i>
-                        <span>${escapeHtml(att.name)}</span>
-                        <button type="button" onclick="window.removeAttachment(${idx})" class="hover:text-white cursor-pointer ml-1">&times;</button>
-                    </span>
-                `).join('');
-            }
-
-            window.removeAttachment = function (idx) {
-                activeAttachments.splice(idx, 1);
-                renderAttachmentPreviews();
-            };
-
-            function startNewSession() {
-                currentSessionId = 'session_' + Date.now();
-                chatHistory = [];
-                activeAttachments = [];
-                renderAttachmentPreviews();
-                if (messagesList) messagesList.innerHTML = '';
-                const emptyState = document.getElementById('emptyState');
-                if (emptyState) emptyState.style.display = 'flex';
-                saveCurrentSessionToMemory();
-            }
-
-            window.loadSavedSession = function (sessionId) {
-                const found = savedSessions.find(s => s.id === sessionId);
-                if (!found) return;
-                currentSessionId = found.id;
-                chatHistory = Array.isArray(found.messages) ? [...found.messages] : [];
-                if (messagesList) messagesList.innerHTML = '';
-                const emptyState = document.getElementById('emptyState');
-                if (emptyState) emptyState.style.display = chatHistory.length ? 'none' : 'flex';
-                chatHistory.forEach(msg => {
-                    if (msg.role === 'user') {
-                        appendUserMessage(msg.content, msg.attachments || []);
-                    } else if (msg.role === 'assistant') {
-                        const { contentEl, logoEl } = createBotPlaceholder();
-                        if (logoEl) logoEl.classList.remove('mei-logo-thinking');
-                        contentEl.classList.remove('typing-cursor');
-                        contentEl.innerHTML = marked.parse(msg.content || '');
-                        contentEl.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
-                        attachProvenancePill(contentEl, msg.metaModel || selectedMeiModel, msg.skippedCount || 0);
+                    sendBtn.classList.remove('text-red-500', 'dark:text-red-400', 'bg-red-500/10');
+                    sendBtn.classList.add('text-blue-600', 'dark:text-blue-400');
+                    if (messageInput.value.trim() === '') {
+                        sendBtn.classList.add('opacity-40', 'cursor-not-allowed');
                     }
-                });
-                try { localStorage.setItem('mei_current_session_id', currentSessionId); } catch (_) {}
-                renderSidebarSessions();
-                scrollToBottom();
-            };
-
-            window.deleteSavedSession = function (sessionId) {
-                savedSessions = savedSessions.filter(s => s.id !== sessionId);
-                try { localStorage.setItem('mei_saved_sessions', JSON.stringify(savedSessions)); } catch (_) {}
-                if (currentSessionId === sessionId) {
-                    startNewSession();
-                } else {
-                    renderSidebarSessions();
                 }
-            };
+            }
 
-            async function handleSendMessage(overridePrompt = null) {
-                if (isGenerating) {
-                    if (currentAbortController) currentAbortController.abort();
+            function interruptMei() {
+                if (!isGenerating) return;
+
+                if (currentAbortController) {
+                    currentAbortController.abort();
+                    currentAbortController = null;
+                }
+                if (typeof activeStreamStopper === 'function') {
+                    activeStreamStopper();
+                    activeStreamStopper = null;
+                }
+
+                const headerMeiLogo = document.getElementById('headerMeiLogo');
+                if (headerMeiLogo) headerMeiLogo.classList.remove('mei-logo-thinking');
+
+                setGeneratingState(false);
+                showToast('Mei interrupted.');
+            }
+
+            // Auto-resize textarea
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                
+                if (isGenerating) return;
+
+                if(this.value.trim() !== "") {
+                    sendBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+                } else {
+                    sendBtn.classList.add('opacity-40', 'cursor-not-allowed');
+                }
+            });
+
+            function appendMessage(role, text, stream = false) {
+                // Keep landing page visible at the top and show messages list underneath it
+                if (messagesList.classList.contains('hidden')) {
+                    messagesList.classList.remove('hidden');
+                }
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex gap-4 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+
+                const contentClass = role === 'user' 
+                    ? 'bg-gray-100 dark:bg-mei-userBubble text-gray-800 dark:text-gray-200 rounded-2xl rounded-tr-sm' 
+                    : 'bg-transparent text-gray-800 dark:text-gray-100';
+                
+                const avatarHTML = role === 'ai' 
+                    ? `<div class="w-8 flex justify-center flex-shrink-0 mt-1"><div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899]"></div></div>`
+                    : '';
+
+                if (role === 'user') {
+                    msgDiv.innerHTML = `<div class="px-5 py-3 ${contentClass} max-w-[85%] text-sm whitespace-pre-wrap">${text}</div>`;
+                    messagesList.appendChild(msgDiv);
+                    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                } else {
+                    msgDiv.innerHTML = `
+                        ${avatarHTML}
+                        <div class="py-1 flex-1 min-w-0">
+                            <div class="prose prose-sm dark:prose-invert max-w-none message-content text-sm"></div>
+                        </div>
+                    `;
+                    messagesList.appendChild(msgDiv);
+                    
+                    const contentDiv = msgDiv.querySelector('.message-content');
+                    
+                    if (stream) {
+                        let index = 0;
+                        let cancelled = false;
+                        const chunkSize = 4; // Characters to render per animation frame
+
+                        activeStreamStopper = () => {
+                            cancelled = true;
+                            const partialText = text.substring(0, index) + (index < text.length ? ' *(interrupted)*' : '');
+                            contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(partialText));
+                            msgDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                            // Update last model history entry with what was actually spoken
+                            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'model') {
+                                chatHistory[chatHistory.length - 1].parts[0].text = partialText;
+                            }
+                        };
+                        
+                        function typeTick() {
+                            if (cancelled) return;
+                            if (index < text.length) {
+                                index = Math.min(index + chunkSize, text.length);
+                                const currentText = text.substring(0, index);
+                                // Parse markdown incrementally and attach the blinking cursor
+                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(currentText)) + '<span class="typing-cursor"></span>';
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                                requestAnimationFrame(typeTick);
+                            } else {
+                                // Final render with syntax highlighting
+                                activeStreamStopper = null;
+                                setGeneratingState(false);
+                                contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(text));
+                                msgDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            }
+                        }
+                        requestAnimationFrame(typeTick); // Start the typewriter animation loop
+                    } else {
+                        // Instant render (used for restoring chat history, if implemented later)
+                        contentDiv.innerHTML = DOMPurify.sanitize(marked.parse(text));
+                        msgDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }
+                }
+            }
+
+            function appendLoadingBubble() {
+                if (messagesList.classList.contains('hidden')) {
+                    messagesList.classList.remove('hidden');
+                }
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex gap-4 justify-start`;
+                
+                const avatarHTML = `<div class="w-8 flex justify-center flex-shrink-0 mt-1"><div class="w-3.5 h-7 rounded-full bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899] mei-logo-thinking"></div></div>`;
+                
+                msgDiv.innerHTML = `
+                    ${avatarHTML}
+                    <div class="py-1 flex-1 min-w-0 flex items-center gap-3">
+                        <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Mei is searching & thinking</span><span class="typing-cursor"></span>
+                    </div>
+                `;
+                messagesList.appendChild(msgDiv);
+                chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                return msgDiv;
+            }
+
+            async function fetchAIResponse(userText) {
+                const headerMeiLogo = document.getElementById('headerMeiLogo');
+                headerMeiLogo.classList.add('mei-logo-thinking'); // Animate header logo
+                setGeneratingState(true);
+
+                currentAbortController = new AbortController();
+                const signal = currentAbortController.signal;
+                
+                const loadingBubble = appendLoadingBubble(); // Show animated chat bubble
+                
+                chatHistory.push({ role: 'user', parts: [{ text: userText }] });
+                
+                const activeProfile = getActiveProfile();
+                const googleKey = activeProfile && activeProfile.provider === 'google' ? activeProfile.key : '';
+                const openRouterKey = activeProfile && activeProfile.provider === 'openrouter' ? activeProfile.key : '';
+                let finalResponseText = null;
+                let sourceLinks = '';
+                let wasAborted = false;
+
+                // Helper to format history for models outside of Gemini
+                const openRouterMessages = chatHistory.map(m => ({
+                    role: m.role === 'model' ? 'assistant' : 'user',
+                    content: m.parts[0].text
+                }));
+
+                try {
+                    // --- TIER 1: Google User-Provided API Profile ---
+                    if (!googleKey) {
+                        throw new Error("No active Google API profile selected. Skipping Tier 1.");
+                    }
+                    
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${googleKey}`;
+                    const payload = {
+                        contents: chatHistory,
+                        tools: [{ "google_search": {} }],
+                        systemInstruction: {
+                            parts: [{ text: "Your name is Mei. Always refer to yourself as Mei (never say 'Mei AI' or 'an AI language model'). Be warm, intelligent, and helpful. You have access to Google Search—use it whenever up-to-date information is needed. If asked to generate a web app, output a complete single-file HTML document enclosed in ```html backticks." }]
+                        }
+                    };
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        signal
+                    });
+                    
+                    if (!response.ok) throw new Error("Tier 1 Google API failed");
+                    
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+                    if (!candidate?.content?.parts?.[0]?.text) throw new Error("Invalid Tier 1 response");
+                    
+                    finalResponseText = candidate.content.parts[0].text;
+                    
+                    // Extract citations/sources
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        const sources = groundingMetadata.groundingAttributions
+                            .map(attr => ({ uri: attr.web?.uri, title: attr.web?.title }))
+                            .filter(s => s.uri && s.title);
+                            
+                        if (sources.length > 0) {
+                            sourceLinks = '\n\n**Sources:**\n' + sources.map(s => `- [${s.title}](${s.uri})`).join('\n');
+                        }
+                    }
+
+                } catch (error1) {
+                    if (signal.aborted || error1.name === 'AbortError') {
+                        wasAborted = true;
+                    } else {
+                        console.warn("Tier 1 failed:", error1.message);
+                        
+                        try {
+                            // --- TIER 2: OpenRouter API Profile (Active or any saved OpenRouter profile) ---
+                            const fallbackOpenRouter = openRouterKey || (apiProfiles.find(p => p.provider === 'openrouter')?.key || '');
+                            if (!fallbackOpenRouter) {
+                                throw new Error("No OpenRouter API profile available. Skipping Tier 2.");
+                            }
+
+                            const orResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${fallbackOpenRouter}`
+                                },
+                                body: JSON.stringify({
+                                    model: "mistralai/mistral-7b-instruct:free",
+                                    messages: [
+                                        { role: "system", content: "Your name is Mei. Always refer to yourself as Mei. Be warm, intelligent, and helpful. If asked to generate a web app, output a complete single-file HTML document enclosed in ```html backticks." },
+                                        ...openRouterMessages
+                                    ]
+                                }),
+                                signal
+                            });
+                            
+                            if (!orResponse.ok) throw new Error("Tier 2 OpenRouter API failed");
+                            
+                            const orResult = await orResponse.json();
+                            if (!orResult.choices?.[0]?.message?.content) throw new Error("Invalid Tier 2 response");
+                            
+                            finalResponseText = orResult.choices[0].message.content;
+                            
+                        } catch (error2) {
+                            if (signal.aborted || error2.name === 'AbortError') {
+                                wasAborted = true;
+                            } else {
+                                console.warn("Tier 2 failed:", error2.message);
+                                
+                                try {
+                                    // --- TIER 3: Pollinations.ai (Free, no auth required) ---
+                                    const pollResponse = await fetch("https://text.pollinations.ai/", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                            messages: [
+                                                { role: "system", content: "Your name is Mei. Always refer to yourself as Mei. Be warm, intelligent, and helpful. If asked to generate a web app, output a complete single-file HTML document enclosed in ```html backticks." },
+                                                ...openRouterMessages
+                                            ],
+                                            model: "openai",
+                                            private: true
+                                        }),
+                                        signal
+                                    });
+                                    
+                                    if (!pollResponse.ok) throw new Error("Tier 3 Pollinations API failed");
+                                    
+                                    const pollText = await pollResponse.text();
+                                    if (!pollText || pollText.includes("doesn't have enough credits")) {
+                                        throw new Error("Pollinations returned an error or credit limit");
+                                    }
+                                    
+                                    finalResponseText = pollText;
+                                    
+                                } catch (error3) {
+                                    if (signal.aborted || error3.name === 'AbortError') {
+                                        wasAborted = true;
+                                    } else {
+                                        console.warn("Tier 3 failed:", error3.message);
+                                        
+                                        // --- TIER 4: Fallback Message ---
+                                        finalResponseText = "⚠️ **Mei couldn't reach any AI service right now.** \n\nPlease configure and select a valid API Key Profile in Settings, or try again later when backup systems are back online.";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    loadingBubble.remove();
+                    headerMeiLogo.classList.remove('mei-logo-thinking'); // Stop header animation
+                    currentAbortController = null;
+                }
+
+                if (wasAborted || signal.aborted) {
                     setGeneratingState(false);
                     return;
                 }
 
-                const rawText = overridePrompt !== null ? String(overridePrompt) : (messageInput ? messageInput.value.trim() : '');
-                if (!rawText && activeAttachments.length === 0) return;
+                // Process successful (or fallback) text
+                if (finalResponseText) {
+                    const fullText = finalResponseText + sourceLinks;
+                    chatHistory.push({ role: 'model', parts: [{ text: finalResponseText }] });
+                    
+                    appendMessage('ai', fullText, true); // True activates the streaming effect
+                    
+                    // Check if HTML code was generated to auto-launch Canvas
+                    if (fullText.includes("```html")) {
+                        const codeMatch = fullText.match(/```html\n([\s\S]*?)```/);
+                        if(codeMatch && codeMatch[1]) {
+                            openCanvas();
+                            document.getElementById('canvasTitle').textContent = "Generated Web App";
+                            canvasIframe.srcdoc = codeMatch[1];
+                            document.getElementById('canvasCodeElement').textContent = codeMatch[1];
+                            hljs.highlightElement(document.getElementById('canvasCodeElement'));
+                        }
+                    }
+                } else {
+                    setGeneratingState(false);
+                }
+            }
 
-                if (!isAccountSignedIn) {
-                    appendUserMessage(rawText, [...activeAttachments]);
-                    const { contentEl, logoEl } = createBotPlaceholder();
-                    if (logoEl) logoEl.classList.remove('mei-logo-thinking');
-                    contentEl.classList.remove('typing-cursor');
-                    contentEl.textContent = 'log in to start chatting';
-                    scrollToBottom();
+            function sendMessage() {
+                const text = messageInput.value.trim();
+
+                // If Mei is currently generating and user clicks Stop (with empty input), just stop Mei
+                if (isGenerating && !text) {
+                    interruptMei();
                     return;
                 }
 
-                const attachmentsToSend = [...activeAttachments];
-                activeAttachments = [];
-                renderAttachmentPreviews();
-                if (messageInput && overridePrompt === null) {
-                    messageInput.value = '';
-                    messageInput.style.height = 'auto';
+                if (!text) return;
+
+                // If Mei is currently generating and user sends a new message, interrupt her first
+                if (isGenerating) {
+                    interruptMei();
                 }
+                
+                appendMessage('user', text);
+                messageInput.value = '';
+                messageInput.style.height = 'auto'; // reset height
 
-                appendUserMessage(rawText, attachmentsToSend);
-                chatHistory.push({
-                    role: 'user',
-                    content: rawText,
-                    attachments: attachmentsToSend
-                });
-                saveCurrentSessionToMemory();
+                fetchAIResponse(text);
+            }
 
-                setGeneratingState(true);
-                currentAbortController = new AbortController();
-                const { contentEl, logoEl } = createBotPlaceholder();
-                currentBotContentEl = contentEl;
-
-                let outcome;
-                try {
-                    outcome = await executeSequentialFailover(
-                        rawText,
-                        attachmentsToSend,
-                        currentAbortController.signal,
-                        (statusMsg) => {
-                            if (currentBotContentEl) {
-                                currentBotContentEl.innerHTML = `<span class="text-xs font-mono text-amber-400 flex items-center gap-2"><i class="fa-solid fa-fire-flame-curved"></i> ${escapeHtml(statusMsg)}</span>`;
-                                scrollToBottom();
-                            }
-                        }
-                    );
-                } catch (err) {
-                    if (err && err.message === 'Aborted') {
-                        outcome = {
-                            text: "*(Generation stopped.)*",
-                            modelName: selectedMeiModel,
-                            skippedCount: 0
-                        };
-                    } else {
-                        outcome = {
-                            text: synthesizeMeiEngineResponse(selectedMeiModel, rawText, attachmentsToSend),
-                            modelName: selectedMeiModel,
-                            skippedCount: 0
-                        };
-                    }
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                } else if (e.key === 'Escape' && isGenerating) {
+                    e.preventDefault();
+                    interruptMei();
                 }
+            });
 
-                if (logoEl) logoEl.classList.remove('mei-logo-thinking');
-                currentBotContentEl.classList.remove('typing-cursor');
-                currentBotContentEl.innerHTML = marked.parse(outcome.text);
-                currentBotContentEl.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                attachProvenancePill(currentBotContentEl, outcome.modelName, outcome.skippedCount);
-                attachCanvasButtonIfCodePresent(currentBotContentEl, outcome.text);
-
-                chatHistory.push({
-                    role: 'assistant',
-                    content: outcome.text,
-                    metaModel: outcome.modelName,
-                    skippedCount: outcome.skippedCount
-                });
-                saveCurrentSessionToMemory();
-                setGeneratingState(false);
-                currentAbortController = null;
-                scrollToBottom();
-            }
-
-            // =========================================================================
-            // 8. SETTINGS, MODEL PICKER & EVENT WIRING
-            // =========================================================================
-            function updateHeaderBadge() {
-                const activeCfg = customApiConfigs.find(c => c.id === activeApiConfigId);
-                const routeLabel = activeCfg ? activeCfg.name : 'Mei AI';
-                activeModelBadge.textContent = `${selectedMeiModel} (${routeLabel})`;
-            }
-
-            function renderMeiModelsList(filterText = '') {
-                const filtered = CUSTOM_MEI_MODELS.filter(m =>
-                    m.name.toLowerCase().includes(filterText.toLowerCase()) ||
-                    m.category.toLowerCase().includes(filterText.toLowerCase())
-                );
-                modelCountBadge.textContent = `${filtered.length} Models`;
-                meiModelSelect.innerHTML = filtered.map(m =>
-                    `<option value="${m.name}" ${m.name === selectedMeiModel ? 'selected' : ''}>${m.name} [${m.category}]</option>`
-                ).join('');
-            }
-
-            function renderApiConfigsList() {
-                if (customApiConfigs.length === 0) {
-                    apiConfigList.innerHTML = `<div class="text-gray-500 italic text-[11px] py-1">No custom API profiles configured. Sequential model failover is active.</div>`;
-                    return;
-                }
-                apiConfigList.innerHTML = customApiConfigs.map(cfg => `
-                    <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border ${cfg.id === activeApiConfigId ? 'border-purple-500' : 'border-gray-700'}">
-                        <div>
-                            <div class="font-medium text-gray-200 text-xs flex items-center gap-1.5">
-                                ${escapeHtml(cfg.name)}
-                                ${cfg.apiKey ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-700/50">Key Set</span>' : ''}
-                            </div>
-                            <div class="text-[10px] text-gray-400 truncate max-w-[200px]">${escapeHtml(cfg.endpoint)}</div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="window.selectApiConfig('${cfg.id}')" class="px-2 py-1 rounded bg-${cfg.id === activeApiConfigId ? 'purple-600' : 'gray-800'} text-white text-[10px] font-medium cursor-pointer">${cfg.id === activeApiConfigId ? 'Active' : 'Select'}</button>
-                            <button type="button" onclick="window.deleteApiConfig('${cfg.id}')" class="text-gray-400 hover:text-red-400 text-xs cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            function appendUserMessage(text, attachments = []) {
-                const emptyState = document.getElementById('emptyState');
-                if (emptyState) emptyState.style.display = 'none';
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'flex items-start gap-3.5 justify-end';
-
-                let attHtml = '';
-                if (attachments && attachments.length > 0) {
-                    attHtml = `<div class="flex flex-wrap gap-2 mb-2">` + attachments.map(att => {
-                        if (att.isImage && att.data) {
-                            return `<img src="${att.data}" alt="${escapeHtml(att.name)}" class="max-h-40 rounded-xl border border-gray-600 object-cover" />`;
-                        }
-                        return `<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/20 text-xs"><i class="fa-solid fa-file-lines"></i> ${escapeHtml(att.name)}</div>`;
-                    }).join('') + `</div>`;
-                }
-
-                wrapper.innerHTML = `
-                    <div class="max-w-[82%] bg-blue-600 dark:bg-mei-userBubble text-white dark:text-gray-100 px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed shadow-sm">
-                        ${attHtml}
-                        <div class="whitespace-pre-wrap">${escapeHtml(text || '')}</div>
-                    </div>
-                `;
-                messagesList.appendChild(wrapper);
-                scrollToBottom();
-            }
-
-            window.selectApiConfig = function (id) {
-                activeApiConfigId = activeApiConfigId === id ? 'default' : id;
-                localStorage.setItem('mei_active_api_id', activeApiConfigId);
-                renderApiConfigsList();
-                updateHeaderBadge();
-            };
-
-            window.deleteApiConfig = function (id) {
-                customApiConfigs = customApiConfigs.filter(c => c.id !== id);
-                localStorage.setItem('mei_custom_api_configs', JSON.stringify(customApiConfigs));
-                if (activeApiConfigId === id) {
-                    activeApiConfigId = 'default';
-                    localStorage.setItem('mei_active_api_id', activeApiConfigId);
-                }
-                renderApiConfigsList();
-                updateHeaderBadge();
-            };
-
-            if (sendBtn) sendBtn.addEventListener('click', () => handleSendMessage());
-
-            if (messageInput) {
-                messageInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }
-                });
-                messageInput.addEventListener('input', () => {
-                    messageInput.style.height = 'auto';
-                    messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + 'px';
-                });
-            }
-
-            document.querySelectorAll('.prompt-chip').forEach(chip => {
+            // Setup prompt chips
+            promptChips.forEach(chip => {
                 chip.addEventListener('click', () => {
                     const prompt = chip.getAttribute('data-prompt');
-                    if (prompt) handleSendMessage(prompt);
+                    messageInput.value = prompt;
+                    // Trigger resize
+                    messageInput.style.height = 'auto';
+                    messageInput.style.height = (messageInput.scrollHeight) + 'px';
+                    sendBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+                    
+                    if (chip.classList.contains('explore-item')) {
+                        closeModal(exploreModal);
+                    }
+                    
+                    // Optional: automatically send
+                    sendMessage(); 
                 });
             });
 
-            if (newChatBtn) newChatBtn.addEventListener('click', startNewSession);
-            if (homeBtn) homeBtn.addEventListener('click', startNewSession);
-            if (clearChatBtn) clearChatBtn.addEventListener('click', () => window.deleteSavedSession(currentSessionId));
-
-            if (sidebarToggleBtn) {
-                sidebarToggleBtn.addEventListener('click', () => {
-                    sidebar.classList.remove('-translate-x-full');
-                    overlay.classList.remove('hidden');
-                });
-            }
-            if (closeSidebarBtn) {
-                closeSidebarBtn.addEventListener('click', () => {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
-                });
-            }
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
-                });
+            // Reset UI
+            function resetChat() {
+                if (isGenerating) interruptMei();
+                chatHistory = [];
+                messagesList.innerHTML = '';
+                messagesList.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                closeCanvas();
+                showToast("Chat cleared.");
             }
 
-            function openSettingsModal() {
-                renderMeiModelsList(modelSearchInput ? modelSearchInput.value : '');
-                renderApiConfigsList();
-                refreshModelCountUI();
-                settingsModal.classList.remove('hidden');
-            }
-            if (openSettingsBtn) openSettingsBtn.addEventListener('click', openSettingsModal);
-            if (openSettingsNavBtn) openSettingsNavBtn.addEventListener('click', openSettingsModal);
-            if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-            if (saveSettingsBtn) {
-                saveSettingsBtn.addEventListener('click', () => {
-                    if (meiModelSelect && meiModelSelect.value) {
-                        selectedMeiModel = meiModelSelect.value;
-                        localStorage.setItem('mei_selected_model', selectedMeiModel);
-                    }
-                    updateHeaderBadge();
-                    settingsModal.classList.add('hidden');
-                });
-            }
-
-            if (modelSearchInput) {
-                modelSearchInput.addEventListener('input', (e) => renderMeiModelsList(e.target.value));
-            }
-
-            if (toggleThemeBtn) {
-                toggleThemeBtn.addEventListener('click', () => {
-                    document.documentElement.classList.toggle('dark');
-                });
-            }
-
-            if (addApiConfigBtn) addApiConfigBtn.addEventListener('click', () => apiConfigForm.classList.remove('hidden'));
-            if (cancelApiConfigBtn) cancelApiConfigBtn.addEventListener('click', () => apiConfigForm.classList.add('hidden'));
-
-            if (saveApiConfigItemBtn) {
-                saveApiConfigItemBtn.addEventListener('click', () => {
-                    const name = document.getElementById('apiConfigName').value.trim();
-                    const endpoint = document.getElementById('apiConfigEndpoint').value.trim();
-                    const modelId = document.getElementById('apiConfigModelId').value.trim();
-                    const apiKey = document.getElementById('apiConfigKey').value.trim();
-
-                    if (!name || !endpoint || isBlockedModelUrl(endpoint)) return;
-
-                    const newCfg = {
-                        id: 'cfg_' + Date.now(),
-                        name,
-                        endpoint,
-                        modelId,
-                        apiKey
-                    };
-
-                    customApiConfigs.push(newCfg);
-                    localStorage.setItem('mei_custom_api_configs', JSON.stringify(customApiConfigs));
-                    activeApiConfigId = newCfg.id;
-                    localStorage.setItem('mei_active_api_id', activeApiConfigId);
-
-                    document.getElementById('apiConfigName').value = '';
-                    document.getElementById('apiConfigEndpoint').value = '';
-                    document.getElementById('apiConfigModelId').value = '';
-                    document.getElementById('apiConfigKey').value = '';
-                    apiConfigForm.classList.add('hidden');
-
-                    renderApiConfigsList();
-                    updateHeaderBadge();
-                });
-            }
-
-            if (attachBtn && fileInput) {
-                attachBtn.addEventListener('click', () => fileInput.click());
-                fileInput.addEventListener('change', (e) => {
-                    const files = Array.from(e.target.files || []);
-                    files.forEach(file => {
-                        const reader = new FileReader();
-                        const isImage = file.type.startsWith('image/');
-                        reader.onload = () => {
-                            activeAttachments.push({
-                                name: file.name,
-                                isImage,
-                                data: reader.result
-                            });
-                            renderAttachmentPreviews();
-                        };
-                        if (isImage) reader.readAsDataURL(file);
-                        else reader.readAsText(file);
-                    });
-                    fileInput.value = '';
-                });
-            }
-
-            function openImageStudioModal() {
-                imageStudioModal.classList.remove('hidden');
-            }
-            if (imageStudioBtn) imageStudioBtn.addEventListener('click', openImageStudioModal);
-            if (openImageStudioNavBtn) openImageStudioNavBtn.addEventListener('click', openImageStudioModal);
-            if (closeImageStudioBtn) closeImageStudioBtn.addEventListener('click', () => imageStudioModal.classList.add('hidden'));
-
-            if (generateImageBtn) {
-                generateImageBtn.addEventListener('click', () => {
-                    const prompt = document.getElementById('imagePromptInput').value.trim();
-                    if (!prompt) return;
-                    const style = document.getElementById('imageStyleSelect').value;
-                    const aspect = document.getElementById('imageAspectSelect').value;
-                    const w = aspect === '16:9' ? 1024 : 768;
-                    const h = aspect === '16:9' ? 576 : 768;
-                    const fullPrompt = encodeURIComponent(`${prompt}, ${style} style, high detail`);
-                    const url = `https://image.pollinations.ai/prompt/${fullPrompt}?width=${w}&height=${h}&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
-
-                    const grid = document.getElementById('imageGalleryGrid');
-                    const empty = document.getElementById('emptyGalleryState');
-                    if (empty) empty.remove();
-
-                    const card = document.createElement('div');
-                    card.className = 'rounded-xl overflow-hidden border border-gray-700 bg-gray-900 flex flex-col';
-                    card.innerHTML = `<img src="${url}" alt="${escapeHtml(prompt)}" class="w-full h-40 object-cover" onerror="this.src='https://placehold.co/600x400/1e1e20/a855f7?text=Mei+Studio'" /><div class="p-2 text-[11px] text-gray-300 truncate">${escapeHtml(prompt)}</div>`;
-                    grid.prepend(card);
-                });
-            }
-
-            function switchCanvasTab(tab) {
-                const isCode = tab === 'code';
-                if (canvasIframe) canvasIframe.classList.toggle('hidden', isCode);
-                if (canvasCodeContainer) canvasCodeContainer.classList.toggle('hidden', !isCode);
-                if (canvasPreviewTab) {
-                    canvasPreviewTab.className = isCode
-                        ? 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer'
-                        : 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer';
-                }
-                if (canvasCodeTab) {
-                    canvasCodeTab.className = isCode
-                        ? 'px-3 py-1 rounded-md font-medium bg-purple-600 text-white transition cursor-pointer'
-                        : 'px-3 py-1 rounded-md font-medium text-gray-400 hover:text-gray-200 transition cursor-pointer';
-                }
-            }
-
-            function openCanvasWithCode(code, title = 'App Preview') {
-                if (!code) return;
-                currentCanvasCode = String(code).trim();
-                const titleEl = document.getElementById('canvasTitle');
-                if (titleEl) titleEl.textContent = title;
-                if (canvasIframe) canvasIframe.srcdoc = currentCanvasCode;
-                if (canvasCodeElement) {
-                    canvasCodeElement.textContent = currentCanvasCode;
-                    if (typeof hljs !== 'undefined') hljs.highlightElement(canvasCodeElement);
-                }
-                if (canvasPanel) canvasPanel.classList.remove('hidden');
-                if (openCanvasHeaderBtn) openCanvasHeaderBtn.classList.remove('hidden');
-                switchCanvasTab('preview');
-            }
-
-            function toggleCanvasFullscreen() {
-                isCanvasFullscreen = !isCanvasFullscreen;
-                if (mainChatArea) mainChatArea.classList.toggle('hidden', isCanvasFullscreen);
-                if (canvasPanel) {
-                    canvasPanel.classList.toggle('lg:w-1/2', !isCanvasFullscreen);
-                    canvasPanel.classList.toggle('w-full', isCanvasFullscreen);
-                }
-                if (canvasFullscreenIcon) {
-                    canvasFullscreenIcon.className = isCanvasFullscreen ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
-                }
-            }
-
-            if (canvasPreviewTab) canvasPreviewTab.addEventListener('click', () => switchCanvasTab('preview'));
-            if (canvasCodeTab) canvasCodeTab.addEventListener('click', () => switchCanvasTab('code'));
-            if (toggleCanvasFullscreenBtn) toggleCanvasFullscreenBtn.addEventListener('click', toggleCanvasFullscreen);
-            if (openCanvasHeaderBtn) {
-                openCanvasHeaderBtn.addEventListener('click', () => {
-                    if (currentCanvasCode) openCanvasWithCode(currentCanvasCode);
-                });
-            }
-            if (closeCanvasBtn) {
-                closeCanvasBtn.addEventListener('click', () => {
-                    if (isCanvasFullscreen) toggleCanvasFullscreen();
-                    canvasPanel.classList.add('hidden');
-                });
-            }
-            if (downloadCanvasCodeBtn) {
-                downloadCanvasCodeBtn.addEventListener('click', () => {
-                    if (!currentCanvasCode) return;
-                    const blob = new Blob([currentCanvasCode], { type: 'text/html' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'mei_canvas_app.html';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
-            }
-
-            // Initialize Workspace State
-            refreshModelCountUI();
-            syncQwenRepositoryModels();
-            updateHeaderBadge();
-            renderSidebarSessions();
-
-            (async function hydrateSidebarAccountInfo() {
-                const labelEl = document.getElementById('accountStatusLabel');
-                const metaEl = document.getElementById('accountUserMeta');
-                const avatarEl = document.getElementById('accountAvatar');
-                const roleEl = document.getElementById('accountSessionRole');
-                const actionBtn = document.getElementById('accountActionBtn');
-
-                function setAccountDisplay(name, email, role, isSignedIn) {
-                    const displayName = name || 'Workspace Member';
-                    const displayEmail = email || 'member@workspace.local';
-                    if (labelEl) labelEl.textContent = displayName;
-                    if (metaEl) metaEl.textContent = displayEmail;
-                    if (roleEl) roleEl.textContent = role || (isSignedIn ? 'Connected Profile' : 'Personal Workspace');
-                    if (actionBtn) actionBtn.textContent = isSignedIn ? 'Refresh' : 'Sign In';
-                    if (avatarEl) {
-                        const initials = displayName
-                            .split(/[\s@._-]+/)
-                            .filter(Boolean)
-                            .slice(0, 2)
-                            .map(part => part[0].toUpperCase())
-                            .join('');
-                        avatarEl.textContent = initials || 'MW';
-                    }
-                }
-
-                async function checkAccountSession(interactiveSignIn = false) {
-                    try {
-                        if (window.puter && window.puter.auth) {
-                            let isSignedIn = false;
-                            if (typeof window.puter.auth.isSignedIn === 'function') {
-                                isSignedIn = Boolean(await window.puter.auth.isSignedIn());
-                            }
-                            if (!isSignedIn && interactiveSignIn && typeof window.puter.auth.signIn === 'function') {
-                                await window.puter.auth.signIn();
-                                isSignedIn = typeof window.puter.auth.isSignedIn === 'function'
-                                    ? Boolean(await window.puter.auth.isSignedIn())
-                                    : true;
-                            }
-                            if (typeof window.puter.auth.getUser === 'function') {
-                                const user = await window.puter.auth.getUser();
-                                if (user && (user.username || user.email)) {
-                                    isAccountSignedIn = true;
-                                    setAccountDisplay(
-                                        user.username || user.email.split('@')[0],
-                                        user.email || `${user.username}@workspace.local`,
-                                        'Connected Profile',
-                                        true
-                                    );
-                                    return;
-                                }
-                            }
-                        }
-                    } catch (_) {}
-                    isAccountSignedIn = false;
-                    setAccountDisplay('Workspace Member', 'member@workspace.local', 'Personal Workspace', false);
-                }
-
-                if (actionBtn) {
-                    actionBtn.addEventListener('click', () => checkAccountSession(true));
-                }
-
-                await checkAccountSession(false);
-            })();
-
-            if (savedSessions.some(s => s.id === currentSessionId)) {
-                window.loadSavedSession(currentSessionId);
-            }
-        })();
+            clearChatBtn.addEventListener('click', resetChat);
+            newChatBtn.addEventListener('click', () => {
+                resetChat();
+                if(window.innerWidth < 1024) closeSidebar();
+            });
+            homeBtn.addEventListener('click', () => {
+                resetChat();
+                if(window.innerWidth < 1024) closeSidebar();
+            });
+            headerBrandBtn.addEventListener('click', resetChat);
+            
+            // Image Generation Mock
+            document.getElementById('generateImageBtn').addEventListener('click', () => {
+                const gallery = document.getElementById('imageGalleryGrid');
+                const empty = document.getElementById('emptyGalleryState');
+                if(empty) empty.style.display = 'none';
+                
+                showToast("Generating image...");
+                
+                setTimeout(() => {
+                    const imgPlaceholder = document.createElement('div');
+                    imgPlaceholder.className = "w-full aspect-square rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden relative group";
+                    imgPlaceholder.innerHTML = `<img src="https://placehold.co/400x400/282a2c/a8c7fa?text=AI+Generated" class="w-full h-full object-cover" alt="Generated">`;
+                    gallery.prepend(imgPlaceholder);
+                    showToast("Image generation complete.");
+                }, 1500);
+            });
+        });
     </script>
 </body>
 </html>
