@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-      <link rel="icon" type="image/png" sizes="32x32" href="./mei.png">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mei AI</title>
+    <title>Mei AI Workspace — Full App</title>
     <!-- Pre-paint theme initialization to prevent theme flicker -->
     <script>
         (function () {
@@ -228,7 +227,7 @@
                     <div id="meiEngineBanner" class="w-full max-w-lg mb-5 bg-gradient-to-r from-purple-100/90 via-blue-100/80 to-pink-100/90 dark:from-purple-900/40 dark:via-blue-900/30 dark:to-pink-900/40 border border-purple-300 dark:border-purple-500/30 rounded-2xl p-4 text-left shadow-lg backdrop-blur-md">
                         <div class="flex items-center justify-between gap-2 mb-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
                             <span>Mei AI Neural Engine Ready</span>
-                            <span id="bannerModelCount" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-purple-500/15 dark:bg-purple-500/20 text-purple-700 dark:text-purple-200 border border-purple-400/30">120 Models + Web</span>
+                            <span id="bannerModelCount" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-purple-500/15 dark:bg-purple-500/20 text-purple-700 dark:text-purple-200 border border-purple-400/30">1,050+ Models + Web</span>
                         </div>
                         <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
                             Searches the live web, inspects pasted links, generates <strong>Python (`python-pptx`)</strong> decks &amp; downloadable <strong>.pptx</strong> files, and renders live apps in <strong>Mei Canvas</strong>.
@@ -457,12 +456,27 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="block text-gray-700 dark:text-gray-300 font-medium">Default Model Engine</label>
-                    <select id="defaultModelSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2.5 text-gray-800 dark:text-gray-200 outline-none text-xs">
-                        <option value="mei-core">Mei-Core-1.0 (Recommended)</option>
-                        <option value="gpt-4">GPT-4 Turbo</option>
-                        <option value="claude-3">Claude 3 Opus</option>
-                    </select>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium">Default Model Engine (<span id="modelCountLabel">1,050</span> Mei Models)</label>
+                        <span id="selectedModelHint" class="text-[11px] text-purple-500 dark:text-purple-400 font-mono">Mei-Core-1.0</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="modelSearchInput" placeholder="Search 1,050+ Mei models (e.g. Coder, Ultra, 70B, Vision)..." class="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                        <select id="modelFamilyFilter" class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
+                            <option value="ALL">All Families</option>
+                            <option value="Mei-Core">Mei-Core</option>
+                            <option value="Mei-Ultra">Mei-Ultra</option>
+                            <option value="Mei-Coder">Mei-Coder</option>
+                            <option value="Mei-Reasoning">Mei-Reasoning</option>
+                            <option value="Mei-Vision">Mei-Vision</option>
+                            <option value="Mei-Research">Mei-Research</option>
+                            <option value="Mei-Nano">Mei-Nano</option>
+                            <option value="Mei-Creative">Mei-Creative</option>
+                            <option value="Mei-Math">Mei-Math</option>
+                            <option value="Mei-Agent">Mei-Agent</option>
+                        </select>
+                    </div>
+                    <select id="defaultModelSelect" size="5" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-1.5 text-gray-800 dark:text-gray-200 outline-none text-xs"></select>
                 </div>
 
                 <!-- Multiple API Key Profiles Manager -->
@@ -493,29 +507,6 @@
                         </div>
                     </div>
                     <p class="text-[10px] text-gray-500">Save as many API profiles as you want. Click any saved profile above to make it active, or fall back to other saved profiles automatically.</p>
-                </div>
-                    
-                    <!-- Saved Profiles List -->
-                    <div id="apiProfilesList" class="space-y-2 max-h-40 overflow-y-auto"></div>
-
-                    <!-- Add New Profile Form -->
-                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700/70 space-y-2">
-                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400">Add New Profile</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <input type="text" id="profileNameInput" placeholder="Profile Name (e.g. Personal Gemini)" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
-                            <select id="profileProviderSelect" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
-                                <option value="google">Google Gemini API</option>
-                                <option value="openrouter">OpenRouter API</option>
-                            </select>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="password" id="profileKeyInput" placeholder="Paste API Key (AIza... or sk-or-...)" class="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-gray-800 dark:text-gray-200 outline-none text-xs">
-                            <button id="addProfileBtn" type="button" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition cursor-pointer flex-shrink-0">
-                                <i class="fa-solid fa-plus mr-1"></i> Add
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-[10px] text-gray-500">Profiles are stored locally in your browser. Select an active profile to prioritize it in Tier 1/2.</p>
                 </div>
             </div>
             
@@ -562,6 +553,14 @@
             const profileProviderSelect = document.getElementById('profileProviderSelect');
             const profileKeyInput = document.getElementById('profileKeyInput');
             const addProfileBtn = document.getElementById('addProfileBtn');
+
+            // Mei Models Catalog Elements
+            const defaultModelSelect = document.getElementById('defaultModelSelect');
+            const modelSearchInput = document.getElementById('modelSearchInput');
+            const modelFamilyFilter = document.getElementById('modelFamilyFilter');
+            const modelCountLabel = document.getElementById('modelCountLabel');
+            const selectedModelHint = document.getElementById('selectedModelHint');
+            const bannerModelCount = document.getElementById('bannerModelCount');
             
             // Chat UI
             const messageInput = document.getElementById('messageInput');
@@ -592,6 +591,93 @@
             const toggleCanvasFullscreenBtn = document.getElementById('toggleCanvasFullscreenBtn');
             const mainChatArea = document.getElementById('mainChatArea');
             const canvasFullscreenIcon = document.getElementById('canvasFullscreenIcon');
+
+            // --- 1,050+ Mei Models Catalog Generator ---
+            const MEI_FAMILIES = [
+                { prefix: 'Mei-Core', desc: 'Balanced general intelligence & web synthesis' },
+                { prefix: 'Mei-Ultra', desc: 'Flagship deep reasoning & multi-step synthesis' },
+                { prefix: 'Mei-Coder', desc: 'Full-stack software engineering & live Canvas' },
+                { prefix: 'Mei-Reasoning', desc: 'Chain-of-thought logic & formal verification' },
+                { prefix: 'Mei-Vision', desc: 'Multimodal visual & spatial understanding' },
+                { prefix: 'Mei-Research', desc: 'Deep literature & live web citations' },
+                { prefix: 'Mei-Nano', desc: 'Ultra-low-latency instant response engine' },
+                { prefix: 'Mei-Creative', desc: 'Long-form storytelling, decks & worldbuilding' },
+                { prefix: 'Mei-Math', desc: 'Symbolic computation & theorem proving' },
+                { prefix: 'Mei-Agent', desc: 'Autonomous tool-calling & workflow execution' }
+            ];
+            const MEI_VERSIONS = ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0'];
+            const MEI_TIERS = ['Lite', 'Standard', 'Pro', 'Max', 'Turbo', 'Flash', 'Preview', 'Instruct', 'Omni', 'Deep', 'HD', 'Quantum', '8B', '32B', '70B', '405B'];
+
+            const meiModelsCatalog = [
+                { id: 'Mei-Core-1.0', name: 'Mei-Core-1.0 (Recommended)', family: 'Mei-Core', desc: 'Default flagship balanced engine' }
+            ];
+
+            for (const fam of MEI_FAMILIES) {
+                for (const ver of MEI_VERSIONS) {
+                    for (const tier of MEI_TIERS) {
+                        const modelName = `${fam.prefix}-${ver}-${tier}`;
+                        meiModelsCatalog.push({
+                            id: modelName,
+                            name: `${modelName} — ${fam.desc}`,
+                            family: fam.prefix,
+                            desc: fam.desc
+                        });
+                    }
+                }
+            }
+
+            let selectedMeiModel = localStorage.getItem('mei_selected_model') || 'Mei-Core-1.0';
+
+            function updateModelDisplayBadges() {
+                if (selectedModelHint) selectedModelHint.textContent = selectedMeiModel;
+                if (bannerModelCount) bannerModelCount.textContent = `${meiModelsCatalog.length.toLocaleString()} Models + Web`;
+                const active = getActiveProfile();
+                if (active) {
+                    activeModelBadge.textContent = `${selectedMeiModel} • ${active.name}`;
+                } else {
+                    activeModelBadge.textContent = selectedMeiModel;
+                }
+            }
+
+            function renderMeiModelsList() {
+                if (!defaultModelSelect) return;
+                const query = (modelSearchInput?.value || '').trim().toLowerCase();
+                const family = modelFamilyFilter?.value || 'ALL';
+
+                const filtered = meiModelsCatalog.filter(m => {
+                    const matchesFamily = family === 'ALL' || m.family === family;
+                    const matchesQuery = !query || m.name.toLowerCase().includes(query);
+                    return matchesFamily && matchesQuery;
+                });
+
+                if (modelCountLabel) {
+                    modelCountLabel.textContent = `${filtered.length.toLocaleString()} / ${meiModelsCatalog.length.toLocaleString()}`;
+                }
+
+                const fragment = document.createDocumentFragment();
+                filtered.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.textContent = m.name;
+                    if (m.id === selectedMeiModel) opt.selected = true;
+                    fragment.appendChild(opt);
+                });
+
+                defaultModelSelect.innerHTML = '';
+                defaultModelSelect.appendChild(fragment);
+            }
+
+            if (modelSearchInput) modelSearchInput.addEventListener('input', renderMeiModelsList);
+            if (modelFamilyFilter) modelFamilyFilter.addEventListener('change', renderMeiModelsList);
+            if (defaultModelSelect) {
+                defaultModelSelect.addEventListener('change', () => {
+                    if (defaultModelSelect.value) {
+                        selectedMeiModel = defaultModelSelect.value;
+                        localStorage.setItem('mei_selected_model', selectedMeiModel);
+                        updateModelDisplayBadges();
+                    }
+                });
+            }
 
             // --- API Key Profiles Management ---
             let apiProfiles = [];
@@ -631,11 +717,10 @@
                 const active = getActiveProfile();
                 if (active) {
                     activeProfileIndicator.textContent = `Active: ${active.name}`;
-                    activeModelBadge.textContent = `${active.name} (${active.provider === 'google' ? 'Gemini' : 'OpenRouter'})`;
                 } else {
                     activeProfileIndicator.textContent = 'Default Free Tier';
-                    activeModelBadge.textContent = 'Mei-Core-1.0';
                 }
+                updateModelDisplayBadges();
 
                 if (apiProfiles.length === 0) {
                     apiProfilesList.innerHTML = `<div class="text-xs text-gray-500 italic py-2 text-center">No custom profiles saved. Using free fallback tiers.</div>`;
@@ -726,6 +811,7 @@
                 showToast(`Added and activated "${name}"`);
             });
 
+            renderMeiModelsList();
             loadApiProfiles();
 
             // --- Utilities ---
@@ -1051,7 +1137,7 @@
                         contents: chatHistory,
                         tools: [{ "google_search": {} }],
                         systemInstruction: {
-                            parts: [{ text: "Your name is Mei. Always refer to yourself as Mei (never say 'Mei AI' or 'an AI language model'). Be warm, intelligent, and helpful. You have access to Google Search—use it whenever up-to-date information is needed. If asked to generate a web app, output a complete single-file HTML document enclosed in ```html backticks." }]
+                            parts: [{ text: `Your name is Mei (running active engine ${selectedMeiModel}). Always refer to yourself as Mei (never say 'Mei AI' or 'an AI language model'). Be warm, intelligent, and helpful. You have access to Google Search—use it whenever up-to-date information is needed. If asked to generate a web app, output a complete single-file HTML document enclosed in \`\`\`html backticks.` }]
                         }
                     };
                     
@@ -1104,7 +1190,7 @@
                                 body: JSON.stringify({
                                     model: "mistralai/mistral-7b-instruct:free",
                                     messages: [
-                                        { role: "system", content: "Your name is Mei. Always refer to yourself as Mei. Be warm, intelligent, and helpful. If asked to generate a web app, output a complete single-file HTML document enclosed in ```html backticks." },
+                                        { role: "system", content: `Your name is Mei (running active engine ${selectedMeiModel}). Always refer to yourself as Mei. Be warm, intelligent, and helpful. If asked to generate a web app, output a complete single-file HTML document enclosed in \`\`\`html backticks.` },
                                         ...openRouterMessages
                                     ]
                                 }),
@@ -1131,7 +1217,7 @@
                                         headers: { "Content-Type": "application/json" },
                                         body: JSON.stringify({
                                             messages: [
-                                                { role: "system", content: "Your name is Mei. Always refer to yourself as Mei. Be warm, intelligent, and helpful. If asked to generate a web app, output a complete single-file HTML document enclosed in ```html backticks." },
+                                                { role: "system", content: `Your name is Mei (running active engine ${selectedMeiModel}). Always refer to yourself as Mei. Be warm, intelligent, and helpful. If asked to generate a web app, output a complete single-file HTML document enclosed in \`\`\`html backticks.` },
                                                 ...openRouterMessages
                                             ],
                                             model: "openai",
